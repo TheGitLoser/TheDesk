@@ -11,10 +11,13 @@
 |
 */
 
-Route::get('/', function () {
-    return view('logoutHome');
-});
 
-Route::get('/home', function () {
-    return view('loginHome');
-}) -> name('home');
+// logout pages
+Route::get('/', function () { return view('logout.home'); }) -> name('logout.home');
+Route::get('login', 'LogoutController@index') -> name('logout.login');
+Route::get('register', function () { return view('logout.register'); }) -> name('logout.register');
+Route::get('forgotPassword', function () { return view('logout.forgotPassword'); }) -> name('logout.forgotPassword');
+Route::get('resetPassword', 'LogoutController@resetPassword') -> name('logout.resetPassword');
+
+
+Route::get('/home', function () { return view('login.home'); }) -> name('home');

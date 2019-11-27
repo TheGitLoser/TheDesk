@@ -1,4 +1,4 @@
-@extends('layouts.logout.app', ['activePage' => 'welcome', 'title' => "The Desk"])
+@extends('logout.layout.app', ['activePage' => 'home', 'title' => "The Desk"])
 
 @section('content')
 <div class="container" style="height: auto;">

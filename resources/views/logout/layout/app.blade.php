@@ -2,12 +2,12 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    @include('layouts.logout.header')
+    @include('logout.layout.header')
 </head>
 
-<body>
+<body class="off-canvas-sidebar">
 
-    @include('layouts.logout.navbar')
+    @include('logout.layout.navbar')
 
     <div class="wrapper wrapper-full-page">
         <div class="page-header login-page header-filter" filter-color="black"
@@ -17,12 +17,12 @@
             
             @yield('content')
 
-            @include('layouts.logout.footer')
+            @include('logout.layout.footer')
 
         </div>
     </div>
 
-    @include('layouts.logout.endScript')
+    @include('logout.layout.endScript')
 
 </body>
 
