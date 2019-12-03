@@ -4,7 +4,7 @@
 <div class="container" style="height: auto;">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-md-8">
-            <h1 class="text-white text-center">Welcome to Material Dashboard FREE Laravel Live Preview.</h1>
+            <h1 class="text-white text-center">Welcome to The Desk.</h1>
         </div>
         
         <div class="col-lg-4 col-md-6 col-sm-8 ml-auto mr-auto">

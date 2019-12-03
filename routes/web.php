@@ -11,13 +11,18 @@
 |
 */
 
+Route::get('/test', 'TemplateController@test') -> name('test');
+// Route::get('/test/{a}', 'TemplateController@test') -> name('test');
 
 // logout pages
-Route::get('/', function () { return view('logout.home'); }) -> name('logout.home');
-Route::get('login', 'LogoutController@index') -> name('logout.login');
-Route::get('register', function () { return view('logout.register'); }) -> name('logout.register');
-Route::get('forgotPassword', function () { return view('logout.forgotPassword'); }) -> name('logout.forgotPassword');
-Route::get('resetPassword', 'LogoutController@resetPassword') -> name('logout.resetPassword');
+Route::get('/', 'AuthController@home') -> name('logout.home');
+Route::get('/login', 'AuthController@index') -> name('logout.login');
+Route::get('/register', 'AuthController@register') -> name('logout.register');
+Route::get('/forgotPassword', 'AuthController@forgotPassword') -> name('logout.forgotPassword');
+Route::get('/resetPassword', 'AuthController@resetPassword') -> name('logout.resetPassword');
+
+Route::post('/ajaxLogin', 'AuthController@ajaxLogin') -> name('ajax.login');
+Route::post('/ajaxRegister', 'AuthController@ajaxRegister') -> name('ajax.register');
 
 
-Route::get('/home', function () { return view('login.home'); }) -> name('home');
+Route::get('/home', 'PageController@index') -> name('login.home');

@@ -3,9 +3,12 @@
 @section('content')
 <div class="container" style="height: auto;">
     <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-8">
+            <h1 class="text-white text-center">Welcome to The Desk.</h1>
+        </div>
         
-        <div class="col-12 ml-auto mr-auto">
-            <form class="form" method="POST" action="#">
+        <div class="col-lg-4 col-md-6 col-sm-8 ml-auto mr-auto">
+            <form class="form" id="form" method="POST">
                     @csrf
                 
                     <div class="card card-login card-hidden mb-3">
@@ -24,38 +27,28 @@
                             </div>
                         </div>
                         <div class="card-body ">
-                            <p class="card-description text-center">text</p>
-                            <div class="bmd-form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
+                            <p class="card-description text-center">Welcome</p>
+                            <div class="bmd-form-group">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
                                             <i class="material-icons">face</i>
                                         </span>
                                     </div>
-                                    <input type="text" name="name" class="form-control" placeholder="Name..." required>
+                                    <input type="text" name="name" id="name" class="form-control" placeholder="Name..." required>
                                 </div>
-                                @if ($errors->has('name'))
-                                <div id="name-error" class="error text-danger pl-3" for="name" style="display: block;">
-                                    <strong>{{ $errors->first('name') }}</strong>
-                                </div>
-                                @endif
                             </div>
-                            <div class="bmd-form-group{{ $errors->has('email') ? ' has-danger' : '' }} mt-3">
+                            <div class="bmd-form-group mt-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
                                             <i class="material-icons">email</i>
                                         </span>
                                     </div>
-                                    <input type="email" name="email" class="form-control" placeholder="Email..." required>
+                                    <input type="email" name="email" id="email" class="form-control" placeholder="Email..." required>
                                 </div>
-                                @if ($errors->has('email'))
-                                <div id="email-error" class="error text-danger pl-3" for="email" style="display: block;">
-                                    <strong>{{ $errors->first('email') }}</strong>
-                                </div>
-                                @endif
                             </div>
-                            <div class="bmd-form-group{{ $errors->has('password') ? ' has-danger' : '' }} mt-3">
+                            <div class="bmd-form-group mt-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
@@ -64,32 +57,40 @@
                                     </div>
                                     <input type="password" name="password" id="password" class="form-control" placeholder="Password..." required>
                                 </div>
-                                @if ($errors->has('password'))
-                                <div id="password-error" class="error text-danger pl-3" for="password" style="display: block;">
-                                    <strong>{{ $errors->first('password') }}</strong>
-                                </div>
-                                @endif
                             </div>
-                            <div class="bmd-form-group{{ $errors->has('password_confirmation') ? ' has-danger' : '' }} mt-3">
+                            <div class="bmd-form-group mt-3">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
                                             <i class="material-icons">lock_outline</i>
                                         </span>
                                     </div>
-                                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm Password..." required>
+                                    <input type="password" name="passwordConfirmation" id="passwordConfirmation" class="form-control" placeholder="Confirm Password..." required>
                                 </div>
-                                @if ($errors->has('password_confirmation'))
-                                <div id="password_confirmation-error" class="error text-danger pl-3" for="password_confirmation"
-                                    style="display: block;">
-                                    <strong>{{ $errors->first('password_confirmation') }}</strong>
+                            </div>
+                            <div class="bmd-form-group mt-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="material-icons">phone</i>
+                                        </span>
+                                    </div>
+                                    <input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone..." required>
                                 </div>
-                                @endif
+                            </div>
+                            <div class="bmd-form-group mt-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="material-icons">calendar_today</i>
+                                        </span>
+                                    </div>
+                                    <input type="date" name="DOB" id="DOB" class="form-control" placeholder="Date of birth..." required>
+                                </div>
                             </div>
                             <div class="form-check mr-auto ml-3 mt-3">
                                 <label class="form-check-label">
-                                    <input class="form-check-input" type="checkbox" id="policy" name="policy"
-                                        {{ old('policy', 1) ? 'checked' : '' }}>
+                                    <input class="form-check-input" type="checkbox" id="policy" name="policy" required>
                                     <span class="form-check-sign">
                                         <span class="check"></span>
                                     </span>
@@ -97,6 +98,7 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer justify-content-center">
                             <button type="submit" class="btn btn-primary btn-link btn-lg">Create account</button>
                         </div>
@@ -118,3 +120,36 @@
     </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+    $('#form').submit(function(e){
+        e.preventDefault();
+        $.ajaxSetup({
+            headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: "{{ route('ajax.register') }}",
+            method: 'post',
+            data: {
+                name: $('#name').val(),
+                email: $('#email').val(),
+                password: $('#password').val(),
+                passwordConfirmation: $('#passwordConfirmation').val(),
+                phone: $('#phone').val(),
+                DOB: $('#DOB').val(),
+            },
+            success: function(response){
+                if (response['output']['result'] == 'true') {
+                    window.location = response['output']['redirect'];
+                }else{
+                    $('#errorMsg').text(response['output']['message']);
+                    console.log(response['output']['message']);
+                }
+            }
+        });
+    });
+</script>
+@endpush
