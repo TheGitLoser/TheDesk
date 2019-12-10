@@ -42,11 +42,22 @@ class TemplateController extends Controller
                     ->first()->toArray();
 
                 
-        // $count = $user -> count();
-        $count = 'a';
+         $user = User::select('unique_id', 'name', 'display_id')
+         -> where('type', 'indi')
+         -> where('status', '1')
+         ->get();
+        //dd($user);
+        $count = $user->toArray();
+ 
+        $result = DB::select('SELECT count(*) as count FROM contact_list where user_id = :user_id 
+                                and contact_user_id = (
+                        SELECT id FROM user WHERE unique_id = :contact_user_id ) 
+                        and status = 1',
+                        ['user_id' => $myId, 'contact_user_id' => $unique_id]);
+
 
       
-        $user = $user['email'];
+      //  $user = $count['display_id'];
         // $user = $user[0]['email'];  if not get first row only
 
        // return response()->json($test);
@@ -55,12 +66,14 @@ class TemplateController extends Controller
        
        // $request->session()->has('users')  exists
        $request->session()->put('user.auth', 'indi');
-       $output = $request->session()->get('user');
+       $output = $request->session()->get('user.info.unique_id');
+       dd($output);
        
        // $request->session()->forget(['key1', 'key2']);
-       $request->session()->flush();
+    //   $request->session()->flush();
        
        $session = $request->session()->all();
+      //  dd($session);
 
 $count = userTypeAccess($request, ['indi']);
 

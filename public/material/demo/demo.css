@@ -54,12 +54,6 @@
   z-index: 2;
 }
 
-#map {
-  z-index: 2;
-  height: calc(100vh - 70px);
-  margin-top: 70px;
-}
-
 .off-canvas-sidebar .wrapper-full-page~.fixed-plugin .dropdown .dropdown-menu
 {
   -webkit-transform:none;

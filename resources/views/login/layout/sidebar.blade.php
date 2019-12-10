@@ -6,12 +6,35 @@
         Tip 2: you can also add an image using data-image tag
     -->
     <div class="logo">
-        <a href="https://creative-tim.com/" class="simple-text logo-normal">
-            {{ __('Creative Tim') }}
+        <a href="{{ route('login.home') }}" class="simple-text logo-normal">
+            The Desk
         </a>
     </div>
     <div class="sidebar-wrapper">
         <ul class="nav">
+            <li class="nav-item{{ $activePage == 'discover' ? ' active' : '' }}">
+                <a class="nav-link" href="{{ route('login.chatroom.discover') }}">
+                    <i class="material-icons">dashboard</i>
+                    <p>Discover</p>
+                </a>
+            </li>
+            <li class="nav-item{{ $activePage == 'contacts' ? ' active' : '' }}">
+                <a class="nav-link" href="{{ route('login.chatroom.contacts') }}">
+                    <i class="material-icons">dashboard</i>
+                    <p>Contacts</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <div class="sidebar-search">
+                    <form class="form-inline" action="/action_page.php">
+                        <input type="text" class="form-control sidebar-search-input" placeholder="Search...">
+                        <button type="submit" class="btn btn-white btn-round btn-just-icon">
+                            <i class="material-icons">search</i>
+                            <div class="ripple-container"></div>
+                        </button>
+                    </form>
+                </div>
+            </li>
             <li class="nav-item{{ $activePage == 'dashboard' ? ' active' : '' }}">
                 <a class="nav-link" href="">
                     <i class="material-icons">dashboard</i>
@@ -76,12 +99,6 @@
                 <a class="nav-link" href="">
                     <i class="material-icons">language</i>
                     <p>{{ __('RTL Support') }}</p>
-                </a>
-            </li>
-            <li class="nav-item active-pro{{ $activePage == 'upgrade' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">unarchive</i>
-                    <p>{{ __('Upgrade to PRO') }}</p>
                 </a>
             </li>
         </ul>

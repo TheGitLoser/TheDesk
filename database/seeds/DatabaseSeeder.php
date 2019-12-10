@@ -43,9 +43,9 @@ class DatabaseSeeder extends Seeder
                 [
                     'unique_id' => 'owirje34rea3q0',
                     'name' => 'indi name',
-                    'display_name' => 'Indi. name',
+                    'display_id' => 'Indi. name',
                     'email' => 'test@example.com',
-                    'password' => '',
+                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
                     'type' => 'indi',
                     'phone' => '12345678',
                     'status' => '1'
@@ -53,9 +53,9 @@ class DatabaseSeeder extends Seeder
                 [
                     'unique_id' => 'dfghhroegdf',
                     'name' => 'business user',
-                    'display_name' => 'Business user',
+                    'display_id' => 'Business user',
                     'email' => 'buesinessuser@example.com',
-                    'password' => '',
+                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
                     'type' => 'business',
                     'phone' => '12345678',
                     'status' => '1'

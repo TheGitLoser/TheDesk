@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Auth;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -10,60 +9,64 @@ class AuthController extends Controller
 {
     public function home(Request $request)
     {
-        if (userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('login.home');
-        }else{
+        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.home');
+        }else{
+            return redirect()->route('login.home');
         }
     }
     public function index(Request $request)
     {
-        if (userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('login.home');
-        }else{
+        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.login');
+        }else{
+            return redirect()->route('login.home');
         }
     }
 
     public function register(Request $request)
     {
-        if (userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('login.home');
-        }else{
+        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.register');
+        }else{
+            return redirect()->route('login.home');
         }
     }
     public function forgotPassword(Request $request)
     {
-        if (userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('login.home');
-        }else{
+        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.forgotPassword');
+        }else{
+            return redirect()->route('login.home');
         }
     }
     public function resetPassword(Request $request)
     {
-        if (userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('login.home');
-        }else{
+        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.resetPassword');
+        }else{
+            return redirect()->route('login.home');
         }
+    }
+    public function logout(Request $request){
+        $request->session()->flush();
+        return redirect()->route('logout.home');
     }
 
     public function ajaxLogin(Request $request)
     {
         $input = $request->only('email', 'password', 'remember');
         
-        $user = User::select('unique_id', 'type', 'password', 'status', 'name', 'display_name')
+        $user = User::select('id', 'unique_id', 'type', 'password', 'status', 'name', 'display_id')
                     -> where('email', $input['email'])
                     -> where('status', '1')
                     ->get();
         $count = $user->count();
         $user = $user->toArray();
-
+        
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
-            $userInfo = array('unique_id' => $user['unique_id'], 'name' => $user['name'], 'display_name' => $user['display_name']);
+            $userInfo = array('id' => $user['id'], 'uniqueId' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
             $request->session()->put('user.auth', 'indi');
             $request->session()->put('user.info', $userInfo);
 
@@ -89,7 +92,7 @@ class AuthController extends Controller
             $user = new User;
             $user->unique_id = $uniqid;
             $user->name = $input['name'];
-            $user->display_name = $input['name'];
+            $user->display_id = $input['name'];  // should unique
             $user->email = $input['email'];
             $user->password = password_hash($input['password'], PASSWORD_DEFAULT, ['cost'=> 11]);
             $user->type = 'indi';
@@ -98,7 +101,9 @@ class AuthController extends Controller
             
             $user->save();
 
-            $userInfo = array('unique_id' => $user['unique_id'], 'name' => $user['name'], 'display_name' => $user['display_name']);
+            $myId = User::select('id')->where('email', $input['email'])->toArray();
+
+            $userInfo = array('id' => $user['id'], 'uniqueId' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
             $request->session()->put('user.auth', 'indi');
             $request->session()->put('user.info', $userInfo);
 
@@ -109,23 +114,4 @@ class AuthController extends Controller
         return response()->json(compact('output'));
     }
 
-    public function show(Auth $auth)
-    {
-        //
-    }
-
-    public function edit(Auth $auth)
-    {
-        //
-    }
-
-    public function update(Request $request, Auth $auth)
-    {
-        //
-    }
-
-    public function destroy(Auth $auth)
-    {
-        //
-    }
 }

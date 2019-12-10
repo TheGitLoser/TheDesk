@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Contact extends Model
 {
-    protected $table = 'user';
+    protected $table = 'contact_list';
     const CREATED_AT = 'create_at';
     const UPDATED_AT = 'update_at';
-
-    public function contact()
+    public function user()
     {
-        return $this->hasMany('App\Models\Contact', 'user_id');
+        return $this->belongsTo('App\Models\User');
     }
 }

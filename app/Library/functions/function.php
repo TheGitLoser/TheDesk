@@ -1,6 +1,9 @@
 <?php
 
     use Illuminate\Http\Request;
+    
+    use App\Models\User;
+
     // generate an unique id
     function getUniqid($table = NULL, $colName = NULL){
         return strtoupper(base_convert(uniqid(mt_rand()),16,36));
@@ -15,4 +18,13 @@
             }
         }
         return false;
+    }
+
+    function getMyId(Request $request){
+        return $request->session()->get('user.info.id');
+    }
+    
+    function uniqueIdToId($uniqueId){
+        $uniqueId = User::select('id')->where('unique_id', $uniqueId)->get()->toArray();
+        return $uniqueId[0]['id'];
     }
