@@ -59,6 +59,16 @@ class DatabaseSeeder extends Seeder
                     'type' => 'business',
                     'phone' => '12345678',
                     'status' => '1'
+                ],
+                [
+                    'unique_id' => 'ajkdh',
+                    'name' => 'Tommy',
+                    'display_id' => 'Tommy',
+                    'email' => 'tommy@example.com',
+                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
+                    'type' => 'indi',
+                    'phone' => '12345678',
+                    'status' => '1'
                 ]
             ]
         );

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Template extends Model
 {
-    // default table name => {class name}='s'
+    // default table name => {class name}+'s'
     protected $table = 'my_flights';
     // default PK = id
     protected $primaryKey = 'flight_id';

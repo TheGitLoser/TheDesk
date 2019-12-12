@@ -7,49 +7,49 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function home(Request $request)
+    public function home()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.home');
         }else{
             return redirect()->route('login.home');
         }
     }
-    public function index(Request $request)
+    public function index()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.login');
         }else{
             return redirect()->route('login.home');
         }
     }
 
-    public function register(Request $request)
+    public function register()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.register');
         }else{
             return redirect()->route('login.home');
         }
     }
-    public function forgotPassword(Request $request)
+    public function forgotPassword()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.forgotPassword');
         }else{
             return redirect()->route('login.home');
         }
     }
-    public function resetPassword(Request $request)
+    public function resetPassword()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return view('logout.resetPassword');
         }else{
             return redirect()->route('login.home');
         }
     }
-    public function logout(Request $request){
-        $request->session()->flush();
+    public function logout(){
+        session()->flush();
         return redirect()->route('logout.home');
     }
 
@@ -66,9 +66,9 @@ class AuthController extends Controller
         
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
-            $userInfo = array('id' => $user['id'], 'uniqueId' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
-            $request->session()->put('user.auth', 'indi');
-            $request->session()->put('user.info', $userInfo);
+            $userInfo = array('id' => $user['id'], 'uniqid' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
+            session()->put('user.auth', 'indi');
+            session()->put('user.info', $userInfo);
 
             $output['result'] = "true";
             $output['redirect'] = route('login.home');
@@ -88,7 +88,7 @@ class AuthController extends Controller
             $output['result'] = 'false';
             $output['message'] = 'Your email has been used';
         }else{
-            $uniqid = getUniqid();
+            $uniqid = \getUniqid();
             $user = new User;
             $user->unique_id = $uniqid;
             $user->name = $input['name'];
@@ -103,9 +103,9 @@ class AuthController extends Controller
 
             $myId = User::select('id')->where('email', $input['email'])->toArray();
 
-            $userInfo = array('id' => $user['id'], 'uniqueId' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
-            $request->session()->put('user.auth', 'indi');
-            $request->session()->put('user.info', $userInfo);
+            $userInfo = array('id' => $user['id'], 'uniqid' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
+            session()->put('user.auth', 'indi');
+            session()->put('user.info', $userInfo);
 
             $output['result'] = 'true';
             $output['redirect'] = route('login.home');

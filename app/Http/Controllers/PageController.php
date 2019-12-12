@@ -7,25 +7,25 @@ use Illuminate\Http\Request;
 // for logged in page
 class PageController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }else{
             return view('login.home');
         }
     }
-    public function profile(Request $request)
+    public function profile()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }else{
             return view('login.account.profile');
         }
     }
-    public function editPassword(Request $request)
+    public function editPassword()
     {
-        if (!userTypeAccess($request, ['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }else{
             return view('login.account.editPassword');

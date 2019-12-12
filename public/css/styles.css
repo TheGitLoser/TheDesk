@@ -12,3 +12,34 @@
 .info-icon {
     font-size: 20px !important;
 }
+.chatroom-info-left{
+    height: 0;
+    text-align: left;
+    color: black;
+    font-size: 16px;
+}
+
+.message-body{
+    position: relative;
+    height: 80%;
+    overflow: auto;
+}
+.message-body::-webkit-scrollbar {
+    display: none;
+}
+.message-item{
+    margin-bottom: 8px;
+}
+.message-item .col-1{
+    padding: 1px 1px 1px 1px;
+}
+.message-left{
+    text-align: left;
+}
+.message-right{
+    text-align: right;
+}
+.message-time{
+    text-align: right;
+    font-size: 10px;
+}

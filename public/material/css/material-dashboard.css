@@ -14538,7 +14538,8 @@ fieldset[disabled] .form-group.is-focused .togglebutton label {
 }
 
 .sidebar .sidebar-wrapper>.nav [data-toggle="collapse"]~div>ul>li>a .sidebar-mini,
-.sidebar .sidebar-wrapper .user .user-info [data-toggle="collapse"]~div>ul>li>a .sidebar-mini {
+.sidebar .sidebar-wrapper .user .user-info [data-toggle="collapse"]~div>ul>li>a .sidebar-mini,
+.user-name-icon {
   text-transform: uppercase;
   width: 30px;
   margin-right: 15px;
@@ -14885,7 +14886,7 @@ fieldset[disabled] .form-group.is-focused .togglebutton label {
 
 .main-panel>.content {
   margin-top: 70px;
-  padding: 30px 15px;
+  /* padding: 30px 15px; */
   min-height: calc(100vh - 123px);
 }
 

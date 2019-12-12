@@ -16,9 +16,11 @@ class CreateChatroomTable extends Migration
         Schema::create('chatroom', function (Blueprint $table) {
             $table->increments('id');
             $table->string('unique_id', 50);
+            $table->string('name', 50)->nullable();
             $table->mediumText('description')->nullable();
 
             $table->timestamp('create_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('update_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->string('status', 2)->default('1');
         });
     }

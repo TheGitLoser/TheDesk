@@ -22,7 +22,7 @@ class CreateUserTable extends Migration
             $table->string('password', 80);
             $table->string('type', 20);
             $table->string('phone', 10)->nullable();
-            $table->timestamp('DOB')->default(\DB::raw('CURRENT_TIMESTAMP'))->nullable();
+            $table->timestamp('DOB')->nullable();
             $table->mediumText('profile')->nullable();
             $table->string('profile_picture', 500)->nullable();  // URL
             

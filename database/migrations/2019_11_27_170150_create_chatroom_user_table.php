@@ -19,7 +19,7 @@ class CreateChatroomUserTable extends Migration
             $table->integer('user_id');
             
             $table->timestamp('create_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('leave_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('update_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->string('status', 2)->default('1');
         });
     }
