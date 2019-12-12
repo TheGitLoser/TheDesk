@@ -91,15 +91,16 @@ dd($chatroom);
         }
         foreach ($message as $item) {
             if($item->userUniqid == $myUniqid){
-                $item->type = 'myMessage';
+                $item->messageType = 'myMessage';
             }elseif($item->userType == $myUserType){
-                $item->type = 'sameType';
+                $item->messageType = 'sameType';
             }else{
-                $item->type = 'oppositeType';
+                $item->messageType = 'oppositeType';
             }
         }
         unset($chatroom[0]['id']);
-        return view('login.chatroom.chat')->with('chatroom', json_encode($chatroom))
+        return view('login.chatroom.chat')->with('chatroomUniqid', $chatroom['unique_id'])
+                                            ->with('chatroom', json_encode($chatroom))
                                             ->with('chatroomUser', json_encode($chatroomUser))
                                             ->with('message', json_encode($message));
 

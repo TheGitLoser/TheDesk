@@ -63,7 +63,7 @@
         var tempHtml = "";
         $.each(chatroomList, function(i, item) {
             var link = '{{ route('login.chatroom.chat',['unique_id'=> '']) }}/' + item.unique_id;
-            if(currentChatroomName == item.name){
+            if(currentChatroomName == item.unique_id){
                 active = 'active';
             }else{
                 active = '';

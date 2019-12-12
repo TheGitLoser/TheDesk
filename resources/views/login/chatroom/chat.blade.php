@@ -1,7 +1,7 @@
-@extends('login.layout.app', ['activePage' => 'contacts', 'title' => 'My contacts'])
+@extends('login.layout.app', ['activePage' => '', 'title' => $chatroomDetails['name'], 'currentChatroom' => $chatroomUniqid ])
 
 @section('content')
-<div class="content">
+<div class="content" style="margin-top: 30px;">
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -26,27 +26,7 @@
                         </div>
                     </div>
                     <div class="card-body message-body" id="message-body">
-                        <div class="row message-item">
-                            <div class="col-1">
-                                <img src="https://placehold.it/50/FA6F57/fff&amp;text=LS" alt="LS"
-                                    class="rounded-circle mx-auto d-block">
-                            </div>
-                            <div class="col-9">
-                                {!! $chatroom !!}
-
-                                {!! $chatroomUser !!}{!! $message !!}
-                            </div>
-                        </div>
-                        <div class="row message-item">
-                            <div class="col-2"></div>
-                            <div class="col-9">
-                                {!! $chatroom !!}{!! $chatroomUser !!}{!! $message !!}
-                            </div>
-                            <div class="col-1">
-                                <img src="https://placehold.it/50/FA6F57/fff&amp;text=RS" alt="RS"
-                                    class="rounded-circle mx-auto d-block">
-                            </div>
-                        </div>
+                        Loading...
 
                     </div>
                     <div class="card-footer row">
@@ -73,20 +53,34 @@
 <script>
     // style 
     $(function(){
-        $('.message-body').height($(window).height() * 0.6);
+        $('.message-body').height($(window).height() * 0.65);
         $( "footer" ).remove("footer");
+        $('a.navbar-brand').remove();
     })
 </script>
 <script>
     var Server;
-        chatroom = {!! $chatroom !!};
+        chatroomUniqid = '{{ $chatroomUniqid }}';
+
+        chatroomUser = {!! $chatroomUser !!};
         var myUniqid = "@php echo getMyUniqid(); @endphp";
-        var initSocket = {type: "initChatroom",
-                            chatroomUniqid: chatroom['unique_id'],
-                            myUniqid: myUniqid};
-        var messageSend = {type: "sendMessage",
-                            chatroomUniqid: chatroom['unique_id'],
-                            myUniqid: myUniqid};
+        var myUserType = "@php echo session('user.auth'); @endphp";
+        var initSocket = {socketType: "initChatroom",
+                            chatroomUniqid: chatroomUniqid,
+                            myUniqid: myUniqid,
+                            myUserType :myUserType};
+        var currentChatroomUser = [];
+        $.each(chatroomUser, function(i, item) {
+            var temp = {};
+            temp['unique_id'] = item['unique_id'];
+            temp['type'] = item['type'];
+            currentChatroomUser.push(temp);
+        });
+        var messageSend = {socketType: "sendMessage",
+                            chatroomUniqid: chatroomUniqid,
+                            myUniqid: myUniqid,
+                            myUserType :myUserType,
+                            currentChatroomUser: currentChatroomUser};
 
 		function send( text ) {
 			Server.send( 'message', text );
@@ -106,6 +100,9 @@
             $('#inputMessage').on('keypress', function (e) {
                 if(e.which === 13){
                     $(this).attr("disabled", "disabled");
+                    // call ajax first
+                    messageSend['messageUniqid'] = 'tbc';
+                    messageSend['messageCreateAt'] = 'tbc';
                     messageSend['message'] = $('#inputMessage').val();
     
                     send(JSON.stringify(messageSend));
@@ -114,9 +111,15 @@
             });
 
 			// message received
-			Server.bind('message', function( payload ) {
-				console.log( payload );
-                response = JSON.parse(payload);
+			Server.bind('message', function( response ) {
+				console.log( response );
+                response = JSON.parse(response);
+                if(response['socketType'] == "newChatroomMessage"){
+                    outputMessage(response);
+                }else{
+                    console.log('noti only');
+                }
+
 			});
 
 			// server lost
@@ -154,22 +157,24 @@
         tempHtml += '</div></div>';
         return tempHtml;
     }
+    function outputMessage(message){
+        var outputHtml = '';
+        if(message['messageType'] == 'myMessage'){
+            outputHtml += messageRight(message);
+        }else if(message['messageType'] == 'sameType'){
+            outputHtml += messageRight(message);
+        }else{
+            //oppositeType
+            outputHtml += messageLeft(message);
+        }
+        $('#message-body').append(outputHtml);
+    }
     $(function() {
         var message = {!! $message !!};
-        var outputHtml ='';
-        $.each(message, function(i, item) {
-            if(item['type'] == 'myMessage'){
-                outputHtml += messageRight(item);
-            }else if(item['type'] == 'sameType'){
-                outputHtml += messageRight(item);
-            }else{
-                //oppositeType
-                outputHtml += messageLeft(item);
-            }
-        });
         $('#message-body').html('');
-        $('#message-body').append(outputHtml);
-
+        $.each(message, function(i, item) {
+            outputMessage(item);
+        });
     });
 
 </script>
