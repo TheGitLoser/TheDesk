@@ -15,73 +15,73 @@ function wsOnMessage($clientID, $message, $messageLength, $binary)
     if ($messageLength == 0) {
         $Server->wsClose($clientID);
         return;
-    }
-	$message = json_decode($message);	// to object
-//print_r($message);
-	// echo 'type= ' .$message->type .'\n';
-	switch ($message->socketType) {
-		case 'sendMessage':
-			// $id = client's id assigned by socket
-			$output['socketType'] = 'newChatroomMessage';	
-			$output['chatroomUniqid'] = $message->chatroomUniqid;	
-			$output['senderUniqid'] = $message->myUniqid;	
-			$output['senderUserType'] = $message->myUserType;	
-			// for output message
-			$output['messageUniqid'] = $message->messageUniqid;
-			$output['messageCreateAt'] = $message->messageCreateAt;
-			$output['message'] = $message->message;
-			
-var_dump($Server->wsClients);
-var_dump($message->currentChatroomUser);
-			foreach ($message->currentChatroomUser as $newMessageChatroomUser) {
-				echo 'open   ';
-				var_dump($newMessageChatroomUser);
-				foreach ($Server->wsClients as $id => $client) {
-					echo 'id='.$id.'   ';
-					$userInfo = $client[50];
-					var_dump($userInfo);
-					echo $userInfo['userUniqid'] .'                '. $newMessageChatroomUser->unique_id.'        ';
-					echo $userInfo['currentChatroomUniqid'] .'                '. $output['chatroomUniqid'];
-					// if user in this chatroom
-					if($userInfo['userUniqid'] == $newMessageChatroomUser->unique_id){
-						// if user in viewing this chatroom
-						if($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']){
-							$output['socketType'] = 'newChatroomMessage';	
-							if($userInfo['userUniqid'] == $output['senderUniqid']){
-								$output['messageType'] = 'myMessage';
-							}elseif($userInfo['userType'] == $output['senderUserType']){
-								$output['messageType'] = 'sameType';
-							}else{
-								$output['messageType'] = 'oppositeType';
-							}
-						}else{
-							$output['socketType'] = 'notiNewChatroomMessage';		
-						}
-						print_r($output);
-						$Server->wsSend($id, json_encode($output));
-						
-					}
-				}
-				
-			}
-			break;
-		case 'initChatroom':
-			$customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer
-			$customUserInfo['userUniqid'] = $message->myUniqid;
-			$customUserInfo['userType'] = $message->myUserType;
-			$customUserInfo['currentChatroomUniqid'] = $message->chatroomUniqid;
-
-			break;
-		case 'initNoti':
-			# code...
-			break;
-		default:
-			# code...
-			break;
 	}
+var_dump($message);
+$message = json_decode($message);	// to object
+var_dump($message);
+    //print_r($message);
+    // echo 'type= ' .$message->type .'\n';
+    switch ($message->socketType) {
+        case 'sendMessage':
+            // $id = client's id assigned by socket
+            $output['socketType'] = 'newChatroomMessage';
+            $output['chatroomUniqid'] = $message->chatroomUniqid;
+            $output['userUniqid'] = $message->myUniqid;
+            $output['userType'] = $message->myUserType;
+            // for output message
+            $output['messageUniqid'] = $message->messageUniqid;
+            $output['messageCreateAt'] = $message->messageCreateAt;
+            $output['message'] = $message->message;
+            
+// var_dump($Server->wsClients);
+// var_dump($message->currentChatroomUser);
+            foreach ($Server->wsClients as $id => $client) {
+                // echo 'open   ';
+                // var_dump($newMessageChatroomUser);
+                foreach ($message->currentChatroomUser as $newMessageChatroomUser) {
+                    // echo 'id='.$id.'   ';
+                    $userInfo = $client[50];
+                    // var_dump($userInfo);
+                    // echo $userInfo['userUniqid'] .'                '. $newMessageChatroomUser->unique_id.'        ';
+                    // echo $userInfo['currentChatroomUniqid'] .'                '. $output['chatroomUniqid'];
+                    // if user in this chatroom
+                    if ($userInfo['userUniqid'] == $newMessageChatroomUser->unique_id) {
+                        // if user in viewing this chatroom
+                        if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
+                            $output['socketType'] = 'newChatroomMessage';
+                            if ($userInfo['userUniqid'] == $output['userUniqid']) {
+                                $output['messageType'] = 'myMessage';
+                            } elseif ($userInfo['userType'] == $output['userType']) {
+                                $output['messageType'] = 'sameType';
+                            } else {
+                                $output['messageType'] = 'oppositeType';
+                            }
+                        } else {
+                            $output['socketType'] = 'notiNewChatroomMessage';
+                        }
+                        print_r($output);
+                        $Server->wsSend($id, json_encode($output));
+                    }
+                }
+            }
+            break;
+        case 'initChatroom':
+            $customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer
+            $customUserInfo['userUniqid'] = $message->myUniqid;
+            $customUserInfo['userType'] = $message->myUserType;
+            $customUserInfo['currentChatroomUniqid'] = $message->chatroomUniqid;
+
+            break;
+        case 'initNoti':
+            # code...
+            break;
+        default:
+            # code...
+            break;
+    }
 
 
-	//The speaker is the only person in the room. Don't let them feel lonely.
+    //The speaker is the only person in the room. Don't let them feel lonely.
     // if (sizeof($Server->wsClients) == 1) {
     //     $Server->wsSend($clientID, "There isn't anyone else in the room, but I'll still listen to you. --Your Trusty Server");
     // } else {
@@ -101,8 +101,7 @@ function wsOnOpen($clientID)
     $ip = long2ip($Server->wsClients[$clientID][6]);
 
     $Server->log("$ip ($clientID) has connected.");
-// print_r($Server);
-
+    // print_r($Server);
 }
 
 // when a client closes or lost connection
@@ -121,4 +120,3 @@ $Server->bind('close', 'wsOnClose');
 // for other computers to connect, you will probably need to change this to your LAN IP or external IP,
 // alternatively use: gethostbyaddr(gethostbyname($_SERVER['SERVER_NAME']))
 $Server->wsStartServer('127.0.0.1', 9300);
-

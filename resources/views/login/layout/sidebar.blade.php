@@ -79,6 +79,36 @@
         });
         $('#chatroom').html(tempHtml);
     });
+    // search chatroom
+    $('#sdf').on('keypress', function (e) {
+        if(e.which === 13){
+            $(this).attr("disabled", "disabled");
+            message = $('#inputMessage').val()
+            messageSend['message'] = message;
+            $.ajaxSetup({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "{{ route('login.chatroom.newMessage') }}",
+                method: 'post',
+                data: {
+                    chatroomUniqid: chatroomUniqid, 
+                    message: message
+                },
+                success: function(response){
+                    responseFromDB =  response['output'];
+                    messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
+                    messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                    Socket.send(JSON.stringify(messageSend));
+                    console.log(messageSend);
+                }
+            });
+            $(this).val('');
+            $(this).removeAttr("disabled");
+        }
+    });
 
 </script>
 

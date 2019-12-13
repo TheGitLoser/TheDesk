@@ -18,21 +18,8 @@ class ContactController extends Controller
                         ['myUserId' => $myUserId]);
         return $result;
     }
-    public function index(){
-        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('logout.login');
-        }
-        
-        $output = $this->getContact();
-
-        return view('login.chatroom.contacts')->with('output', json_encode($output));
-    }
-    
-    public function addContact($unique_id){
-        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('logout.login');
-        }
-        
+    // shared form this@addContact & Chatroom@addToChat
+    function checkContactExists($unique_id){
         $myId = getMyId();
         $contactUserId = uniqueIdToId($unique_id);
         $contact = Contact::where('user_id', $myId) 
@@ -52,6 +39,23 @@ class ContactController extends Controller
             $newContact->save();
 
         }
+    }
+    public function index(){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        
+        $output = $this->getContact();
+
+        return view('login.chatroom.contacts')->with('output', json_encode($output));
+    }
+    
+    public function addContact($unique_id){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        checkContactExists($unique_id);
+        
         return redirect()->route('login.chatroom.contacts');
     }
 

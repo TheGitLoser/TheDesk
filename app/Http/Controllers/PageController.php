@@ -12,6 +12,7 @@ class PageController extends Controller
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }else{
+            return redirect()->route('login.chatroom.discover');
             return view('login.home');
         }
     }

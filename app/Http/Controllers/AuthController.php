@@ -62,11 +62,11 @@ class AuthController extends Controller
                     -> where('status', '1')
                     ->get();
         $count = $user->count();
-        $user = $user->toArray();
+        $user = $user;
         
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
-            $userInfo = array('id' => $user['id'], 'uniqid' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
+            $userInfo = array('id' => $user->id, 'uniqid' => $user->unique_id, 'name' => $user->name, 'displayId' => $user->display_id);
             session()->put('user.auth', 'indi');
             session()->put('user.info', $userInfo);
 
@@ -101,9 +101,7 @@ class AuthController extends Controller
             
             $user->save();
 
-            $myId = User::select('id')->where('email', $input['email'])->toArray();
-
-            $userInfo = array('id' => $user['id'], 'uniqid' => $user['unique_id'], 'name' => $user['name'], 'displayId' => $user['display_id']);
+            $userInfo = array('id' => $user->id, 'uniqid' => $user->unique_id, 'name' => $user->name, 'displayId' => $user->display_id);
             session()->put('user.auth', 'indi');
             session()->put('user.info', $userInfo);
 

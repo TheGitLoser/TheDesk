@@ -1,4 +1,5 @@
-@extends('login.layout.app', ['activePage' => '', 'title' => $chatroomDetails['name'], 'currentChatroom' => $chatroomUniqid ])
+@extends('login.layout.app', ['activePage' => '', 'title' => $chatroomDetails['name'], 'currentChatroom' =>
+$chatroomUniqid ])
 
 @section('content')
 <div class="content" style="margin-top: 30px;">
@@ -49,132 +50,166 @@
 @endsection
 
 @push('js')
-<script src="http://server.localhost/PHPWebSocket-Chat/fancywebsocket.js"></script>
+{{-- socket --}}
 <script>
-    // style 
+    chatroomUniqid = '{{ $chatroomUniqid }}';
+
+    chatroomUser = {!! $chatroomUser !!};
+    var myUniqid = "@php echo getMyUniqid(); @endphp";
+    var myUserType = "@php echo session('user.auth'); @endphp";
+    var initSocket = {socketType: "initChatroom",
+                        chatroomUniqid: chatroomUniqid,
+                        myUniqid: myUniqid,
+                        myUserType :myUserType};
+    // for socket
+    var currentChatroomUser = [];
+    var responseFromDB;
+    // for html output
+    var participateInfo = [];
+    $.each(chatroomUser, function(i, item) {
+        // for socket
+        var temp = {};
+        temp['unique_id'] = item['unique_id'];
+        temp['type'] = item['type'];
+        currentChatroomUser.push(temp);
+        // for html output
+        participateInfo[item['unique_id']] = item;
+    });
+    var messageSend = {socketType: "sendMessage",
+                        chatroomUniqid: chatroomUniqid,
+                        myUniqid: myUniqid,
+                        myUserType :myUserType,
+                        currentChatroomUser: currentChatroomUser};
+
     $(function(){
-        $('.message-body').height($(window).height() * 0.65);
-        $( "footer" ).remove("footer");
-        $('a.navbar-brand').remove();
-    })
-</script>
-<script>
-    var Server;
-        chatroomUniqid = '{{ $chatroomUniqid }}';
+        var socketUrl = 'ws://127.0.0.1:9300';
+        var Socket = new WebSocket(socketUrl);
+        console.log(Socket.readyState);
 
-        chatroomUser = {!! $chatroomUser !!};
-        var myUniqid = "@php echo getMyUniqid(); @endphp";
-        var myUserType = "@php echo session('user.auth'); @endphp";
-        var initSocket = {socketType: "initChatroom",
-                            chatroomUniqid: chatroomUniqid,
-                            myUniqid: myUniqid,
-                            myUserType :myUserType};
-        var currentChatroomUser = [];
-        $.each(chatroomUser, function(i, item) {
-            var temp = {};
-            temp['unique_id'] = item['unique_id'];
-            temp['type'] = item['type'];
-            currentChatroomUser.push(temp);
+        Socket.onopen = function(event){
+            Socket.send(JSON.stringify(initSocket));
+        }
+
+        // send chatroom message
+        $('#inputMessage').on('keypress', function (e) {
+            if(e.which === 13){
+                $(this).attr("disabled", "disabled");
+                message = $('#inputMessage').val()
+                messageSend['message'] = message;
+                $.ajaxSetup({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                $.ajax({
+                    url: "{{ route('login.chatroom.newMessage') }}",
+                    method: 'post',
+                    data: {
+                        chatroomUniqid: chatroomUniqid, 
+                        message: message
+                    },
+                    success: function(response){
+                        responseFromDB =  response['output'];
+                        messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
+                        messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                        Socket.send(JSON.stringify(messageSend));
+                        console.log(messageSend);
+                    }
+                });
+                $(this).val('');
+                $(this).removeAttr("disabled");
+            }
         });
-        var messageSend = {socketType: "sendMessage",
-                            chatroomUniqid: chatroomUniqid,
-                            myUniqid: myUniqid,
-                            myUserType :myUserType,
-                            currentChatroomUser: currentChatroomUser};
 
-		function send( text ) {
-			Server.send( 'message', text );
-    console.log(text);
-		}
-        $(function(){
-			console.log('Connecting...');
-			Server = new FancyWebSocket('ws://127.0.0.1:9300');
-			
-			Server.bind('open', function() {
-                // init message
-                send(JSON.stringify(initSocket));
-				console.log( "Connected." );
-			});
+        // when message comes form server
+        Socket.onmessage = function(event){
+            response = JSON.parse(event['data']);
+            if(response['socketType'] == "newChatroomMessage"){
+                outputMessage(response);
+            }else{
+console.log('noti only');
+            }
+            console.log();
+        }
 
-            // send chatroom message
-            $('#inputMessage').on('keypress', function (e) {
-                if(e.which === 13){
-                    $(this).attr("disabled", "disabled");
-                    // call ajax first
-                    messageSend['messageUniqid'] = 'tbc';
-                    messageSend['messageCreateAt'] = 'tbc';
-                    messageSend['message'] = $('#inputMessage').val();
-    
-                    send(JSON.stringify(messageSend));
-                    $(this).removeAttr("disabled");
-                }
-            });
+        Socket.onclose = function(event){
+            console.log("Socket is closed now (onclose())");
+        }
+    });
 
-			// message received
-			Server.bind('message', function( response ) {
-				console.log( response );
-                response = JSON.parse(response);
-                if(response['socketType'] == "newChatroomMessage"){
-                    outputMessage(response);
-                }else{
-                    console.log('noti only');
-                }
-
-			});
-
-			// server lost
-			Server.bind('close', function( data ) {
-				console.log( "Disconnected." );
-			});
-
-
-			Server.connect();
-        });
 </script>
-@endpush
 
-@push('js')
+{{-- output message to html --}}
 <script>
-    
     function messageLeft(tempMessage){
+        var name = participateInfo[tempMessage['userUniqid']]['name'];
+        var profilePic = participateInfo[tempMessage['userUniqid']]['profile_picture'];
+        if(profilePic == null){
+            var initials = participateInfo[tempMessage['userUniqid']]['initials'];
+            profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+        }
+
         var tempHtml = '';
         tempHtml += '<div class="row message-item">';
         tempHtml += '<div class="col-1" id="message:' + tempMessage["messageUniqid"] +'">';
-        tempHtml += '<img src="https://placehold.it/50/FA6F57/fff&amp;text=LS" alt="LS" class="rounded-circle mx-auto d-block">';
+        tempHtml += profilePic;
         tempHtml += '</div><div class="col-9 message-left">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ tempMessage['messageCreateAt']+'</small>';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
         tempHtml += '</div></div>';
         return tempHtml;
         
     }
     function messageRight(tempMessage){
+        var name = participateInfo[tempMessage['userUniqid']]['name'];
+        var profilePic = participateInfo[tempMessage['userUniqid']]['profile_picture'];
+        if(profilePic == null){
+            var initials = participateInfo[tempMessage['userUniqid']]['initials'];
+            profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+        }
+
         var tempHtml = '';
         tempHtml += '<div class="row message-item">';
         tempHtml += '<div class="col-2"></div><div class="col-9 message-right" id="message:' + tempMessage["messageUniqid"] +'">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ tempMessage['messageCreateAt']+'</small>';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
         tempHtml += '</div><div class="col-1">';
-        tempHtml += '<img src="https://placehold.it/50/FA6F57/fff&amp;text=RS" alt="RS" class="rounded-circle mx-auto d-block">';
+        tempHtml += profilePic;
         tempHtml += '</div></div>';
         return tempHtml;
     }
     function outputMessage(message){
         var outputHtml = '';
-        if(message['messageType'] == 'myMessage'){
-            outputHtml += messageRight(message);
-        }else if(message['messageType'] == 'sameType'){
-            outputHtml += messageRight(message);
+        if(chatroomUser.length == 2){
+            if(message['userUniqid'] == myUniqid){
+                outputHtml += messageRight(message);    
+            }
+            else{
+                outputHtml += messageLeft(message);
+            }
         }else{
-            //oppositeType
-            outputHtml += messageLeft(message);
+            if(message['messageType'] == 'myMessage'){
+                outputHtml += messageRight(message);
+            }else if(message['messageType'] == 'sameType'){
+                outputHtml += messageRight(message);
+            }else{
+                //oppositeType
+                outputHtml += messageLeft(message);
+            }
         }
         $('#message-body').append(outputHtml);
+        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
     }
     $(function() {
-        var message = {!! $message !!};
+        // style adjust
+        $('.message-body').height($(window).height() * 0.65);
+        $( "footer" ).remove("footer");
+        $('a.navbar-brand').remove();
+
+        message = {!! $message !!};
         $('#message-body').html('');
         $.each(message, function(i, item) {
             outputMessage(item);
         });
+        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
     });
 
 </script>

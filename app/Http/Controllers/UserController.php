@@ -18,7 +18,7 @@ class UserController extends Controller
                     -> where('status', '1')
                     -> where('id', '<>', \getMyId())
                     ->get();
-        $output = $user->toArray();
+        $output = $user;
 
         return view('login.chatroom.discover')->with('output', json_encode($output));
     }
