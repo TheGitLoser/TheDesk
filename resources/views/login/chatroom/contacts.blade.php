@@ -3,7 +3,7 @@
 @section('content')
 <div class="content">
     <div class="container-fluid">
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-12">
 
                 <form class="form" id="form" method="GET">
@@ -49,7 +49,7 @@
                 </form>
             </div>
 
-        </div>
+        </div> --}}
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -58,12 +58,7 @@
                         <div class="card-icon">
                             <i class="material-icons">content_copy</i>
                         </div>
-                        <p class="card-category" style="height: 0;">
-                            Hide
-                            <i class="far fa-minus-square info-icon"></i>
-
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
+                        <p class="card-category">
                         </p>
                     </div>
                     <div class="card-body">
@@ -90,6 +85,11 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
+                            Hide
+                            <i class="far fa-minus-square info-icon"></i>
+
+                            Start to chat
+                            <i class="material-icons info-icon">chat</i>
                         </div>
                     </div>
                 </div>
@@ -105,18 +105,18 @@
 <script>
     var discoverList = {!! $output !!};
     $(function() {
-        function getTableButton(unique_id){
-            addContactButton = 'href="{{ route('login.chatroom.addContact',['unique_id'=> '']) }}/' + unique_id + '"';
-            startChatButton = 'href="{{ route('login.chatroom.startChat',['unique_id'=> '']) }}/' + unique_id + '"';
+        function getTableButton(uniqueId){
+            addContactButton = '{{ route('login.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
+            startChatButton = '{{ route('login.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
 
             output = '<td class="td-actions text-right td-button">';
-            output += '<a ' + addContactButton + '>';
+            output += '<a href="' + addContactButton + '">';
             output += '<button type="button" title="Hide" class="btn btn-primary btn-link btn-sm">';
             output += '<i class="far fa-minus-square td-icon"></i>';
             output += '</button></a></td>';
 
             output += '<td class="td-actions text-right td-button">';
-            output += '<a ' + startChatButton + '>';
+            output += '<a href="' + startChatButton + '">';
             output += '<button type="button" title="Start to chat" class="btn btn-primary btn-link btn-sm">';
             output += '<i class="material-icons td-icon">chat</i>';
             output += '</button></a></td>';
@@ -126,13 +126,12 @@
 
         var tempHtml = '<tbody>';
         $.each(discoverList, function(i, item) {
-            tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+            tempHtml += '<tr><td>' + item.name + ' <small>@' + item.unique_id + '</small><td>'
                         + getTableButton(item.unique_id)
                         + '</tr>';
         });
         tempHtml += '</tbody>';
          $('#ajaxTable').html(tempHtml);
-        // $('#ajaxTable').appendTo(tempHtml);
     });
 
 </script>

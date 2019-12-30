@@ -24,10 +24,12 @@
                     <p>Contacts</p>
                 </a>
             </li>
+
+            {{-- start chatroom --}}
             <li class="nav-item">
                 <div class="sidebar-search">
-                    <form class="form-inline" action="/action_page.php">
-                        <input type="text" class="form-control sidebar-search-input" placeholder="Search...">
+                    <form class="form-inline">
+                        <input type="text" class="form-control sidebar-search-input" placeholder="Search..." disabled>
                         <button type="submit" class="btn btn-white btn-round btn-just-icon">
                             <i class="material-icons">search</i>
                             <div class="ripple-container"></div>
@@ -35,72 +37,79 @@
                     </form>
                 </div>
             </li>
-            <li class="nav-item{{ $activePage == 'dashboard' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">dashboard</i>
-                    <p>{{ __('Dashboard') }}</p>
-                </a>
-            </li>
-            <li class="nav-item {{ ($activePage == 'profile' || $activePage == 'user-management') ? ' active' : '' }}">
-                <a class="nav-link" data-toggle="collapse" href="#laravelExample" aria-expanded="true">
-                    <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
-                    <p>{{ __('Laravel Examples') }}
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse show" id="laravelExample">
-                    <ul class="nav">
-                        <li class="nav-item{{ $activePage == 'profile' ? ' active' : '' }}">
-                            <a class="nav-link" href="">
-                                <span class="sidebar-mini"> UP </span>
-                                <span class="sidebar-normal">{{ __('User profile') }} </span>
-                            </a>
-                        </li>
-                        <li class="nav-item{{ $activePage == 'user-management' ? ' active' : '' }}">
-                            <a class="nav-link" href="">
-                                <span class="sidebar-mini"> UM </span>
-                                <span class="sidebar-normal"> {{ __('User Management') }} </span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item{{ $activePage == 'table' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">content_paste</i>
-                    <p>{{ __('Table List') }}</p>
-                </a>
-            </li>
-            <li class="nav-item{{ $activePage == 'typography' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">library_books</i>
-                    <p>{{ __('Typography') }}</p>
-                </a>
-            </li>
-            <li class="nav-item{{ $activePage == 'icons' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">bubble_chart</i>
-                    <p>{{ __('Icons') }}</p>
-                </a>
-            </li>
-            <li class="nav-item{{ $activePage == 'map' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">location_ons</i>
-                    <p>{{ __('Maps') }}</p>
-                </a>
-            </li>
-            <li class="nav-item{{ $activePage == 'notifications' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">notifications</i>
-                    <p>{{ __('Notifications') }}</p>
-                </a>
-            </li>
-            <li class="nav-item{{ $activePage == 'language' ? ' active' : '' }}">
-                <a class="nav-link" href="">
-                    <i class="material-icons">language</i>
-                    <p>{{ __('RTL Support') }}</p>
-                </a>
-            </li>
+            <div id="chatroom">
+                <li class="nav-item{{ $activePage == 'profile' ? ' active' : '' }}">
+                    <a class="nav-link" href="">
+                        <span class="sidebar-mini user-name-icon"> </span>
+                        <span class="sidebar-normal">Loding... </span>
+                    </a>
+                </li>
+            </div>
         </ul>
     </div>
 </div>
+
+@push('js')
+<script>
+    var chatroomList = {!! App\Http\Controllers\ChatroomController::getChatroomList() !!};
+    $(function() {
+        var currentChatroomName;
+        @php
+            if(isset($currentChatroom)){
+                echo 'currentChatroomName = "' . $currentChatroom .'"';
+            }
+        @endphp
+        
+        var tempHtml = "";
+        $.each(chatroomList, function(i, item) {
+            var link = '{{ route('login.chatroom.chat',['unique_id'=> '']) }}/' + item.unique_id;
+            if(currentChatroomName == item.unique_id){
+                active = 'active';
+            }else{
+                active = '';
+            }
+            var initials = item.initials;
+            var chatroomName = item.name;
+
+            tempHtml += '<li class="nav-item ' + active +'">';
+            tempHtml += '<a class="nav-link" href="' + link +'">';
+            tempHtml += '<span class="sidebar-mini user-name-icon"> ' + initials +' </span>';
+            tempHtml += '<span class="sidebar-normal">' + chatroomName +' </span>';
+            tempHtml += '</a></li>';
+        });
+        $('#chatroom').html(tempHtml);
+    });
+    // search chatroom
+    $('#sdf').on('keypress', function (e) {
+        if(e.which === 13){
+            $(this).attr("disabled", "disabled");
+            message = $('#inputMessage').val()
+            messageSend['message'] = message;
+            $.ajaxSetup({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                url: "{{ route('login.chatroom.newMessage') }}",
+                method: 'post',
+                data: {
+                    chatroomUniqid: chatroomUniqid, 
+                    message: message
+                },
+                success: function(response){
+                    responseFromDB =  response['output'];
+                    messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
+                    messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                    Socket.send(JSON.stringify(messageSend));
+                    console.log(messageSend);
+                }
+            });
+            $(this).val('');
+            $(this).removeAttr("disabled");
+        }
+    });
+
+</script>
+
+@endpush

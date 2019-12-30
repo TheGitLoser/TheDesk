@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateChatroomRequestTable extends Migration
+class CreateRequestTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateChatroomRequestTable extends Migration
      */
     public function up()
     {
-        Schema::create('chatroom_request', function (Blueprint $table) {
+        Schema::create('request', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
             $table->integer('business_plan_id'); 
@@ -32,6 +32,6 @@ class CreateChatroomRequestTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chatroom_request');
+        Schema::dropIfExists('request');
     }
 }

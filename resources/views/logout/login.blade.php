@@ -16,7 +16,7 @@
                     <div class="card-header card-header-primary text-center">
                         <h4 class="card-title"><strong>Login</strong></h4>
                         <div class="social-line">
-                            <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
+                            {{-- <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
                             <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
@@ -24,7 +24,7 @@
                             </a>
                             <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                                 <i class="fab fa-google-plus-g"></i>
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
 
@@ -40,7 +40,7 @@
                                         <i class="material-icons">email</i>
                                     </span>
                                 </div>
-                                <input type="email" name="email" id="email" class="form-control" placeholder="Email..." required value='test@example.com'>
+                                <input type="email" name="email" id="email" class="form-control" placeholder="Email..." required {{--value='test@example.com'--}}>
                             </div>
                         </div>
 
@@ -51,18 +51,18 @@
                                         <i class="material-icons">lock_outline</i>
                                     </span>
                                 </div>
-                                <input type="password" name="password" id="password" class="form-control" placeholder="Password..." required value='123'>
+                                <input type="password" name="password" id="password" class="form-control" placeholder="Password..." required {{--value='123'--}}>
                             </div>
                         </div>
 
                         <div class="form-check mr-auto ml-3 mt-3">
-                            <label class="form-check-label">
+                            {{-- <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" name="remember" id="remember">
                                 Remember me
                                 <span class="form-check-sign">
                                     <span class="check"></span>
                                 </span>
-                            </label>
+                            </label> --}}
                         </div>
                     </div>
                     <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
@@ -74,9 +74,9 @@
             <div class="row">
                 <div class="col-6">
                     {{-- @if (Route::has('password.request')) --}}
-                    <a href="{{ route('logout.forgotPassword') }}" class="text-light">
+                    {{-- <a href="{{ route('logout.forgotPassword') }}" class="text-light">
                         <small>Forgot password?</small>
-                    </a>
+                    </a> --}}
                     {{-- @endif --}}
                 </div>
                 <div class="col-6 text-right">

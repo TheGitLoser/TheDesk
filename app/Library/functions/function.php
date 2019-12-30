@@ -10,9 +10,9 @@
     }
 
     // check the user.Auth 
-    function userTypeAccess(Request $request, $acceptTypes){
-        if ($request->session()->has('user.auth')) {
-            $session = $request->session()->get('user.auth');   // indi, business, business admin, admin
+    function userTypeAccess($acceptTypes){
+        if (session()->has('user.auth')) {
+            $session = session('user.auth');   // indi, business, business admin, admin
             if (in_array($session, $acceptTypes)) {
                 return true;
             }
@@ -20,11 +20,26 @@
         return false;
     }
 
-    function getMyId(Request $request){
-        return $request->session()->get('user.info.id');
+    function getMyId(){
+        return session('user.info.id');
     }
-    
+    function getMyUniqid(){
+        return session('user.info.uniqid');
+    }
     function uniqueIdToId($uniqueId){
         $uniqueId = User::select('id')->where('unique_id', $uniqueId)->get()->toArray();
         return $uniqueId[0]['id'];
+    }
+    function displayIdToId($displayId){
+        $uniqueId = User::select('id')->where('display_id', $displayId)->get()->toArray();
+        return $uniqueId[0]['id'];
+    }
+
+    function initials($name){
+        $words = explode(" ", $name);
+        $initials = null;
+        foreach ($words as $w) {
+            $initials .= $w[0];
+        }
+        return $initials;
     }

@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    @include('login.layout.sidebarFilter')
+    {{-- @include('login.layout.sidebarFilter') --}}
     @include('login.layout.endScript')
 
 </body>

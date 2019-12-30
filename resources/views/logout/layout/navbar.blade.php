@@ -24,7 +24,7 @@
                         <i class="material-icons">fingerprint</i> Login
                     </a>
                 </li>
-                <li class="nav-item{{ $activePage == 'logout.forgotPassword' ? ' active' : '' }}">
+                {{-- <li class="nav-item{{ $activePage == 'logout.forgotPassword' ? ' active' : '' }}">
                     <a href="{{ route('logout.forgotPassword') }}" class="nav-link">
                         <i class="fas fa-unlock"></i> Forgot Password
                     </a>
@@ -33,7 +33,7 @@
                     <a href="{{ route('logout.resetPassword') }}" class="nav-link">
                         <i class="fas fa-lock-open"></i> Reset Password
                     </a>
-                </li>
+                </li> --}}
                 
             </ul>
         </div>
