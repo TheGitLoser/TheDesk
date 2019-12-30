@@ -3,7 +3,7 @@
 @section('content')
 <div class="content">
     <div class="container-fluid">
-        <div class="row">
+        {{-- <div class="row">
             <div class="col-md-12">
 
                 <form class="form" id="form" method="GET">
@@ -49,7 +49,7 @@
                 </form>
             </div>
 
-        </div>
+        </div> --}}
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -58,12 +58,7 @@
                         <div class="card-icon">
                             <i class="material-icons">content_copy</i>
                         </div>
-                        <p class="card-category" style="height: 0;">
-                            Add to contact list
-                            <i class="material-icons info-icon">playlist_add</i>
-
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
+                        <p class="card-category">
                         </p>
                     </div>
                     <div class="card-body">
@@ -71,7 +66,7 @@
                             <tbody>
                                 <tr>
                                     <td>Loading...</td>
-                                    <td class="td-actions text-right td-button">
+                                    {{-- <td class="td-actions text-right td-button">
                                         <button type="button" rel="tooltip" title="Add to contact list"
                                             class="btn btn-primary btn-link btn-sm">
                                             <i class="material-icons td-icon">playlist_add</i>
@@ -82,7 +77,7 @@
                                             class="btn btn-primary btn-link btn-sm">
                                             <i class="material-icons td-icon">chat</i>
                                         </button>
-                                    </td>
+                                    </td> --}}
                                 </tr>
 
                             </tbody>
@@ -90,6 +85,11 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
+                                Add to contact list
+                                <i class="material-icons info-icon">playlist_add</i>
+    
+                                Start to chat
+                                <i class="material-icons info-icon">chat</i>
                         </div>
                     </div>
                 </div>

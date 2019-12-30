@@ -82,7 +82,7 @@ $chatroomUniqid ])
                         currentChatroomUser: currentChatroomUser};
 
     $(function(){
-        var socketUrl = 'ws://127.0.0.1:9300';
+        var socketUrl = '{{ $wsConnection }}';
         var Socket = new WebSocket(socketUrl);
         console.log(Socket.readyState);
 

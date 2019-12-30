@@ -85,11 +85,23 @@ class ChatroomController extends Controller
             return redirect()->route('logout.login');
         }
 
-
-        // check permission (TBC)
-
+        // get chatroom id
         $chatroom = Chatroom::where('unique_id', $chatroomUniqid)->first();
-        $chatroomId = $chatroom->id;
+        if($chatroom){
+            $chatroomId = $chatroom->id;
+        }else{
+            return redirect()->route('login.chatroom.contacts');
+        }
+
+        // check permission, whether you are in this chatroom
+        $checkPermission = ChatroomUser::where('chatroom_id', $chatroomId)
+                    -> where('user_id', \getMyId())
+                    -> where('status', 1)
+                    ->count();
+        if($checkPermission == 0){
+            return redirect()->route('login.chatroom.contacts');
+        }
+
         $chatroomUser = DB::select('SELECT cu.create_at as chatroomUserCreateAt, cu.update_at as chatroomUserUpdateAt, 
                                     u.unique_id, u.name, u.display_id, u.email,
                                     u.type, u.profile, u.profile_picture, u.status
@@ -125,8 +137,12 @@ class ChatroomController extends Controller
             }
         }
         unset($chatroom->id);
+
+        // ws connection details
+        $wsConnection = env('WS_Protocol') ."://". env('WS_URL');
         
         return view('login.chatroom.chat')->with('chatroomUniqid', $chatroom['unique_id'])
+                                            ->with('wsConnection', $wsConnection)
                                             ->with('chatroom', json_encode($chatroom))
                                             ->with('chatroomUser', json_encode($chatroomUser))
                                             ->with('message', json_encode($message));

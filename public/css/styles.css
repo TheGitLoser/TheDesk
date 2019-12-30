@@ -43,3 +43,8 @@
     text-align: right;
     font-size: 10px;
 }
+
+.message-body img{
+    max-width:100%;
+    max-height:100%;
+}

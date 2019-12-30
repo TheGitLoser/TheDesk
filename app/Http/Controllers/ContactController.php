@@ -54,7 +54,7 @@ class ContactController extends Controller
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        checkContactExists($unique_id);
+        ContactController::checkContactExists($unique_id);
         
         return redirect()->route('login.chatroom.contacts');
     }

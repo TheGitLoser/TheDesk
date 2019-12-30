@@ -28,8 +28,8 @@
             {{-- start chatroom --}}
             <li class="nav-item">
                 <div class="sidebar-search">
-                    <form class="form-inline" action="/action_page.php">
-                        <input type="text" class="form-control sidebar-search-input" placeholder="Search...">
+                    <form class="form-inline">
+                        <input type="text" class="form-control sidebar-search-input" placeholder="Search..." disabled>
                         <button type="submit" class="btn btn-white btn-round btn-just-icon">
                             <i class="material-icons">search</i>
                             <div class="ripple-container"></div>

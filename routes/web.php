@@ -30,7 +30,7 @@ Route::get('/login/account/logout', 'AuthController@logout') -> name('login.acco
 
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
 Route::post('/chatroom/newMessage', 'ChatroomController@ajaxNewMessage') -> name('login.chatroom.newMessage');
-Route::get('/chatroom/startChat/{unique_id}', 'ChatroomController@addToChat') -> name('login.chatroom.startChat');
+Route::get('/chatroom/createChatroom/{unique_id}', 'ChatroomController@addToChat') -> name('login.chatroom.startChat');
 
 Route::get('/chatroom/contacts', 'ContactController@index') -> name('login.chatroom.contacts');
 Route::get('/chatroom/addContact/{unique_id}', 'ContactController@addContact') -> name('login.chatroom.addContact');

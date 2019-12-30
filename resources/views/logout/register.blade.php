@@ -15,7 +15,7 @@
                         <div class="card-header card-header-primary text-center">
                             <h4 class="card-title"><strong>Register</strong></h4>
                             <div class="social-line">
-                                <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
+                                {{-- <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                                     <i class="fab fa-facebook-f"></i>
                                 </a>
                                 <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
@@ -23,7 +23,7 @@
                                 </a>
                                 <a href="#pablo" class="btn btn-just-icon btn-link btn-white">
                                     <i class="fab fa-google-plus-g"></i>
-                                </a>
+                                </a> --}}
                             </div>
                         </div>
                         <div class="card-body ">
@@ -88,7 +88,7 @@
                                     <input type="date" name="DOB" id="DOB" class="form-control" placeholder="Date of birth..." required>
                                 </div>
                             </div>
-                            <div class="form-check mr-auto ml-3 mt-3">
+                            {{-- <div class="form-check mr-auto ml-3 mt-3">
                                 <label class="form-check-label">
                                     <input class="form-check-input" type="checkbox" id="policy" name="policy" required>
                                     <span class="form-check-sign">
@@ -96,7 +96,7 @@
                                     </span>
                                     I agree with the <a href="#">Privacy Policy</a>
                                 </label>
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer justify-content-center">
