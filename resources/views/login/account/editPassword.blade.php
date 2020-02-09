@@ -1,12 +1,11 @@
-@extends('login.layout.app', ['activePage' => '', 'title' => 'Change Password'])
+@extends('login.layout.app', ['activePage' => '', 'title' => ''])
 
 @section('content')
 <div class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form method="post" action="http://server.localhost/Material%20Dashboard/public/profile/password"
-                    class="form-horizontal">
+                <form method="post" id="form" class="form-horizontal">
                     <input type="hidden" name="_token" value="OGIm6e74J813CAVjrqZzTZUxzrKZenT3k1OC7bjc"> <input
                         type="hidden" name="_method" value="put">
                     <div class="card">
@@ -20,9 +19,7 @@
                                     Password</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" input="" type="password" name="old_password"
-                                            id="input-current-password" placeholder="Current Password" value=""
-                                            required="">
+                                        <input class="form-control" type="password" id="currentPassword" placeholder="Current Password" required>
                                     </div>
                                 </div>
                             </div>
@@ -30,8 +27,7 @@
                                 <label class="col-sm-2 col-form-label" for="input-password">New Password</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" name="password" id="input-password" type="password"
-                                            placeholder="New Password" value="" required="">
+                                        <input class="form-control" type="password" id="newPassword" placeholder="New Password" required>
                                     </div>
                                 </div>
                             </div>
@@ -40,13 +36,12 @@
                                     Password</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" name="password_confirmation"
-                                            id="input-password-confirmation" type="password"
-                                            placeholder="Confirm New Password" value="" required="">
+                                        <input class="form-control" type="password" id="passwordConfirmation" placeholder="Confirm New Password" required>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
                             <button type="submit" class="btn btn-primary">Change password</button>
                         </div>
@@ -61,3 +56,33 @@
 </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+    $('#form').submit(function(e){
+        e.preventDefault();
+        $.ajaxSetup({
+            headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: "{{ route('ajax.editPassword') }}",
+            method: 'post',
+            data: {
+                currentPassword: $('#currentPassword').val(),
+                newPassword: $('#newPassword').val(),
+                passwordConfirmation: $('#passwordConfirmation').val()
+            },
+            success: function(response){
+                if (response['output']['result'] == 'true') {
+                    window.location = response['output']['redirect'];
+                }else{
+                    $('#errorMsg').text(response['output']['message']);
+                    console.log(response['output']['message']);
+                }
+            }
+        });
+    });
+</script>
+@endpush

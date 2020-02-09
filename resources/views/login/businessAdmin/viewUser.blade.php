@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'contacts', 'title' => 'My contacts'])
+@extends('login.layout.app', ['activePage' => 'businessAdminViewUser', 'title' => ''])
 
 @section('content')
 <div class="content">
@@ -11,18 +11,12 @@
                         <div class="card-header card-header-tabs card-header-primary">
                             <div class="nav-tabs-navigation">
                                 <div class="nav-tabs-wrapper">
-                                    <span class="nav-tabs-title">Search:</span>
+                                    <span class="nav-tabs-title">User under your business plan:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link active show" id="discover-indi" data-toggle="tab">
-                                                <i class="material-icons">emoji_people</i> Individual 
-                                            </a>
+                                            
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="discover-business" data-toggle="tab">
-                                                <i class="material-icons">business</i> Business
-                                            </a>
-                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </div>
@@ -72,11 +66,8 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                            Hide
-                            <i class="far fa-minus-square info-icon"></i>
-
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
+                            Remove user account
+                            <i class="far fa-trash-alt"></i>
                         </div>
                     </div>
                 </div>
@@ -86,43 +77,37 @@
     </div>
 </div>
 @endsection
- 
+
 
 @push('js')
 <script>
-    var contactList = {!! $output !!};
+    var discoverList = {!! $output !!};
+    
     function getTableButton(uniqueId){
-        hideContactButton = '{{ route('login.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
-        startChatButton = '{{ route('login.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
+        removeButton = '{{ route('login.businessAdmin.removeBusinessPlanUser',['uniqueId'=> '']) }}/' + uniqueId;
 
         output = '<td class="td-actions text-right td-button">';
-        output += '<a href="' + hideContactButton + '">';
-        output += '<button type="button" title="Hide" class="btn btn-primary btn-link btn-sm">';
-        output += '<i class="far fa-minus-square td-icon"></i>';
-        output += '</button></a></td>';
+        output += '<a href="' + removeButton + '">';
+        output += '<i class="far fa-trash-alt"></i>';
+        output += '</a></td>';
 
-        output += '<td class="td-actions text-right td-button">';
-        output += '<a href="' + startChatButton + '">';
-        output += '<button type="button" title="Start to chat" class="btn btn-primary btn-link btn-sm">';
-        output += '<i class="material-icons td-icon">chat</i>';
-        output += '</button></a></td>';
-        
         return output;
     }
-    function outputList(contactList){
+    function outputList(discoverList){
         tempHtml = '';
         tempHtml = '<tbody>';
-        $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
-                    + getTableButton(item.unique_id)
-                    + '</tr>';
+        $.each(discoverList, function(i, item) {
+            tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+                        + getTableButton(item.unique_id)
+                        + '</tr>';
         });
         tempHtml += '</tbody>';
         $('#ajaxTable').html(tempHtml);
     }
     $(function() {
-        outputList(contactList);
-    });
+        outputList(discoverList);
+        
+        });
 
 </script>
 @endpush
@@ -130,12 +115,7 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        var searchType;
-        if($("#discover-indi").hasClass("show")){
-            searchType = 'indi';
-        }else{
-            searchType = 'business';
-        }
+        var searchType = 'colleague';
         e.preventDefault();
         $.ajaxSetup({
             headers: {
@@ -143,7 +123,7 @@
             }
         });
         $.ajax({
-            url: "{{ route('ajax.searchContact') }}",
+            url: "{{ route('ajax.discover') }}",
             method: 'post',
             data: {
                 name: $('#name').val(),

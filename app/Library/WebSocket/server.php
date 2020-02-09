@@ -119,6 +119,7 @@ $Server->bind('open', 'wsOnOpen');
 $Server->bind('close', 'wsOnClose');
 // for other computers to connect, you will probably need to change this to your LAN IP or external IP,
 // alternatively use: gethostbyaddr(gethostbyname($_SERVER['SERVER_NAME']))
+
 $wsIP = $_ENV["WS_Server_IP"];
 $wsPort = $_ENV["WS_Server_Port"];
 

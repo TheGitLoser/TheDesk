@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\BusinessUser;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -67,7 +68,15 @@ class AuthController extends Controller
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
             $userInfo = array('id' => $user->id, 'uniqid' => $user->unique_id, 'name' => $user->name, 'displayId' => $user->display_id);
-            session()->put('user.auth', 'indi');
+            // get user's company's id if "business / business admin"
+            if($user->type == "business" || $user->type == "business admin"){
+                $businessUser = BusinessUser::select('business_plan_id')
+                                ->where('user_id', $user->id)
+                                ->where('status', '1')
+                                ->first();
+                $userInfo['businessPlanId'] = $businessUser->business_plan_id;
+            }
+            session()->put('user.auth', $user->type);
             session()->put('user.info', $userInfo);
 
             $output['result'] = "true";
@@ -80,19 +89,28 @@ class AuthController extends Controller
     }
 
     public function ajaxRegister(Request $request){
-        $input = $request->only('name', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
+        $input = $request->only('name', 'displayId', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
 
-        $checkUser = User::where('email', $input['email'])->count();
-        if($checkUser){
+        $checkUserEmail = User::where('email', $input['email'])->count();
+        $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
+
+        if($input['password'] != $input['passwordConfirmation']){
+            $output['result'] = 'false';
+            $output['message'] = 'Both password must be the same';
+        }elseif($checkUserEmail){
             // duplicated
             $output['result'] = 'false';
             $output['message'] = 'Your email has been used';
+        }elseif ($checkUserDisplayId) {
+            // duplicated
+            $output['result'] = 'false';
+            $output['message'] = 'Your Display ID has been used';
         }else{
             $uniqid = \getUniqid();
             $user = new User;
             $user->unique_id = $uniqid;
             $user->name = $input['name'];
-            $user->display_id = $input['name'];  // should unique
+            $user->display_id = $input['displayId'];  // unique
             $user->email = $input['email'];
             $user->password = password_hash($input['password'], PASSWORD_DEFAULT, ['cost'=> 11]);
             $user->type = 'indi';

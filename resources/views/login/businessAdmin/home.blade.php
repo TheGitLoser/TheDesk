@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'contacts', 'title' => 'My contacts'])
+@extends('login.layout.app', ['activePage' => 'businessAdminDashboard', 'title' => 'Business admin - Dashboard'])
 
 @section('content')
 <div class="content">
@@ -11,7 +11,7 @@
                         <div class="card-header card-header-tabs card-header-primary">
                             <div class="nav-tabs-navigation">
                                 <div class="nav-tabs-wrapper">
-                                    <span class="nav-tabs-title">Search:</span>
+                                    <span class="nav-tabs-title">Discover:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
                                             <a class="nav-link active show" id="discover-indi" data-toggle="tab">
@@ -72,11 +72,11 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                            Hide
-                            <i class="far fa-minus-square info-icon"></i>
-
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
+                                Add to contact list
+                                <i class="material-icons info-icon">playlist_add</i>
+    
+                                Start to chat
+                                <i class="material-icons info-icon">chat</i>
                         </div>
                     </div>
                 </div>
@@ -88,72 +88,3 @@
 @endsection
  
 
-@push('js')
-<script>
-    var contactList = {!! $output !!};
-    function getTableButton(uniqueId){
-        hideContactButton = '{{ route('login.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
-        startChatButton = '{{ route('login.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
-
-        output = '<td class="td-actions text-right td-button">';
-        output += '<a href="' + hideContactButton + '">';
-        output += '<button type="button" title="Hide" class="btn btn-primary btn-link btn-sm">';
-        output += '<i class="far fa-minus-square td-icon"></i>';
-        output += '</button></a></td>';
-
-        output += '<td class="td-actions text-right td-button">';
-        output += '<a href="' + startChatButton + '">';
-        output += '<button type="button" title="Start to chat" class="btn btn-primary btn-link btn-sm">';
-        output += '<i class="material-icons td-icon">chat</i>';
-        output += '</button></a></td>';
-        
-        return output;
-    }
-    function outputList(contactList){
-        tempHtml = '';
-        tempHtml = '<tbody>';
-        $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
-                    + getTableButton(item.unique_id)
-                    + '</tr>';
-        });
-        tempHtml += '</tbody>';
-        $('#ajaxTable').html(tempHtml);
-    }
-    $(function() {
-        outputList(contactList);
-    });
-
-</script>
-@endpush
-
-@push('js')
-<script>
-    $('#form').submit(function(e){
-        var searchType;
-        if($("#discover-indi").hasClass("show")){
-            searchType = 'indi';
-        }else{
-            searchType = 'business';
-        }
-        e.preventDefault();
-        $.ajaxSetup({
-            headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: "{{ route('ajax.searchContact') }}",
-            method: 'post',
-            data: {
-                name: $('#name').val(),
-                id: $('#id').val(),
-                searchType: searchType
-            },
-            success: function(response){
-                outputList(response['output']);
-            }
-        });
-    });
-</script>
-@endpush

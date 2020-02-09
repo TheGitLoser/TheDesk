@@ -9,13 +9,14 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    private function getContact(){
+    private function getContact($searchType, $name, $displayId){
         $myUserId = getMyId();
         $result = DB::select('SELECT u.unique_id, u.name, u.display_id 
                             FROM contact_list c JOIN user u ON c.contact_user_id = u.id
                             WHERE c.user_id = :myUserId 
+                                and u.type LIKE :searchType and u.name LIKE :name and u.display_id LIKE :display_id
                                 and c.status = 1 and u.status = 1',
-                        ['myUserId' => $myUserId]);
+                        ['myUserId' => $myUserId, 'searchType' => "%{$searchType}%", 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]);
         return $result;
     }
     // shared form this@addContact & Chatroom@addToChat
@@ -45,7 +46,7 @@ class ContactController extends Controller
             return redirect()->route('logout.login');
         }
         
-        $output = $this->getContact();
+        $output = $this->getContact('', '', '');
 
         return view('login.chatroom.contacts')->with('output', json_encode($output));
     }
@@ -54,7 +55,7 @@ class ContactController extends Controller
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        ContactController::checkContactExists($unique_id);
+        $this->checkContactExists($unique_id);
         
         return redirect()->route('login.chatroom.contacts');
     }
@@ -74,5 +75,10 @@ class ContactController extends Controller
         
         return back();
     }
-    
+    public function ajaxSearchContact(Request $request){
+        $input = $request->only('name', 'id', 'searchType');
+        
+        $output = $this->getContact($input['searchType'], $input['name'], $input['id']);
+        return response()->json(compact('output'));
+    }
 }

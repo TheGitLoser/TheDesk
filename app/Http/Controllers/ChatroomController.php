@@ -12,7 +12,7 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName
+        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId
                                 FROM chatroom c
                                     JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
                                     JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> :myUserId2
@@ -165,7 +165,7 @@ class ChatroomController extends Controller
         $message->save();
         
         $output['messageUniqid'] = $message['unique_id'];
-        $output['messageCreateAt'] = $message['create_at']->format('Y-m-d h:m:s');;
+        $output['messageCreateAt'] = $message['create_at']->format('Y-m-d H:i:s');
         return response()->json(compact('output'));
     }
 }

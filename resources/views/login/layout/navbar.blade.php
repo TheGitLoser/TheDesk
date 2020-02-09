@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
     <div class="container-fluid">
         <div class="navbar-wrapper">
-            <a class="navbar-brand" href="#">{{ $title }}</a>
+            <a class="navbar-brand" href="/">{{ $title }}</a>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -32,13 +32,13 @@
                             Notifications
                         </p>
                     </a>
-                    {{-- <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" href="#">{{ __('Mike John responded to your email') }}</a>
                         <a class="dropdown-item" href="#">{{ __('You have 5 new tasks') }}</a>
                         <a class="dropdown-item" href="#">{{ __('You\'re now friend with Andrew') }}</a>
                         <a class="dropdown-item" href="#">{{ __('Another Notification') }}</a>
                         <a class="dropdown-item" href="#">{{ __('Another One') }}</a>
-                    </div> --}}
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown"
@@ -49,8 +49,8 @@
                         </p>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                        {{-- <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
-                        <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a> --}}
+                        <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
+                        <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ route('login.account.logout') }}"> Logout</a>
                     </div>
