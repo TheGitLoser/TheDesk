@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Models\User;
 use App\Models\BusinessUser;
 use Illuminate\Http\Request;
@@ -12,7 +13,19 @@ class BusinessAdminController extends Controller
         if (!userTypeAccess(['business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        return view('login.businessAdmin.home');
+        $userNumber = DB::select(
+                        'SELECT SUM(CASE WHEN u.type="business" THEN 1 END) as businessUser,
+                                SUM(CASE WHEN u.type="business admin" THEN 1 END) as businessAdmin
+                                    FROM user u JOIN business_user bu ON u.id = bu.user_id
+                                    WHERE (u.type = "business" OR u.type = "business admin")
+                                    AND bu.business_plan_id = :businessPlanId
+                                    AND u.status = 1
+                                            ',
+                        ["businessPlanId" => \getMyBusinessPlanId()]);
+        $output['businessUserNumber'] = $userNumber[0]->businessUser;
+        $output['businessAdminNumber'] = $userNumber[0]->businessAdmin;
+
+        return view('login.businessAdmin.home')->with('output', $output);
     }
     public function viewUser(){
         if (!userTypeAccess(['business admin', 'admin'])) {

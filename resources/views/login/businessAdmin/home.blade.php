@@ -4,79 +4,47 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-
-                <form class="form" id="form">
-                    <div class="card">
-                        <div class="card-header card-header-tabs card-header-primary">
-                            <div class="nav-tabs-navigation">
-                                <div class="nav-tabs-wrapper">
-                                    <span class="nav-tabs-title">Discover:</span>
-                                    <ul class="nav nav-tabs" data-tabs="tabs">
-                                        <li class="nav-item">
-                                            <a class="nav-link active show" id="discover-indi" data-toggle="tab">
-                                                <i class="material-icons">emoji_people</i> Individual 
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="discover-business" data-toggle="tab">
-                                                <i class="material-icons">business</i> Business
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-body ">
-                            @csrf
-                            <div class="form-group row">
-                                <label class="col-sm-2 col-form-label align-middle">name</label>
-                                <div class="col-sm-4 form-group bmd-form-group">
-                                    <input type="text" class="form-control" id="name" placeholder="name">
-                                </div>
-                                <label class="col-sm-2 col-form-label align-middle">id</label>
-                                <div class="col-sm-4 form-group bmd-form-group">
-                                    <input type="text" class="form-control" id="id" placeholder="id">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer ml-auto mr-auto">
-                            <button type="submit" class="btn btn-primary">Search</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="col-4">
                 <div class="card card-stats">
                     <div class="card-header card-header-warning card-header-icon">
                         <div class="card-icon">
                             <i class="material-icons">content_copy</i>
                         </div>
-                        <p class="card-category">
-                        </p>
+                        <h3 class="card-title">
+                            User Number
+                        </h3>
                     </div>
                     <div class="card-body">
-                        <table class="table" id="ajaxTable">
-                            <tbody>
-                                <tr>
-                                    <td>Loading...</td>
-                                </tr>
-
-                            </tbody>
-                        </table>
+                        <h3 class="card-title">
+                            {{ $output['businessUserNumber'] }}
+                            <small></small>
+                          </h3>
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                                Add to contact list
-                                <i class="material-icons info-icon">playlist_add</i>
-    
-                                Start to chat
-                                <i class="material-icons info-icon">chat</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card card-stats">
+                    <div class="card-header card-header-warning card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">content_copy</i>
+                        </div>
+                        <h3 class="card-title">
+                            Admin Number
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">
+                            {{ $output['businessAdminNumber'] }}
+                            <small></small>
+                          </h3>
+                          {{-- <div id="chart_div"></div> --}}
+                    </div>
+                    <div class="card-footer">
+                        <div class="stats">
                         </div>
                     </div>
                 </div>
@@ -85,6 +53,47 @@
 
     </div>
 </div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+    google.charts.load('current', {packages: ['corechart', 'line']});
+google.charts.setOnLoadCallback(drawLineColors);
+
+function drawLineColors() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('number', 'X');
+      data.addColumn('number', 'Dogs');
+      data.addColumn('number', 'Cats');
+
+      data.addRows([
+        [0, 0, 0],    [1, 10, 5],   [2, 23, 15],  [3, 17, 9],   [4, 18, 10],  [5, 9, 5],
+        [6, 11, 3],   [7, 27, 19],  [8, 33, 25],  [9, 40, 32],  [10, 32, 24], [11, 35, 27],
+        [12, 30, 22], [13, 40, 32], [14, 42, 34], [15, 47, 39], [16, 44, 36], [17, 48, 40],
+        [18, 52, 44], [19, 54, 46], [20, 42, 34], [21, 55, 47], [22, 56, 48], [23, 57, 49],
+        [24, 60, 52], [25, 50, 42], [26, 52, 44], [27, 51, 43], [28, 49, 41], [29, 53, 45],
+        [30, 55, 47], [31, 60, 52], [32, 61, 53], [33, 59, 51], [34, 62, 54], [35, 65, 57],
+        [36, 62, 54], [37, 58, 50], [38, 55, 47], [39, 61, 53], [40, 64, 56], [41, 65, 57],
+        [42, 63, 55], [43, 66, 58], [44, 67, 59], [45, 69, 61], [46, 69, 61], [47, 70, 62],
+        [48, 72, 64], [49, 68, 60], [50, 66, 58], [51, 65, 57], [52, 67, 59], [53, 70, 62],
+        [54, 71, 63], [55, 72, 64], [56, 73, 65], [57, 75, 67], [58, 70, 62], [59, 68, 60],
+        [60, 64, 56], [61, 60, 52], [62, 65, 57], [63, 67, 59], [64, 68, 60], [65, 69, 61],
+        [66, 70, 62], [67, 72, 64], [68, 75, 67], [69, 80, 72]
+      ]);
+
+      var options = {
+        hAxis: {
+          title: 'Time'
+        },
+        vAxis: {
+          title: 'Popularity'
+        },
+        colors: ['#a52714', '#097138']
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+    </script>
+    
 @endsection
  
 

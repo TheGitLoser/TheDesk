@@ -12,68 +12,70 @@
     </div>
     <div class="sidebar-wrapper">
         <ul class="nav">
-            <li
-                class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
-                <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
-                    <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
-                    <p> Admin
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse show" id="sidebarDropdownList">
-                    <ul class="nav">
-                        <li class="nav-item{{ $activePage == 'adminDashboard' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.admin.dashboard') }}">
-                                <span class="sidebar-mini"> D </span>
-                                <span class="sidebar-normal">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item{{ $activePage == 'adminViewBusinessPlan' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.admin.viewBusinessPlan') }}">
-                                <span class="sidebar-mini"> B </span>
-                                <span class="sidebar-normal">Business list</span>
-                            </a>
-                        </li>
-                        <li class="nav-item{{ $activePage == 'adminCreateBusinessPlan' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.admin.createBusinessPlan') }}">
-                                <span class="sidebar-mini"> C </span>
-                                <span class="sidebar-normal">Create business plan</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li
-                class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
-                <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
-                    <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
-                    <p> Business admin
-                        <b class="caret"></b>
-                    </p>
-                </a>
-                <div class="collapse show" id="sidebarDropdownList">
-                    <ul class="nav">
-                        <li class="nav-item{{ $activePage == 'businessAdminDashboard' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.businessAdmin.dashboard') }}">
-                                <span class="sidebar-mini"> D </span>
-                                <span class="sidebar-normal">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item{{ $activePage == 'businessAdminViewUser' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.businessAdmin.viewUser') }}">
-                                <span class="sidebar-mini"> ~ </span>
-                                <span class="sidebar-normal">User list</span>
-                            </a>
-                        </li>
-                        <li class="nav-item{{ $activePage == 'businessAdminAddUser' ? ' active' : '' }}">
-                            <a class="nav-link" href="{{ route('login.businessAdmin.addUser') }}">
-                                <span class="sidebar-mini"> + </span>
-                                <span class="sidebar-normal">Add user</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
+            @if (userTypeAccess(['admin']))
+                <li class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
+                    <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
+                        <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
+                        <p> Admin
+                            <b class="caret"></b>
+                        </p>
+                    </a>
+                    <div class="collapse show" id="sidebarDropdownList">
+                        <ul class="nav">
+                            {{-- <li class="nav-item{{ $activePage == 'adminDashboard' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.admin.dashboard') }}">
+                                    <span class="sidebar-mini"> D </span>
+                                    <span class="sidebar-normal">Dashboard</span>
+                                </a>
+                            </li> --}}
+                            <li class="nav-item{{ $activePage == 'adminViewBusinessPlan' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.admin.viewBusinessPlan') }}">
+                                    <span class="sidebar-mini"> B </span>
+                                    <span class="sidebar-normal">Business list</span>
+                                </a>
+                            </li>
+                            <li class="nav-item{{ $activePage == 'adminCreateBusinessPlan' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.admin.createBusinessPlan') }}">
+                                    <span class="sidebar-mini"> C </span>
+                                    <span class="sidebar-normal">Create business plan</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            @endif
+            @if (userTypeAccess(['business admin']))
+                <li class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
+                    <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
+                        <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
+                        <p> Business admin
+                            <b class="caret"></b>
+                        </p>
+                    </a>
+                    <div class="collapse show" id="sidebarDropdownList">
+                        <ul class="nav">
+                            {{-- <li class="nav-item{{ $activePage == 'businessAdminDashboard' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.businessAdmin.dashboard') }}">
+                                    <span class="sidebar-mini"> D </span>
+                                    <span class="sidebar-normal">Dashboard</span>
+                                </a>
+                            </li> --}}
+                            <li class="nav-item{{ $activePage == 'businessAdminViewUser' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.businessAdmin.viewUser') }}">
+                                    <span class="sidebar-mini"> ~ </span>
+                                    <span class="sidebar-normal">User list</span>
+                                </a>
+                            </li>
+                            <li class="nav-item{{ $activePage == 'businessAdminAddUser' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.businessAdmin.addUser') }}">
+                                    <span class="sidebar-mini"> + </span>
+                                    <span class="sidebar-normal">Add user</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            @endif
 
             <li class="nav-item{{ $activePage == 'businessUserHome' ? ' active' : '' }}">
                 <a class="nav-link" href="{{ route('login.home') }}">
