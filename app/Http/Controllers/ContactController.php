@@ -11,12 +11,41 @@ class ContactController extends Controller
 {
     private function getContact($searchType, $name, $displayId){
         $myUserId = getMyId();
-        $result = DB::select('SELECT u.unique_id, u.name, u.display_id 
-                            FROM contact_list c JOIN user u ON c.contact_user_id = u.id
-                            WHERE c.user_id = :myUserId 
-                                and u.type LIKE :searchType and u.name LIKE :name and u.display_id LIKE :display_id
-                                and c.status = 1 and u.status = 1',
-                        ['myUserId' => $myUserId, 'searchType' => "%{$searchType}%", 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]);
+        if ($searchType == 'indi') {
+            $result = DB::select(
+                "SELECT u.unique_id, u.name, u.display_id 
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
+                                WHERE c.user_id = :myUserId 
+                                    and u.type = 'indi' and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and c.status = 1 and u.status = 1",
+                ['myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
+            );
+        }elseif($searchType == 'business'){
+            $result = DB::select(
+                "SELECT u.unique_id, u.name, u.display_id 
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
+                                JOIN business_user bu ON u.id = bu.user_id
+                                WHERE c.user_id = :myUserId 
+                                    AND bu.business_plan_id != :businessPlanId
+                                    and u.type LIKE 'business%' and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and c.status = 1 and u.status = 1",
+                ["businessPlanId" => \getMyBusinessPlanId(), 
+                'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
+            );
+        }else{  // colleague
+            $result = DB::select(
+                "SELECT u.unique_id, u.name, u.display_id 
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
+                                JOIN business_user bu ON u.id = bu.user_id
+                                WHERE c.user_id = :myUserId 
+                                    AND bu.business_plan_id = :businessPlanId
+                                    and u.type LIKE 'business%' and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and c.status = 1 and u.status = 1",
+                ["businessPlanId" => \getMyBusinessPlanId(), 
+                'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
+            );
+
+        }
         return $result;
     }
     // shared form this@addContact & Chatroom@addToChat
@@ -46,9 +75,15 @@ class ContactController extends Controller
             return redirect()->route('logout.login');
         }
         
-        $output = $this->getContact('', '', '');
+        if (session('user.auth') == 'indi') {
+            $searchType = 'indi';
+        }else{
+            $searchType = 'colleague';
+        }
 
-        return view('login.chatroom.contacts')->with('output', json_encode($output));
+        $output = $this->getContact($searchType, '', '');
+        return view('login.chatroom.contacts')->with('output', json_encode($output))
+                                                ->with('searchType', $searchType);
     }
     
     public function addContact($unique_id){

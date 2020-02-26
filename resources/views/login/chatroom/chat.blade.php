@@ -1,5 +1,11 @@
-@extends('login.layout.app', ['activePage' => '', 'title' => $chatroomDetails['name'], 'currentChatroom' =>
-$chatroomUniqid ])
+@php
+$chatroomDetails = json_decode($chatroom, true);
+$chatroomUniqid = $chatroomDetails['unique_id'];
+$chatroomDetails['description'] = substr($chatroomDetails['description'],30);
+$chatroomUserDetails = json_decode($chatroomUser, true);
+@endphp
+
+@extends('login.layout.app', ['activePage' => '', 'title' => $chatroomDetails['name'], 'currentChatroom' => $chatroomUniqid ])
 
 @section('content')
 <div class="content" style="margin-top: 30px;">
@@ -12,15 +18,15 @@ $chatroomUniqid ])
                             <i class="material-icons">content_copy</i>
                         </div>
                         <div class="card-category chatroom-info-left">
-                            @php
-                            $chatroomDetails = json_decode($chatroom, true);
-                            $chatroomDetails['description'] = substr($chatroomDetails['description'],30);
-                            $chatroomUserDetails = json_decode($chatroomUser, true);
-                            @endphp
                             <h4>{{ $chatroomDetails['name'] }}</h4>
                             @foreach ($chatroomUserDetails as $userDetails)
                             {{ $userDetails['name'] }},
                             @endforeach
+                        </div>
+                        <div class="card-category chatroom-info-right">
+                            <a href="{{ route('login.chatroom.setting', ['unique_id'=>$chatroomUniqid]) }}">
+                                <i class="fas fa-cog"></i>
+                            </a>
                         </div>
                         <div class="card-category" style="height: 0;">
                             {{ $chatroomDetails['description'] }}
@@ -48,6 +54,12 @@ $chatroomUniqid ])
     </div>
 </div>
 @endsection
+
+@push('js')
+<script>
+    $("#pageTitle").hide();
+</script>
+@endpush
 
 @push('js')
 {{-- socket --}}
@@ -102,7 +114,7 @@ $chatroomUniqid ])
                     }
                 });
                 $.ajax({
-                    url: "{{ route('login.chatroom.newMessage') }}",
+                    url: "{{ route('ajax.chatroom.newMessage') }}",
                     method: 'post',
                     data: {
                         chatroomUniqid: chatroomUniqid, 

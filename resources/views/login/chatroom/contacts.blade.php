@@ -7,6 +7,7 @@
             <div class="col-md-12">
 
                 <form class="form" id="form">
+                    @csrf
                     <div class="card">
                         <div class="card-header card-header-tabs card-header-primary">
                             <div class="nav-tabs-navigation">
@@ -14,13 +15,18 @@
                                     <span class="nav-tabs-title">Search:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link active show" id="discover-indi" data-toggle="tab">
+                                            <a class="nav-link" id="discover-indi" data-toggle="tab">
                                                 <i class="material-icons">emoji_people</i> Individual 
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="discover-business" data-toggle="tab">
                                                 <i class="material-icons">business</i> Business
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="discover-colleague" data-toggle="tab">
+                                                <i class="material-icons">business_center</i> Colleague
                                             </a>
                                         </li>
                                     </ul>
@@ -52,34 +58,38 @@
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <div class="card card-stats">
-                    <div class="card-header card-header-warning card-header-icon">
-                        <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                <form action="{{ route('login.chatroom.createChannel') }}" method="POST">
+                    @csrf
+                    <div class="card card-stats">
+                        <div class="card-header card-header-warning card-header-icon">
+                            <div class="card-icon">
+                                <i class="material-icons">content_copy</i>
+                            </div>
+                            <div class="card-category" style="height: 0;">
+                                <button type="submit" class="btn btn-primary">Create channel</button>
+                            </div>
                         </div>
-                        <p class="card-category">
-                        </p>
-                    </div>
-                    <div class="card-body">
-                        <table class="table" id="ajaxTable">
-                            <tbody>
-                                <tr>
-                                    <td>Loading...</td>
-                                </tr>
+                        <div class="card-body">
+                            <table class="table" id="ajaxTable">
+                                <tbody>
+                                    <tr>
+                                        <td>Loading...</td>
+                                    </tr>
 
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="stats">
-                            Hide
-                            <i class="far fa-minus-square info-icon"></i>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-footer">
+                            <div class="stats">
+                                Hide
+                                <i class="far fa-minus-square info-icon"></i>
 
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
+                                Start to chat
+                                <i class="material-icons info-icon">chat</i>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
 
@@ -91,6 +101,8 @@
 @push('js')
 <script>
     var contactList = {!! $output !!};
+    var searchType = '{{ $searchType }}';
+    
     function getTableButton(uniqueId){
         hideContactButton = '{{ route('login.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
         startChatButton = '{{ route('login.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
@@ -109,19 +121,46 @@
         
         return output;
     }
+    function getCheckBox(uniqueId){
+        output = '<div class="form-check">';
+        output += '<label class="form-check-label">';
+        output += '<input class="form-check-input" type="checkbox" name="' + uniqueId + '">';
+        output += '<span class="form-check-sign">';
+        output += '<span class="check"></span>';
+        output += '</span>';
+        output += '</label>';
+        output += '</div>';
+        return output;
+    }
     function outputList(contactList){
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });
         tempHtml += '</tbody>';
         $('#ajaxTable').html(tempHtml);
     }
+
     $(function() {
         outputList(contactList);
+        switch(searchType) {
+            case 'indi':
+                $('#discover-indi').addClass("active show");
+                $('#discover-colleague').hide();
+                break;
+            case 'business':
+                $('#discover-business').addClass("active show");
+                $('#discover-colleague').hide();
+                break;
+            case 'colleague':
+                $('#discover-colleague').addClass("active show");
+                break;
+            default:
+                $('#discover-indi').addClass("active show");
+        }
     });
 
 </script>
@@ -130,11 +169,12 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        var searchType;
         if($("#discover-indi").hasClass("show")){
             searchType = 'indi';
-        }else{
+        }else if($("#discover-business").hasClass("show")){
             searchType = 'business';
+        }else{
+            searchType = 'colleague';
         }
         e.preventDefault();
         $.ajaxSetup({

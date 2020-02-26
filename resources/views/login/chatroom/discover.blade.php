@@ -7,6 +7,7 @@
             <div class="col-md-12">
 
                 <form class="form" id="form">
+                    @csrf
                     <div class="card">
                         <div class="card-header card-header-tabs card-header-primary">
                             <div class="nav-tabs-navigation">
@@ -25,7 +26,12 @@
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="discover-colleague" data-toggle="tab">
-                                                <i class="material-icons">business</i> Colleague
+                                                <i class="material-icons">business_center</i> Colleague
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="discover-extact" data-toggle="tab">
+                                                <i class="material-icons">perm_identity</i> by extact name/id
                                             </a>
                                         </li>
                                     </ul>
@@ -82,6 +88,9 @@
 
                             Start to chat
                             <i class="material-icons info-icon">chat</i>
+                            
+                            New request to business
+                            <i class="material-icons info-icon">mail</i>
                         </div>
                     </div>
                 </div>
@@ -116,14 +125,34 @@
         
         return output;
     }
+    function getNewRequestButton(uniqueId){
+        newRequestButton = '{{ route('login.request.new',['uniqueId'=> '']) }}/' + uniqueId;
+
+        output = '<td class="td-actions text-right td-button">';
+        output += '<a href="' + newRequestButton + '">';
+        output += '<button type="button" title="New Request" class="btn btn-primary btn-link btn-sm">';
+        output += '<i class="material-icons td-icon">mail</i>';
+        output += '</button></a></td>';
+        
+        return output;
+    }
     function outputList(discoverList){
         tempHtml = '';
         tempHtml = '<tbody>';
-        $.each(discoverList, function(i, item) {
-            tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
-                        + getTableButton(item.unique_id)
-                        + '</tr>';
-        });
+
+        if(searchType == 'business'){
+            $.each(discoverList, function(i, item) {
+                tempHtml += '<tr><td>' + item.name + ' <td>'
+                            + getNewRequestButton(item.unique_id)
+                            + '</tr>';
+            });
+        }else{
+            $.each(discoverList, function(i, item) {
+                tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+                            + getTableButton(item.unique_id)
+                            + '</tr>';
+            });
+        }
         tempHtml += '</tbody>';
         $('#ajaxTable').html(tempHtml);
     }
@@ -132,9 +161,11 @@
         switch(searchType) {
             case 'indi':
                 $('#discover-indi').addClass("active show");
+                $('#discover-colleague').hide();
                 break;
             case 'business':
                 $('#discover-business').addClass("active show");
+                $('#discover-colleague').hide();
                 break;
             case 'colleague':
                 $('#discover-colleague').addClass("active show");
@@ -150,13 +181,14 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        var searchType;
         if($("#discover-indi").hasClass("show")){
             searchType = 'indi';
         }else if($("#discover-business").hasClass("show")){
             searchType = 'business';
-        }else{
+        }else if($("#discover-colleague").hasClass("show")){
             searchType = 'colleague';
+        }else{
+            searchType = 'extact';
         }
         e.preventDefault();
         $.ajaxSetup({

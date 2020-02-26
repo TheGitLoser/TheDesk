@@ -30,8 +30,14 @@ Route::get('/login/account/logout', 'AuthController@logout') -> name('login.acco
 
 // chatroom
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
-Route::post('/chatroom/newMessage', 'ChatroomController@ajaxNewMessage') -> name('login.chatroom.newMessage');
+Route::get('/chatroom/setting/{unique_id}', 'ChatroomController@setting') -> name('login.chatroom.setting');
+Route::post('/ajax/chatroom/setting', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
+
+Route::post('/ajax/newMessage', 'ChatroomController@ajaxNewMessage') -> name('ajax.chatroom.newMessage');
+
 Route::get('/chatroom/createChatroom/{unique_id}', 'ChatroomController@addToChat') -> name('login.chatroom.startChat');
+Route::post('/chatroom/createChannel', 'ChatroomController@createChannel') -> name('login.chatroom.createChannel');
+Route::post('/ajax/createChannel', 'ChatroomController@ajaxCreateChannel') -> name('ajax.createChannel');
 
 // contact list
 Route::get('/chatroom/contacts', 'ContactController@index') -> name('login.chatroom.contacts');
@@ -42,6 +48,7 @@ Route::get('/chatroom/hideContact/{unique_id}', 'ContactController@hideContact')
 // discover user
 Route::get('/chatroom/discover', 'UserController@discoverUser') -> name('login.chatroom.discover');
 Route::post('/ajax/discover', 'UserController@ajaxDiscover') -> name('ajax.discover');
+Route::get('/request/new/{unique_id}', 'ContactController@hideContact') -> name('login.request.new');
 
 // profile management
 Route::get('/home', 'PageController@index') -> name('login.home');

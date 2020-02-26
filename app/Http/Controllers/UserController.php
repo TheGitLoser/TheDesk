@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use DB;
+use App\Models\BusinessPlan;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     function getUserList($searchType, $name, $displayId){
-        if($searchType != 'colleague'){
-            // indi || business
+        if ($searchType == 'indi') {
             $user = User::select('unique_id', 'name', 'display_id')
             -> where('type', $searchType)
             -> where('name', 'LIKE', "%{$name}%")
@@ -18,7 +18,11 @@ class UserController extends Controller
             -> where('status', '1')
             -> where('id', '<>', \getMyId())
             ->get();
-        }else{
+        }elseif($searchType == 'business'){
+            $user = BusinessPlan::select('unique_id', 'company_name as name')
+                    -> where('status', '1')
+                    ->get();
+        }elseif($searchType == 'colleague'){
             // myCompany
             $user = DB::select(
                 'SELECT u.unique_id, u.name, u.display_id, bu.business_plan_id
@@ -32,6 +36,15 @@ class UserController extends Controller
                                                 ',
                 ["businessPlanId" => \getMyBusinessPlanId(), "name" => "%".$name."%", "displayId" => "%".$displayId."%", "myId" => \getMyId()]
             );
+        }else{  // extact
+            $user = User::select('unique_id', 'name', 'display_id')
+                ->where(function($q) {
+                    $q->where('name', $name)
+                    ->orWhere('display_id', $displayId);
+                })
+                -> where('status', '1')
+                -> where('id', '<>', \getMyId())
+                ->get();
         }
         return $user;
     }
@@ -45,8 +58,7 @@ class UserController extends Controller
             $searchType = 'indi';
         }elseif(session('user.auth') == 'admin'){
             $searchType = 'business';
-        }
-        else{
+        }else{
             $searchType = 'colleague';
         }
 

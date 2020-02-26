@@ -120,6 +120,7 @@
 @push('js')
 <script>
     var chatroomList = {!! App\Http\Controllers\ChatroomController::getChatroomList() !!};
+    
     function outputChatroomList(chatroomList){
         tempHtml = "";
         $.each(chatroomList, function(i, item) {
@@ -155,7 +156,7 @@
         var value = $(this).val();
         tempChatroomList = [];
         $.each(chatroomList, function(i, item) {
-            if(item.name.toLowerCase().includes(value.toLowerCase()) || item.displayId.toLowerCase().includes(value.toLowerCase())){
+            if(item.name.toLowerCase().includes(value.toLowerCase())){
                 tempChatroomList.push(item);
             }
         });

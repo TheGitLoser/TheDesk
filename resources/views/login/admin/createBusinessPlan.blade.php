@@ -6,8 +6,7 @@
         <div class="row">
             <div class="col-md-12">
                 <form method="post" id="form" class="form-horizontal">
-                    <input type="hidden" name="_token" value="OGIm6e74J813CAVjrqZzTZUxzrKZenT3k1OC7bjc"> <input
-                        type="hidden" name="_method" value="put">
+                    @csrf
                     <div class="card">
                         <div class="card-header card-header-primary">
                             <h4 class="card-title">Create new business plan</h4>
