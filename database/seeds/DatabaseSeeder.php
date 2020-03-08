@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
         DB::table('business_plan')->insert(
             [
                 'unique_id' => 'sjhkfrot3524se',
-                'company_name' => 'Business Name',
+                'name' => 'Business Name',
                 'status' => '1'
             ]
         );
@@ -41,10 +41,10 @@ class DatabaseSeeder extends Seeder
         DB::table('user')->insert(
             [
                 [
-                    'unique_id' => 'owirje34rea3q0',
-                    'name' => 'indi name',
-                    'display_id' => 'Indi. name',
-                    'email' => 'test@example.com',
+                    'unique_id' => 'ajkdh',
+                    'name' => 'Tommy',
+                    'display_id' => 'Tommy',
+                    'email' => 'tommy@example.com',
                     'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
                     'type' => 'indi',
                     'phone' => '12345678',
@@ -56,17 +56,17 @@ class DatabaseSeeder extends Seeder
                     'display_id' => 'Business user',
                     'email' => 'buesinessuser@example.com',
                     'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
-                    'type' => 'business',
+                    'type' => 'business admin',
                     'phone' => '12345678',
                     'status' => '1'
                 ],
                 [
-                    'unique_id' => 'ajkdh',
-                    'name' => 'Tommy',
-                    'display_id' => 'Tommy',
-                    'email' => 'tommy@example.com',
+                    'unique_id' => '1KDVJS5MU44KWWOCSO',
+                    'name' => 'Admin',
+                    'display_id' => 'systemadmin',
+                    'email' => 'admin@example.com',
                     'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
-                    'type' => 'indi',
+                    'type' => 'admin',
                     'phone' => '12345678',
                     'status' => '1'
                 ]

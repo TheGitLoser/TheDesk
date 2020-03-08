@@ -29,7 +29,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                             {{ $chatroomDetails['description'] }}
                         </div>
                     </div>
-                    <form class="form" id="form">
+                    <form id="form">
                     @csrf
                     <div class="card-body message-body" id="message-body">
                         <table class="table">
@@ -103,7 +103,11 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
                             <button type="submit" class="btn btn-primary">Update</button>
-                            <button class="btn btn-info"><a href="{{route('login.chatroom.settingAddUser', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">Add User</a></button>
+                            <a href="{{route('login.chatroom.settingAddUser', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">
+                                <button type="button" class="btn btn-info">
+                                    Add User
+                                </button>
+                            </a>
                         </div>
                     </div>
                     </form>
