@@ -29,28 +29,70 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                             {{ $chatroomDetails['description'] }}
                         </div>
                     </div>
-                    @php
-                    print_r($chatroomDetails);
-                    echo "
-                    <hR>";
-                    print_r($chatroomUserDetails);
-                    @endphp
-last update
-                    add user
-                    side
-                    gpname
-
                     <form class="form" id="form">
+                    @csrf
                     <div class="card-body message-body" id="message-body">
                         <table class="table">
+                            <tr><td>name</td>
+                                <td>
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="name" value="{{$chatroomDetails['name']}}" required>
+                                    </div>
+                                </td>
+                            </tr>
                             <tr><td>Chat room type</td><td>Channel</td></tr>
                             <tr><td>Create at</td><td>{{ $chatroomDetails['create_at'] }}</td></tr>
                             <tr><td>Last update at</td><td>{{ $chatroomDetails['update_at'] }}</td></tr>
                             <tr><td>Description</td>
                                 <td>
-                                    @csrf
                                     <div class="form-group">
                                         <textarea id="description" rows="10" style="width:90%">{{$chatroomDetails['description']}}</textarea>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr><td>User side</td>
+                                <td>
+                                    <div class="form-group bmd-form-group">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h5 class="card-title">
+                                                Select the side of participant shown in chat room
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="padding-top: 5px;">
+                                            <div class="col-2">
+                                                Opposite side
+                                            </div>
+                                            <div class="col-8">
+                                            </div>
+                                            <div class="col-2">
+                                                My side
+                                            </div>
+                                        </div>
+                                    @foreach ($chatroomUserDetails as $item)
+                                        <div class="form-group bmd-form-group">
+                                            <div class="row" style="padding-top: 5px;">
+                                                <div class="col-2">
+                                                    @if ($item['side'] != $mySide)
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required checked>
+                                                    @else
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                    @endif
+                                                </div>
+                                                <div class="col-8">
+                                                    {{ $item['name'] }} @ {{ $item['display_id'] }}
+                                                </div>
+                                                <div class="col-2">
+                                                    @if ($item['side'] == $mySide)
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required checked>
+                                                    @else
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                     </div>
                                 </td>
                             </tr>
@@ -61,6 +103,7 @@ last update
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
                             <button type="submit" class="btn btn-primary">Update</button>
+                            <button class="btn btn-info"><a href="{{route('login.chatroom.settingAddUser', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">Add User</a></button>
                         </div>
                     </div>
                     </form>
@@ -71,9 +114,9 @@ last update
 
             @foreach ($chatroomUserDetails as $userDetails)
 
-            <div class="col-6">
+            <div class="col">
                 <div class="card">
-                    @if ($userDetails['you'] == true)
+                    @if ($userDetails['currentUser'] == true)
                         <div class="card-header card-header-success">
                     @else
                         <div class="card-header card-header-info">
@@ -112,6 +155,11 @@ last update
 @push('js')
 <script>
     $('#form').submit(function(e){
+        userSide = {};
+        @foreach ($chatroomUserDetails as $item)
+            userSide['{{$item['unique_id']}}'] = $('input[name={{$item["unique_id"]}}]:checked').val();
+        @endforeach
+
         e.preventDefault();
         $.ajaxSetup({
             headers: {
@@ -119,11 +167,13 @@ last update
             }
         });
         $.ajax({
-            url: "{{ route('ajax.chatroom.setting') }}",
+            url: "{{ route('ajax.chatroom.setting', ['mode'=>'channel']) }}",
             method: 'post',
             data: {
                 uniqid: "{{ $chatroomDetails['unique_id'] }}",
-                description: $('#description').val()
+                name: $('#name').val(),
+                description: $('#description').val(),
+                userSide: userSide
             },
             success: function(response){
                 if (response['output']['result'] == 'true') {

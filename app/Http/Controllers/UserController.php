@@ -19,7 +19,7 @@ class UserController extends Controller
             -> where('id', '<>', \getMyId())
             ->get();
         }elseif($searchType == 'business'){
-            $user = BusinessPlan::select('unique_id', 'company_name as name')
+            $user = BusinessPlan::select('unique_id', 'name')
                     -> where('status', '1')
                     ->get();
         }elseif($searchType == 'colleague'){

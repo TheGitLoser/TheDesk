@@ -23,13 +23,13 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                             {{ $userDetails['name'] }},
                             @endforeach
                         </div>
+                        {{-- <div class="card-category chatroom-info-right" style="height: 0;">
+                            {{ $chatroomDetails['description'] }}
+                        </div> --}}
                         <div class="card-category chatroom-info-right">
                             <a href="{{ route('login.chatroom.setting', ['unique_id'=>$chatroomUniqid]) }}">
                                 <i class="fas fa-cog"></i>
                             </a>
-                        </div>
-                        <div class="card-category" style="height: 0;">
-                            {{ $chatroomDetails['description'] }}
                         </div>
                     </div>
                     <div class="card-body message-body" id="message-body">
@@ -65,32 +65,31 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 {{-- socket --}}
 <script>
     chatroomUniqid = '{{ $chatroomUniqid }}';
-
     chatroomUser = {!! $chatroomUser !!};
     var myUniqid = "@php echo getMyUniqid(); @endphp";
-    var myUserType = "@php echo session('user.auth'); @endphp";
-    var initSocket = {socketType: "initChatroom",
-                        chatroomUniqid: chatroomUniqid,
-                        myUniqid: myUniqid,
-                        myUserType :myUserType};
+
     // for socket
     var currentChatroomUser = [];
     var responseFromDB;
+
     // for html output
-    var participateInfo = [];
+    var participantInfo = [];
     $.each(chatroomUser, function(i, item) {
         // for socket
         var temp = {};
         temp['unique_id'] = item['unique_id'];
-        temp['type'] = item['type'];
+        temp['side'] = item['side'];
+        if(item['unique_id'] == myUniqid){
+            mySide = item['side'];
+        }
         currentChatroomUser.push(temp);
         // for html output
-        participateInfo[item['unique_id']] = item;
+        participantInfo[item['unique_id']] = item;
     });
-    var messageSend = {socketType: "sendMessage",
+    var messageSend = {socketType: "initChatroom",
                         chatroomUniqid: chatroomUniqid,
                         myUniqid: myUniqid,
-                        myUserType :myUserType,
+                        mySide: mySide,
                         currentChatroomUser: currentChatroomUser};
 
     $(function(){
@@ -99,7 +98,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         console.log(Socket.readyState);
 
         Socket.onopen = function(event){
-            Socket.send(JSON.stringify(initSocket));
+            Socket.send(JSON.stringify(messageSend));
         }
 
         // send chatroom message
@@ -107,6 +106,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
             if(e.which === 13){
                 $(this).attr("disabled", "disabled");
                 message = $('#inputMessage').val()
+                messageSend['socketType'] = "sendMessage";
                 messageSend['message'] = message;
                 $.ajaxSetup({
                     headers: {
@@ -117,6 +117,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     url: "{{ route('ajax.chatroom.newMessage') }}",
                     method: 'post',
                     data: {
+                        // to DB
                         chatroomUniqid: chatroomUniqid, 
                         message: message
                     },
@@ -138,10 +139,10 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
             response = JSON.parse(event['data']);
             if(response['socketType'] == "newChatroomMessage"){
                 outputMessage(response);
+                $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
             }else{
 console.log('noti only');
             }
-            console.log();
         }
 
         Socket.onclose = function(event){
@@ -154,10 +155,10 @@ console.log('noti only');
 {{-- output message to html --}}
 <script>
     function messageLeft(tempMessage){
-        var name = participateInfo[tempMessage['userUniqid']]['name'];
-        var profilePic = participateInfo[tempMessage['userUniqid']]['profile_picture'];
+        var name = participantInfo[tempMessage['senderUniqid']]['name'];
+        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
         if(profilePic == null){
-            var initials = participateInfo[tempMessage['userUniqid']]['initials'];
+            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
             profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
         }
 
@@ -172,11 +173,15 @@ console.log('noti only');
         
     }
     function messageRight(tempMessage){
-        var name = participateInfo[tempMessage['userUniqid']]['name'];
-        var profilePic = participateInfo[tempMessage['userUniqid']]['profile_picture'];
+        var name = participantInfo[tempMessage['senderUniqid']]['name'];
+        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
         if(profilePic == null){
-            var initials = participateInfo[tempMessage['userUniqid']]['initials'];
-            profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
+            if (participantInfo[tempMessage['senderUniqid']]['currentUser'] == true) {
+                profilePic = '<img src="https://placehold.it/50/1169F7/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+            }else{
+                profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+            }
         }
 
         var tempHtml = '';
@@ -191,7 +196,7 @@ console.log('noti only');
     function outputMessage(message){
         var outputHtml = '';
         if(chatroomUser.length == 2){
-            if(message['userUniqid'] == myUniqid){
+            if(message['senderUniqid'] == myUniqid){
                 outputHtml += messageRight(message);    
             }
             else{

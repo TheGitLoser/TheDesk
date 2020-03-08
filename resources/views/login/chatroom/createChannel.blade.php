@@ -1,9 +1,5 @@
 @php
 $selectedUser = json_decode($selectedUser, true);
-$selectedUserUniqueId = [];
-foreach ($selectedUser as $item) {
-    array_push($selectedUserUniqueId, $item['unique_id']);
-}
 @endphp
 
 @extends('login.layout.app', ['activePage' => '', 'title' => ''])
@@ -32,13 +28,51 @@ foreach ($selectedUser as $item) {
                             <div class="row">
                                 <label class="col-sm-2 col-form-label" for="input-password-confirmation">User to be added</label>
                                 <div class="col-sm-7">
-                                    @foreach ($selectedUser as $item)
-                                        <div class="row" style="padding-top: 5px;">
+                                    <div class="form-group bmd-form-group">
+                                        <div class="row">
                                             <div class="col">
-                                                {{ $item['name'] }} @ {{ $item['display_id'] }}
+                                                <h5 class="card-title">
+                                                Select the side of participant shown in chat room
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="padding-top: 5px;">
+                                            <div class="col-2">
+                                                Opposite side
+                                            </div>
+                                            <div class="col-8">
+                                            </div>
+                                            <div class="col-2">
+                                                Same side with you
+                                            </div>
+                                        </div>
+                                        {{-- Current user --}}
+                                        <div class="row" style="padding-top: 5px;">
+                                            <div class="col-2"></div>
+                                            <div class="col-8">
+                                                {{ session('user.info.name') }} @ {{ session('user.info.displayId') }}
+                                            </div>
+                                            <div class="col-2">
+                                                Here
+                                            </div>
+                                        </div>
+                                    
+                                    @foreach ($selectedUser as $item)
+                                        <div class="form-group bmd-form-group">
+                                            <div class="row" style="padding-top: 5px;">
+                                                <div class="col-2">
+                                                    <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                </div>
+                                                <div class="col-8">
+                                                    {{ $item['name'] }} @ {{ $item['display_id'] }}
+                                                </div>
+                                                <div class="col-2">
+                                                    <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
+                                                </div>
                                             </div>
                                         </div>
                                     @endforeach
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">
@@ -65,6 +99,11 @@ foreach ($selectedUser as $item) {
 @push('js')
 <script>
     $('#form').submit(function(e){
+        userSide = {};
+        @foreach ($selectedUser as $item)
+            userSide['{{$item['unique_id']}}'] = $('input[name={{$item["unique_id"]}}]:checked').val();
+        @endforeach
+
         e.preventDefault();
         $.ajaxSetup({
             headers: {
@@ -77,7 +116,7 @@ foreach ($selectedUser as $item) {
             data: {
                 name: $('#name').val(),
                 description: $('#description').val(),
-                selectedUser: {!! json_encode($selectedUserUniqueId) !!}
+                selectedUser: userSide
             },
             success: function(response){
                 if (response['output']['result'] == 'true') {

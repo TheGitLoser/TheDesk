@@ -1,64 +1,67 @@
-@extends('login.layout.app', ['activePage' => 'businessAdminAddUser', 'title' => 'Add user account to you business plan'])
+@php
+    $business = json_decode($requestBusiness, true);
+@endphp
+
+@extends('login.layout.app', ['activePage' => 'Discover', 'title' => 'Submit new request'])
 
 @section('content')
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-lg-12 col-md-12 col-sm-12">
                 <form method="post" id="form" class="form-horizontal">
                     @csrf
                     <div class="card">
                         <div class="card-header card-header-primary">
-                            <h4 class="card-title">New account under your business plan</h4>
+                            <h4 class="card-title">My Profile</h4>
                             <p class="card-category"></p>
                         </div>
                         <div class="card-body ">
                             <div class="row">
-                                <label class="col-sm-2 col-form-label">Name</label>
+                                <label class="col-sm-2 col-form-label">Request to</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="text" id="name" placeholder="Name" required>
+                                        {{ $business['name'] }}
+                                    </div>
+                                </div>
+                            </div>
+                            @if (session("user.info.businessPlanId") != $business['id'])
+                                <div class="row">
+                                    <label class="col-sm-2 col-form-label">{{ $business['name'] }}'s profile</label>
+                                    <div class="col-sm-7">
+                                        <div class="form-group bmd-form-group">
+                                        {{ $business['profile'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">Request title</label>
+                                <div class="col-sm-7">
+                                    <div class="form-group bmd-form-group">
+                                        <input class="form-control" type="text" id="title" placeholder="Title" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-sm-2 col-form-label">Display ID</label>
+                                <label class="col-sm-2 col-form-label">Request details</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="text" id="displayId" placeholder="Display ID" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-sm-2 col-form-label">Email</label>
-                                <div class="col-sm-7">
-                                    <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="email" id="email" placeholder="Email" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-sm-2 col-form-label">Password</label>
-                                <div class="col-sm-7">
-                                    <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="password" id="password" placeholder="Password" required>
+                                        <textarea name="profile" id="details" rows="10" style="width:100%"></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
-                            <button type="submit" class="btn btn-primary">Create</button>
+                            <button type="submit" class="btn btn-primary">Submit request</button>
                         </div>
                     </div>
                 </form>
             </div>
-
         </div>
-    </div>
-</div>
 
-</div>
+    </div>
 </div>
 @endsection
 
@@ -72,13 +75,12 @@
             }
         });
         $.ajax({
-            url: "{{ route('ajax.createBusinessUser') }}",
+            url: "{{ route('ajax.newRequest') }}",
             method: 'post',
             data: {
-                name: $('#name').val(),
-                displayId: $('#displayId').val(),
-                email: $('#email').val(),
-                password: $('#password').val()
+                unique_id: "{{ $business['unique_id'] }}",
+                title: $('#title').val(),
+                details: $('#details').val()
             },
             success: function(response){
                 if (response['output']['result'] == 'true') {

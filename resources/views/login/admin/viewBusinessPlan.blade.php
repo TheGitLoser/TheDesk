@@ -93,7 +93,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(discoverList, function(i, item) {
-            tempHtml += '<tr><td>' + item.company_name + '<td>'
+            tempHtml += '<tr><td>' + item.name + '<td>'
                         + getTableButton(item.unique_id)
                         + '</tr>';
         });

@@ -108,8 +108,8 @@
     var searchType = '{{ $searchType }}';
     
     function getTableButton(uniqueId){
-        addContactButton = '{{ route('login.chatroom.addContact',['uniqueId'=> '']) }}/' + uniqueId;
-        startChatButton = '{{ route('login.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
+        addContactButton = '{{ route('backend.chatroom.addContact',['uniqueId'=> '']) }}/' + uniqueId;
+        startChatButton = '{{ route('backend.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + addContactButton + '">';
@@ -142,13 +142,13 @@
 
         if(searchType == 'business'){
             $.each(discoverList, function(i, item) {
-                tempHtml += '<tr><td>' + item.name + ' <td>'
+                tempHtml += '<tr><td>' + item.name + ' </td>'
                             + getNewRequestButton(item.unique_id)
                             + '</tr>';
             });
         }else{
             $.each(discoverList, function(i, item) {
-                tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+                tempHtml += '<tr><td>' + item.name + ' <small>@' + item.display_id + '</small></td>'
                             + getTableButton(item.unique_id)
                             + '</tr>';
             });

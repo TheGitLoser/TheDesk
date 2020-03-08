@@ -49,6 +49,7 @@
                         </p>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
+                        <div class="dropdown-item">Hi, @php echo session("user.info.name"); @endphp</div>
                         <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
                         <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a>
                         <div class="dropdown-divider"></div>

@@ -60,9 +60,9 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 
             @foreach ($chatroomUserDetails as $userDetails)
 
-            <div class="col-6">
+            <div class="col">
                 <div class="card">
-                    @if ($userDetails['you'] == true)
+                    @if ($userDetails['currentUser'] == true)
                         <div class="card-header card-header-success">
                     @else
                         <div class="card-header card-header-info">
@@ -108,7 +108,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
             }
         });
         $.ajax({
-            url: "{{ route('ajax.chatroom.setting') }}",
+            url: "{{ route('ajax.chatroom.setting', ['mode'=>'direct']) }}",
             method: 'post',
             data: {
                 uniqid: "{{ $chatroomDetails['unique_id'] }}",

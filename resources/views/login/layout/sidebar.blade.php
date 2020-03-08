@@ -72,13 +72,19 @@
                                     <span class="sidebar-normal">Add user</span>
                                 </a>
                             </li>
+                            {{-- <li class="nav-item{{ $activePage == 'businessAdminAssignRequest' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.businessAdmin.addUser') }}">
+                                    <span class="sidebar-mini"> R </span>
+                                    <span class="sidebar-normal">Assign request</span>
+                                </a>
+                            </li> --}}
                         </ul>
                     </div>
                 </li>
             @endif
 
-            <li class="nav-item{{ $activePage == 'businessUserHome' ? ' active' : '' }}">
-                <a class="nav-link" href="{{ route('login.home') }}">
+            <li class="nav-item{{ $activePage == 'request' ? ' active' : '' }}">
+                <a class="nav-link" href="{{ route('login.request.view') }}">
                     <i class="material-icons">dashboard</i>
                     <p>Request</p>
                 </a>

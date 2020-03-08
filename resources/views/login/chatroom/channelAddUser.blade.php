@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'contacts', 'title' => 'My contacts'])
+@extends('login.layout.app', ['activePage' => '', 'title' => 'Add user', 'currentChatroom' => $chatroomUniqid])
 
 @section('content')
 <div class="content">
@@ -58,7 +58,7 @@
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{ route('login.chatroom.createChannel') }}" method="POST">
+                <form action="{{ route('backend.chatroom.settingAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
                     @csrf
                     <div class="card card-stats">
                         <div class="card-header card-header-warning card-header-icon">
@@ -66,7 +66,7 @@
                                 <i class="material-icons">content_copy</i>
                             </div>
                             <div class="card-category" style="height: 0;">
-                                <button type="submit" class="btn btn-primary">Create channel</button>
+                                <button type="submit" class="btn btn-primary">Add User</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -136,7 +136,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small></td>'
+        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });

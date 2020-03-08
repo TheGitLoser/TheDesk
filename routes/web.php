@@ -31,24 +31,32 @@ Route::get('/login/account/logout', 'AuthController@logout') -> name('login.acco
 // chatroom
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
 Route::get('/chatroom/setting/{unique_id}', 'ChatroomController@setting') -> name('login.chatroom.setting');
-Route::post('/ajax/chatroom/setting', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
+Route::get('/chatroom/setting/addUser/{unique_id}', 'ChatroomController@settingAddUser') -> name('login.chatroom.settingAddUser');
+Route::post('/backend/chatroom/setting/addUser/{unique_id}', 'ChatroomController@backendSettingAddUser') -> name('backend.chatroom.settingAddUser');
+Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
 
 Route::post('/ajax/newMessage', 'ChatroomController@ajaxNewMessage') -> name('ajax.chatroom.newMessage');
+Route::get('/backend/chatroom/messageSeen/{unique_id}', 'ChatroomController@backendMessageSeen') -> name('backend.chatroom.messageSeen');
 
-Route::get('/chatroom/createChatroom/{unique_id}', 'ChatroomController@addToChat') -> name('login.chatroom.startChat');
+Route::get('/backend/chatroom/createChatroom/{unique_id}', 'ChatroomController@backendAddToChat') -> name('backend.chatroom.startChat');
 Route::post('/chatroom/createChannel', 'ChatroomController@createChannel') -> name('login.chatroom.createChannel');
 Route::post('/ajax/createChannel', 'ChatroomController@ajaxCreateChannel') -> name('ajax.createChannel');
 
 // contact list
 Route::get('/chatroom/contacts', 'ContactController@index') -> name('login.chatroom.contacts');
 Route::post('/ajax/searchContact', 'ContactController@ajaxSearchContact') -> name('ajax.searchContact');
-Route::get('/chatroom/addContact/{unique_id}', 'ContactController@addContact') -> name('login.chatroom.addContact');
-Route::get('/chatroom/hideContact/{unique_id}', 'ContactController@hideContact') -> name('login.chatroom.hideContact');
+Route::get('/backend/addContact/{unique_id}', 'ContactController@backendAddContact') -> name('backend.chatroom.addContact');
+Route::get('/backend/hideContact/{unique_id}', 'ContactController@backendHideContact') -> name('backend.chatroom.hideContact');
 
 // discover user
 Route::get('/chatroom/discover', 'UserController@discoverUser') -> name('login.chatroom.discover');
 Route::post('/ajax/discover', 'UserController@ajaxDiscover') -> name('ajax.discover');
-Route::get('/request/new/{unique_id}', 'ContactController@hideContact') -> name('login.request.new');
+
+// request
+Route::get('/request/new/{unique_id}', 'NewRequestController@new') -> name('login.request.new');
+Route::post('/ajax/newRequest', 'NewRequestController@ajaxNewRequest') -> name('ajax.newRequest');
+Route::get('/request/view', 'NewRequestController@view') -> name('login.request.view');
+Route::get('/backend/request/response/{unique_id}', 'NewRequestController@backendResponse') -> name('backend.request.response');
 
 // profile management
 Route::get('/home', 'PageController@index') -> name('login.home');
