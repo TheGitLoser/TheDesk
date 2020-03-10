@@ -56,15 +56,14 @@ class AuthController extends Controller
 
     public function ajaxLogin(Request $request)
     {
-        $input = $request->only('email', 'password', 'remember');
+        $input = $request->only('email', 'password');
         
         $user = User::select('id', 'unique_id', 'type', 'password', 'status', 'name', 'display_id')
                     -> where('email', $input['email'])
                     -> where('status', '1')
                     ->get();
         $count = $user->count();
-        $user = $user;
-        
+
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
             $userInfo = array('id' => $user->id, 'uniqid' => $user->unique_id, 'name' => $user->name, 'displayId' => $user->display_id);

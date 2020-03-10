@@ -38,12 +38,16 @@ $selectedUser = json_decode($selectedUser, true);
                                         </div>
                                         <div class="row" style="padding-top: 5px;">
                                             <div class="col-2">
-                                                Opposite side
+                                                <h5>
+                                                    Opposite side
+                                                </h5>
                                             </div>
                                             <div class="col-8">
                                             </div>
                                             <div class="col-2">
-                                                Same side with you
+                                                <h5>
+                                                    Same side with you
+                                                </h5>
                                             </div>
                                         </div>
                                         {{-- Current user --}}

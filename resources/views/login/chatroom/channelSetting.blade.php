@@ -62,12 +62,16 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                                         </div>
                                         <div class="row" style="padding-top: 5px;">
                                             <div class="col-2">
-                                                Opposite side
+                                                <h5>
+                                                    Opposite side
+                                                </h5>
                                             </div>
                                             <div class="col-8">
                                             </div>
                                             <div class="col-2">
-                                                My side
+                                                <h5>
+                                                    My side
+                                                </h5>
                                             </div>
                                         </div>
                                     @foreach ($chatroomUserDetails as $item)

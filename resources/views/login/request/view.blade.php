@@ -26,14 +26,8 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                            Add to contact list
-                            <i class="material-icons info-icon">playlist_add</i>
-
-                            Start to chat
-                            <i class="material-icons info-icon">chat</i>
-                            
-                            New request to business
-                            <i class="material-icons info-icon">mail</i>
+                            Goto response
+                            <i class="material-icons info-icon">reply</i>
                         </div>
                     </div>
                 </div>
@@ -55,7 +49,7 @@
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + newRequestButton + '">';
         output += '<button type="button" title="New Request" class="btn btn-primary btn-link btn-sm">';
-        output += '<i class="material-icons td-icon">mail</i>';
+        output += '<i class="material-icons td-icon">reply</i>';
         output += '</button></a></td>';
         
         return output;
@@ -69,7 +63,7 @@
             if(item.companyName){
                 item.requesterName += " <small>@" + item.companyName + "</small>";
             }
-            if(item.status = 1){
+            if(item.status == 1){
                 status = "Waiting to response";
             }else{
                 status = "Ongoing";
