@@ -68,6 +68,9 @@ class ChatroomController extends Controller
         $chatroom = $this->checkChatroomPermission($chatroomUniqid);
         $chatroomId = $chatroom->id;
 
+        $myUniqid = \getMyUniqid();
+        $myId = \getMyId();
+
         $chatroomUser = DB::select('SELECT cu.create_at as chatroomUserCreateAt, cu.update_at as chatroomUserUpdateAt, cu.side,
                                     u.unique_id, u.name, u.display_id, u.email,
                                     u.type, u.profile, u.profile_picture, u.status
@@ -79,12 +82,9 @@ class ChatroomController extends Controller
                                     CASE WHEN seen.id is not null THEN 1 ELSE 0 END as seen
                                     FROM message m 
                                     JOIN user u ON m.user_id = u.id AND u.status = 1
-                                    LEFT JOIN message_seen seen ON m.id = seen.message_id
+                                    LEFT JOIN message_seen seen ON m.id = seen.message_id AND seen.user_id = :myId
                                     WHERE m.chatroom_id = :chatroomId AND m.status = 1',
-                                    ["chatroomId" => $chatroomId]);
-        
-        $myUniqid = \getMyUniqid();
-        $myId = \getMyId();
+                                    ["chatroomId" => $chatroomId, "myId" => $myId]);
 
         $participationSide = [];
         
