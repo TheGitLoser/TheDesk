@@ -138,7 +138,11 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         Socket.onmessage = function(event){
             response = JSON.parse(event['data']);
             if(response['socketType'] == "newChatroomMessage"){
-                outputMessage(response);
+                try {
+                    outputMessage(response);
+                } catch (error) {
+                    location.reload();                    
+                }
                 $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
             }else{
 console.log('noti only');
