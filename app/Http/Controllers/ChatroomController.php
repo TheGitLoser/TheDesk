@@ -101,57 +101,37 @@ class ChatroomController extends Controller
             }
         }
 
-        if(empty($chatroom->name)){
-            // for DM
+        if (empty($chatroom->name)) {
+            // DM
             // get chat room name
             foreach ($chatroomUser as $user) {
-                if($user->unique_id != $myUniqid){
+                if ($user->unique_id != $myUniqid) {
                     $chatroom->name = $user->name;
                     break;
                 }
             }
-            foreach ($message as $item){
-                // get message side
-                if($item->senderUniqid == $myUniqid){
-                    $item->messageType = 'myMessage';
-                }else{
-                    $item->messageType = 'oppositeType';
-                }
-                
-                // message seen
-                if(!$item->seen){
-                    // not seen
-                    $messageSeen = new MessageSeen;
-                    $messageSeen->chatroom_id = $chatroomId;
-                    $messageSeen->message_id = $item->id;
-                    $messageSeen->user_id = $myId;
-                    $messageSeen->save();
-                }
-                unset($item->id);
-            }
-        }else{
-            // for channel
-            foreach ($message as $item) {
-                // get message side
-                if($item->senderUniqid == $myUniqid){
-                    $item->messageType = 'myMessage';
-                }elseif($participationSide[$item->senderUniqid] == $mySide){
-                    $item->messageType = 'sameType';
-                }else{
-                    $item->messageType = 'oppositeType';
-                }
+        }
 
-                // message seen
-                if(!$item->seen){
-                    // not seen
-                    $messageSeen = new MessageSeen;
-                    $messageSeen->chatroom_id = $chatroomId;
-                    $messageSeen->message_id = $item->id;
-                    $messageSeen->user_id = $myId;
-                    $messageSeen->save();
-                }
-                unset($item->id);
+        // get message side
+        foreach ($message as $item) {
+            if($item->senderUniqid == $myUniqid){
+                $item->messageSide = 'myMessage';
+            }elseif($participationSide[$item->senderUniqid] == $mySide){
+                $item->messageSide = 'sameSide';
+            }else{
+                $item->messageSide = 'oppositeSide';
             }
+
+            // message seen
+            if(!$item->seen){
+                // not seen
+                $messageSeen = new MessageSeen;
+                $messageSeen->chatroom_id = $chatroomId;
+                $messageSeen->message_id = $item->id;
+                $messageSeen->user_id = $myId;
+                $messageSeen->save();
+            }
+            unset($item->id);
         }
 
         unset($chatroom->id);
@@ -280,11 +260,13 @@ class ChatroomController extends Controller
             $addMe = new ChatroomUser;
             $addMe->chatroom_id = $chatroom->id;
             $addMe->user_id = $myId;
+            $addMe->side = '1';
             $addMe->save();
             
             $addContactUser = new ChatroomUser;
             $addContactUser->chatroom_id = $chatroom->id;
             $addContactUser->user_id = $contactUserId;
+            $addMe->side = '0';
             $addContactUser->save();
             $chatroomUniqid = $chatroom->unique_id;
         }

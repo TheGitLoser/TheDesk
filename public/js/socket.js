@@ -32,7 +32,6 @@ function socketNewNotiInThisRoom(response){
 
 // new message or new chat room
 function socketNewNoti(response){
-    console.log('noti');
     url = window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + response['chatroomUniqid'];
     pushNoti(response['chatroomName'], response['message'], url, false);
 }

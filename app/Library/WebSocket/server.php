@@ -32,42 +32,53 @@ var_dump($message);
             $output['messageCreateAt'] = $message->messageCreateAt;
             $output['message'] = $message->message;
             
-            // for each connected participant
-            foreach ($Server->wsClients as $id => $client) {
-                if(!isset($client[50])){
-                    continue;
-                }
-                $userInfo = $client[50];
+            // for each chatroom participant
+            foreach ($message->currentChatroomUser as $newMessageChatroomUser) {
+                $tempThisParticipant;   // server->clientId to be send socket msg
+                // for each connected participant
+                foreach ($Server->wsClients as $id => $client) {
+                    if (!isset($client[50])) {
+                        continue;
+                    }
+                    // is current chatroom participant
+                    $userInfo = $client[50];
 
-                // for each chatroom participant
-                foreach ($message->currentChatroomUser as $newMessageChatroomUser) {
-                    if( $userInfo['userUniqid'] == $newMessageChatroomUser->unique_id) {
+                    if ($userInfo['userUniqid'] != $newMessageChatroomUser->unique_id) {
                         // if socket is not chatroom participant
                         continue;
                     }
                     // if socket is chatroom participant
 
-                    // default socket msg 
-                    $output['socketType'] = 'notiNewChatroomMessage';
-                    $output['messageType'] = '';
+                    if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
+                        // is viewing THIS chatroom
+                        $tempThisParticipant = $id;
+                        break;
+                    } else {
+                        $tempThisParticipant = $id;
+                    }
+                }
 
-                    // if is socket is viewing chatroom
-                    if ($userInfo['connectionType'] == "initChatroom"){
-                        // if user is viewing THIS chatroom
-                        if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
-                            $output['socketType'] = 'newChatroomMessage';
-                            if ($userInfo['userUniqid'] == $output['senderUniqid']) { // = sender uniqid
-                                $output['messageType'] = 'myMessage';
-                            } elseif ($userInfo['side'] == $output['senderSide']) { 
-                                $output['messageType'] = 'sameType';
-                            } else {
-                                $output['messageType'] = 'oppositeType';
-                            }
+                // default socket msg
+                $output['socketType'] = 'notiNewChatroomMessage';
+                $output['messageSide'] = '';
+
+                // if is socket is viewing chatroom
+                if ($userInfo['connectionType'] == "initChatroom") {
+                    // if user is viewing THIS chatroom
+                    if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
+                        $output['socketType'] = 'newChatroomMessage';
+                        if ($userInfo['userUniqid'] == $output['senderUniqid']) { // = sender uniqid
+                            $output['messageSide'] = 'myMessage';
+                        } elseif ($userInfo['side'] == $output['senderSide']) {
+                            $output['messageSide'] = 'sameSide';
+                        } else {
+                            $output['messageSide'] = 'oppositeSide';
                         }
                     }
                 }
+
                 print_r($output);
-                $Server->wsSend($id, json_encode($output));     // send socket message
+                $Server->wsSend($tempThisParticipant, json_encode($output));     // send socket message
             }
             break;
         case 'initChatroom':

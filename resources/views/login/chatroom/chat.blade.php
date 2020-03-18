@@ -141,28 +141,20 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         tempHtml += '</div></div>';
         return tempHtml;
     }
+    
     function outputMessage(message){
         var outputHtml = '';
-        if(chatroomUser.length == 2){
-            if(message['senderUniqid'] == myUniqid){
-                outputHtml += messageRight(message);    
-            }
-            else{
-                outputHtml += messageLeft(message);
-            }
+        if(message['messageSide'] == 'myMessage'){
+            outputHtml += messageRight(message);
+        }else if(message['messageSide'] == 'sameSide'){
+            outputHtml += messageRight(message);
         }else{
-            if(message['messageType'] == 'myMessage'){
-                outputHtml += messageRight(message);
-            }else if(message['messageType'] == 'sameType'){
-                outputHtml += messageRight(message);
-            }else{
-                //oppositeType
-                outputHtml += messageLeft(message);
-            }
+            //oppositeSide
+            outputHtml += messageLeft(message);
         }
         $('#message-body').append(outputHtml);
-        
     }
+
     $(function() {
         // style adjust
         $("#pageTitle").hide();    
