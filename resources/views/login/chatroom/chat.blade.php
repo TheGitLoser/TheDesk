@@ -55,24 +55,19 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 </div>
 @endsection
 
-@push('js')
-<script>
-    $("#pageTitle").hide();
-</script>
-@endpush
 
 @push('js')
 {{-- socket --}}
 <script>
     chatroomUniqid = '{{ $chatroomUniqid }}';
     chatroomUser = {!! $chatroomUser !!};
-    var myUniqid = "@php echo getMyUniqid(); @endphp";
+    chatroomName = "{{ $chatroomDetails['name'] }}";
 
     // for socket
     var currentChatroomUser = [];
     var responseFromDB;
 
-    // for html output
+    // for html output (process participant info in JS)
     var participantInfo = [];
     $.each(chatroomUser, function(i, item) {
         // for socket
@@ -86,78 +81,27 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         // for html output
         participantInfo[item['unique_id']] = item;
     });
-    var messageSend = {socketType: "initChatroom",
+    messageSend = {socketType: "initChatroom",
                         chatroomUniqid: chatroomUniqid,
+                        chatroomName: chatroomName,
                         myUniqid: myUniqid,
                         mySide: mySide,
                         currentChatroomUser: currentChatroomUser};
-
-    $(function(){
-        var socketUrl = '{{ $wsConnection }}';
-        var Socket = new WebSocket(socketUrl);
-        console.log(Socket.readyState);
-
-        Socket.onopen = function(event){
-            Socket.send(JSON.stringify(messageSend));
-        }
-
-        // send chatroom message
-        $('#inputMessage').on('keypress', function (e) {
-            if(e.which === 13){
-                $(this).attr("disabled", "disabled");
-                message = $('#inputMessage').val()
-                messageSend['socketType'] = "sendMessage";
-                messageSend['message'] = message;
-                $.ajaxSetup({
-                    headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: "{{ route('ajax.chatroom.newMessage') }}",
-                    method: 'post',
-                    data: {
-                        // to DB
-                        chatroomUniqid: chatroomUniqid, 
-                        message: message
-                    },
-                    success: function(response){
-                        responseFromDB =  response['output'];
-                        messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
-                        messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
-                        Socket.send(JSON.stringify(messageSend));
-                        console.log(messageSend);
-                    }
-                });
-                $(this).val('');
-                $(this).removeAttr("disabled");
-            }
-        });
-
-        // when message comes form server
-        Socket.onmessage = function(event){
-            response = JSON.parse(event['data']);
-            if(response['socketType'] == "newChatroomMessage"){
-                try {
-                    outputMessage(response);
-                } catch (error) {
-                    location.reload();                    
-                }
-                $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
-            }else{
-console.log('noti only');
-            }
-        }
-
-        Socket.onclose = function(event){
-            console.log("Socket is closed now (onclose())");
-        }
-    });
 
 </script>
 
 {{-- output message to html --}}
 <script>
+    function socketNewChatroomMessage(response){
+        try {
+            outputMessage(response);
+            $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
+        } catch (error) {
+            location.reload();                    
+        }
+        $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
+    }
+
     function messageLeft(tempMessage){
         var name = participantInfo[tempMessage['senderUniqid']]['name'];
         var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
@@ -217,10 +161,12 @@ console.log('noti only');
             }
         }
         $('#message-body').append(outputHtml);
-        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
+        
     }
     $(function() {
         // style adjust
+        $("#pageTitle").hide();    
+
         $('.message-body').height($(window).height() * 0.65);
         $( "footer" ).remove("footer");
         $('a.navbar-brand').remove();
@@ -231,6 +177,41 @@ console.log('noti only');
             outputMessage(item);
         });
         $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
+
+        // send chatroom message
+        $('#inputMessage').on('keypress', function (e) {
+            if(e.which === 13){
+                $(this).attr("disabled", "disabled");
+                message = $('#inputMessage').val()
+                messageSend['socketType'] = "sendMessage";
+                messageSend['message'] = message;
+                $.ajaxSetup({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                $.ajax({
+                    url: "{{ route('ajax.chatroom.newMessage') }}",
+                    method: 'post',
+                    data: {
+                        // to DB
+                        chatroomUniqid: chatroomUniqid, 
+                        message: message
+                    },
+                    success: function(response){
+                        responseFromDB =  response['output'];
+                        messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
+                        messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                        Socket.send(JSON.stringify(messageSend));
+
+                        console.log('messageSend to socket');
+                        console.log(messageSend);
+                    }
+                });
+                $(this).val('');
+                $(this).removeAttr("disabled");
+            }
+        });
     });
 
 </script>

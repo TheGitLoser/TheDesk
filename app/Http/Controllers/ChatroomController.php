@@ -156,11 +156,8 @@ class ChatroomController extends Controller
 
         unset($chatroom->id);
 
-        // ws connection details
-        $wsConnection = env('WS_Protocol') ."://". env('WS_URL');
-        
-        return view('login.chatroom.chat')->with('wsConnection', $wsConnection)
-                                            ->with('chatroom', json_encode($chatroom))
+
+        return view('login.chatroom.chat')->with('chatroom', json_encode($chatroom))
                                             ->with('chatroomUser', json_encode($chatroomUser))
                                             ->with('message', json_encode($message));
     }
