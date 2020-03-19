@@ -1,9 +1,9 @@
 $(function(){
     Socket = new WebSocket(socketUrl);
-    console.log(Socket.readyState);
-
+    
     Socket.onopen = function(event){
         // init connection message
+        console.log(Socket.readyState);
         Socket.send(JSON.stringify(messageSend));
     }
 
@@ -12,10 +12,14 @@ $(function(){
         response = JSON.parse(event['data']);
 console.log(response);
         if(response['socketType'] == "newChatroomMessage"){
-            socketNewChatroomMessage(response);
-            socketNewNotiInThisRoom(response);
-        }else{
+            socketNewChatroomMessage(response); // show msg
+            updateChatroomList(response, false);
+            socketNewNotiInThisRoom(response);  // noti new coming msg
+        }else if(response['socketType'] == "notiNewChatroomMessage"){
+            updateChatroomList(response, true);
             socketNewNoti(response);
+        }else if(response['socketType'] == "notiNewInvitation"){
+
         }
     }
 
@@ -24,16 +28,35 @@ console.log(response);
     }
 });
 
+function updateChatroomList(response, unseen){
+    indexToBeUpdate = chatroomList.findIndex( ({ unique_id }) => unique_id === response['chatroomUniqid'] );
+    chatroomName = chatroomList[indexToBeUpdate].name;
+    chatroomList[indexToBeUpdate].update_at = response['messageCreateAt'];
+    if(unseen){
+        chatroomList[indexToBeUpdate].unseen ++;
+    }
+
+    // sort chatroom list by update_at desc
+    chatroomList.sort(function (a, b) {
+        return b.update_at.localeCompare(a.update_at);
+    });
+    outputChatroomList(chatroomList);
+}
+
 // new message in the same chatroom
 function socketNewNotiInThisRoom(response){
-    url = window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + response['chatroomUniqid'];
-    pushNoti(response['chatroomName'], response['message'], url, true);
+    if(response['messageSide'] != 'myMessage'){
+        url = window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + response['chatroomUniqid'];
+        pushNoti(chatroomName, response['message'], url, true);
+    }
 }
 
 // new message or new chat room
 function socketNewNoti(response){
     url = window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + response['chatroomUniqid'];
-    pushNoti(response['chatroomName'], response['message'], url, false);
+    pushNoti(chatroomName, response['message'], url, false);
+    // update chatroom list
+
 }
 
 function newNoti(title, body, url, current){

@@ -24,7 +24,6 @@ var_dump($message);
             // $id = client's id assigned by socket
             $output['socketType'] = 'newChatroomMessage';
             $output['chatroomUniqid'] = $message->chatroomUniqid;
-            $output['chatroomName'] = $message->chatroomName;
             $output['senderUniqid'] = $message->myUniqid;
             $output['senderSide'] = $message->mySide;
             // for output message
@@ -49,7 +48,7 @@ var_dump($message);
                     }
                     // if socket is chatroom participant
 
-                    if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
+                    if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
                         // is viewing THIS chatroom
                         $tempThisParticipant = $id;
                         break;

@@ -2,7 +2,7 @@
 $selectedUser = json_decode($selectedUser, true);
 @endphp
 
-@extends('login.layout.app', ['activePage' => '', 'title' => ''])
+@extends('login.layout.app', ['activePage' => '', 'title' => 'Create New Channel'])
 
 @section('content')
 <div class="content">
@@ -52,12 +52,14 @@ $selectedUser = json_decode($selectedUser, true);
                                         </div>
                                         {{-- Current user --}}
                                         <div class="row" style="padding-top: 5px;">
-                                            <div class="col-2"></div>
+                                            <div class="col-2">
+                                                <input class="form-control" type="radio" disabled>
+                                            </div>
                                             <div class="col-8">
                                                 {{ session('user.info.name') }} @ {{ session('user.info.displayId') }}
                                             </div>
                                             <div class="col-2">
-                                                Here
+                                                <input class="form-control" type="radio" checked disabled>
                                             </div>
                                         </div>
                                     

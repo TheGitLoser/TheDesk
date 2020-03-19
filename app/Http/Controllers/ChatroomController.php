@@ -14,15 +14,18 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId
-                                FROM chatroom c
-                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
-                                    LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> :myUserId2 AND cu2.status = 1
-                                    LEFT JOIN user u2 ON cu2.user_id = u2.id 
-                                WHERE c.status = 1 and cu.status = 1 
-                                GROUP BY c.unique_id, c.name, c.update_at
-                                ORDER BY c.update_at DESC',
-                            ['myUserId' => \getMyId(), 'myUserId2' => \getMyId()]);
+        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId, count(msg.id) - count(msgSeen.id) as unseen
+                                    FROM chatroom c
+                                        JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
+                                        LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
+                                        LEFT JOIN user u2 ON cu2.user_id = u2.id 
+                                        LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                        LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
+                                            AND msgSeen.seen_status = 1 AND msg.id = msgSeen.message_id
+                                    WHERE c.status = 1 and cu.status = 1 
+                                    GROUP BY c.unique_id, c.name, c.update_at
+                                    ORDER BY c.update_at DESC',
+                            ['myUserId' => \getMyId()]);
         foreach ($myChatroom as $item) {
             // if chatroom Name = null, use participate name
             if(is_null($item->chatroomName)){
@@ -31,6 +34,8 @@ class ChatroomController extends Controller
                 $item->name = $item->chatroomName;
             }
             $item->initials = \initials($item->name);
+            
+            unset($item->chatroomName);
         }
         return $myChatroom;
     }

@@ -61,7 +61,6 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 <script>
     chatroomUniqid = '{{ $chatroomUniqid }}';
     chatroomUser = {!! $chatroomUser !!};
-    chatroomName = "{{ $chatroomDetails['name'] }}";
 
     // for socket
     var currentChatroomUser = [];
@@ -83,7 +82,6 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
     });
     messageSend = {socketType: "initChatroom",
                         chatroomUniqid: chatroomUniqid,
-                        chatroomName: chatroomName,
                         myUniqid: myUniqid,
                         mySide: mySide,
                         currentChatroomUser: currentChatroomUser};

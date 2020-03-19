@@ -2,6 +2,19 @@
     width: 200px !important;
 }
 
+.sidebar-noti {
+    top: 2px;
+    border: 1px solid #FFF;
+    font-size: 10px;
+    background: #f44336;
+    color: #FFFFFF;
+    padding: 0px 5px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 19px; 
+    display: block;
+}
+
 .td-icon {
     font-size: 30px !important;
 }

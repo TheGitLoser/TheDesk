@@ -136,13 +136,15 @@
             }else{
                 active = '';
             }
-            var initials = item.initials;
-            var chatroomName = item.name;
 
             tempHtml += '<li class="nav-item ' + active +'">';
             tempHtml += '<a class="nav-link" href="' + link +'">';
-            tempHtml += '<span class="sidebar-mini user-name-icon"> ' + initials +' </span>';
-            tempHtml += '<span class="sidebar-normal">' + chatroomName +' </span>';
+            if(item.unseen){
+                tempHtml += '<span class="sidebar-mini user-name-icon sidebar-noti"> ' + item.unseen +' </span>';
+            }else{
+                tempHtml += '<span class="sidebar-mini user-name-icon"> ' + item.initials +' </span>';
+            }
+            tempHtml += '<span class="sidebar-normal">' + item.name.substring(0, 23) +' </span>';
             tempHtml += '</a></li>';
         });
         $('#chatroom').html(tempHtml);
