@@ -138,7 +138,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+        tempHtml += '<tr><td style="width: 10%;">' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });

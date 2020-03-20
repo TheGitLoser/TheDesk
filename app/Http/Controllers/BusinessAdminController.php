@@ -57,7 +57,7 @@ class BusinessAdminController extends Controller
         return back();
     }
     public function ajaxCreateBusinessUser(Request $request){
-        $input = $request->only('name', 'displayId', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
+        $input = $request->only('type', 'name', 'displayId', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
 
         $checkUserEmail = User::where('email', $input['email'])->count();
         $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
@@ -78,7 +78,7 @@ class BusinessAdminController extends Controller
             $user->display_id = $input['displayId'];  
             $user->email = $input['email'];
             $user->password = password_hash($input['password'], PASSWORD_DEFAULT, ['cost'=> 11]);
-            $user->type = 'business';
+            $user->type = $input['type'];
             
             $user->save();
 
