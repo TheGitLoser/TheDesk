@@ -14,23 +14,24 @@ function getChatroomParticipantInSocket($currentChatroomUser, $chatrooomUniqid){
     foreach ($currentChatroomUser as $newMessageChatroomUser) {
         $tempThisParticipant;   // server->clientId to be send socket msg
         $checkThisParticipant = false;
-
+echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
         // for each connected participant
         foreach ($Server->wsClients as $id => $clientInfo) {
+            echo "D";
+        var_dump($Server->wsClients) ;
             if (!isset($clientInfo[50])) {
                 // this socket is not a user
                 continue;
             }
             // this socket is a user
             $userInfo = $clientInfo[50];
-            
             if ($userInfo['userUniqid'] != $newMessageChatroomUser->unique_id) {
                 // if socket is not a participant
                 continue;
             }
             // if socket is a participant
             $checkThisParticipant = true;
-
+echo "\n   checkThisParticipant : ";
             if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $chatrooomUniqid) {
                 // is viewing THIS chatroom
                 $tempThisParticipant = $id;
@@ -44,6 +45,7 @@ function getChatroomParticipantInSocket($currentChatroomUser, $chatrooomUniqid){
             array_push($chatroomParticipantInSocket, $tempThisParticipant);
         }
     }
+    var_dump($chatroomParticipantInSocket);
     return $chatroomParticipantInSocket;
 }
 
@@ -69,7 +71,7 @@ var_dump($message);
             $output['senderSide'] = $message->mySide;
             // for output message
             $output['messageUniqid'] = $message->messageUniqid;
-            $output['messageCreateAt'] = $message->messageCreateAt;
+            $output['messageUpdateAt'] = $message->messageUpdateAt;
             $output['message'] = $message->message;
             
             $chatroomParticipantInSocket = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
@@ -129,7 +131,7 @@ var_dump($message);
             break;
         case 'backend':
             var_dump($Server->wsClients);
-            $Server->wsSend($clientID, json_encode($Server->wsClients));
+            $Server->wsSend($clientID, json_encode($Server->wsClients[50]));
             break;
         default:
             # code...

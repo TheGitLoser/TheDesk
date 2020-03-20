@@ -113,7 +113,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         tempHtml += '<div class="col-1" id="message:' + tempMessage["messageUniqid"] +'">';
         tempHtml += profilePic;
         tempHtml += '</div><div class="col-9 message-left">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageUpdateAt'] + '</small>';
         tempHtml += '</div></div>';
         return tempHtml;
         
@@ -133,7 +133,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         var tempHtml = '';
         tempHtml += '<div class="row message-item">';
         tempHtml += '<div class="col-2"></div><div class="col-9 message-right" id="message:' + tempMessage["messageUniqid"] +'">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageUpdateAt'] + '</small>';
         tempHtml += '</div><div class="col-1">';
         tempHtml += profilePic;
         tempHtml += '</div></div>';
@@ -160,7 +160,6 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
             messageSend['socketType'] = "notiNewInvitation";
             Socket.send(JSON.stringify(messageSend));
         }
-        console.log('s');
     }
 
     $(function() {
@@ -173,6 +172,8 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 
         // check if is new chatroom
         Socket.onopen = function(event){
+            console.log(Socket.readyState);
+            Socket.send(JSON.stringify(messageSend));
             checkType();
         }
 
@@ -206,7 +207,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     success: function(response){
                         responseFromDB =  response['output'];
                         messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
-                        messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                        messageSend['messageUpdateAt'] = responseFromDB['messageUpdateAt'];
                         Socket.send(JSON.stringify(messageSend));
 
                         console.log('messageSend to socket');

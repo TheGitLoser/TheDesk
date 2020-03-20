@@ -14,7 +14,8 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId, count(msg.id) - count(msgSeen.id) as unseen
+        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId, 
+                                        count(msg.id) - count(msgSeen.id) as unseen
                                     FROM chatroom c
                                         JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
                                         LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
@@ -82,17 +83,18 @@ class ChatroomController extends Controller
                                     FROM chatroom_user cu JOIN user u ON cu.user_id = u.id AND u.status = 1
                                     WHERE cu.chatroom_id = :chatroomId AND cu.status = 1',
                                     ["chatroomId" => $chatroomId]);
-        $message = DB::select('SELECT m.id, m.unique_id as messageUniqid, m.content as message, m.create_at as messageCreateAt,
-                                    m.update_at as messageUpdateAt,u.unique_id as senderUniqid, 
+        $message = DB::select('SELECT m.id, m.unique_id as messageUniqid, m.content as message,  
+                                    m.update_at as messageUpdateAt, u.unique_id as senderUniqid, 
                                     CASE WHEN seen.id is not null THEN 1 ELSE 0 END as seen
                                     FROM message m 
                                     JOIN user u ON m.user_id = u.id AND u.status = 1
                                     LEFT JOIN message_seen seen ON m.id = seen.message_id AND seen.user_id = :myId
-                                    WHERE m.chatroom_id = :chatroomId AND m.status = 1',
+                                    WHERE m.chatroom_id = :chatroomId AND m.status = 1
+                                    ORDER BY m.update_at',
                                     ["chatroomId" => $chatroomId, "myId" => $myId]);
 
         $participationSide = [];
-        
+     //  dd($message); 
         foreach ($chatroomUser as $participant) {
             $participant->initials = \initials($participant->name);
             if($participant->unique_id == $myUniqid){
@@ -277,7 +279,7 @@ class ChatroomController extends Controller
             $addContactUser->side = '0';
             $addContactUser->save();
             $chatroomUniqid = $chatroom->unique_id;
-            
+
             return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid, 'type' => 'new']);
         }
     }
@@ -352,7 +354,7 @@ class ChatroomController extends Controller
         $message->save();
         
         $output['messageUniqid'] = $message['unique_id'];
-        $output['messageCreateAt'] = $message['create_at']->format('Y-m-d H:i:s');
+        $output['messageUpdateAt'] = $message['update_at']->format('Y-m-d H:i:s');
         return response()->json(compact('output'));
     }
 

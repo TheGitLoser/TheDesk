@@ -1,3 +1,4 @@
+$(function() {  
     Socket = new WebSocket(socketUrl);
     
     Socket.onopen = function(event){
@@ -37,7 +38,7 @@ console.log(response);
             Socket = new WebSocket(socketUrl);
           }, 10);
     }
-    
+});
 
 function getChatroomURL(chatroomUniqid){
     return window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + chatroomUniqid;
@@ -46,7 +47,7 @@ function getChatroomURL(chatroomUniqid){
 function updateChatroomList(response, unseen){ 
     indexToBeUpdate = chatroomList.findIndex( ({ unique_id }) => unique_id === response['chatroomUniqid'] );
     chatroomName = chatroomList[indexToBeUpdate].name;
-    chatroomList[indexToBeUpdate].update_at = response['messageCreateAt'];
+    chatroomList[indexToBeUpdate].update_at = response['messageUpdateAt'];
     if(unseen){
         // not current chatroom
         chatroomList[indexToBeUpdate].unseen ++;
