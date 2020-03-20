@@ -24,7 +24,7 @@ class CreateRequestTable extends Migration
 
             $table->timestamp('create_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('update_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
-            $table->string('status', 2)->default('1');
+            $table->string('status', 2)->default('2');
         });
     }
 

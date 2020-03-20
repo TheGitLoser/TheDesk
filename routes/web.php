@@ -34,6 +34,7 @@ Route::get('/chatroom/setting/{unique_id}', 'ChatroomController@setting') -> nam
 Route::get('/chatroom/setting/addUser/{unique_id}', 'ChatroomController@settingAddUser') -> name('login.chatroom.settingAddUser');
 Route::post('/backend/chatroom/setting/addUser/{unique_id}', 'ChatroomController@backendSettingAddUser') -> name('backend.chatroom.settingAddUser');
 Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
+Route::post('/ajax/chatroom/getChatroomList', 'ChatroomController@ajaxGetChatroomList') -> name('ajax.chatroom.getChatroomList');
 
 Route::post('/ajax/newMessage', 'ChatroomController@ajaxNewMessage') -> name('ajax.chatroom.newMessage');
 Route::get('/backend/chatroom/messageSeen/{unique_id}', 'ChatroomController@backendMessageSeen') -> name('backend.chatroom.messageSeen');

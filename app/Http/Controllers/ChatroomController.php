@@ -233,6 +233,7 @@ class ChatroomController extends Controller
         return view('login.chatroom.createChannel')->with('selectedUser', json_encode($user));
     }
 
+    // add to DM
     public function backendAddToChat($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
@@ -250,8 +251,10 @@ class ChatroomController extends Controller
         
         if($checkChatroom){
             // already exists
-            $chatroomUniqid = Chatroom::select('unique_id')->where('id', $checkChatroom[0]->chatroom_id)->first();
-            $chatroomUniqid = $chatroomUniqid->unique_id;
+            $chatroom = Chatroom::select('unique_id')->where('id', $checkChatroom[0]->chatroom_id)->first();
+            $chatroomUniqid = $chatroom->unique_id;
+
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid]);
         }else{
             // check is it on Contact list
             app()->call('App\Http\Controllers\ContactController@checkContactExists', [$unique_id]); 
@@ -271,14 +274,15 @@ class ChatroomController extends Controller
             $addContactUser = new ChatroomUser;
             $addContactUser->chatroom_id = $chatroom->id;
             $addContactUser->user_id = $contactUserId;
-            $addMe->side = '0';
+            $addContactUser->side = '0';
             $addContactUser->save();
             $chatroomUniqid = $chatroom->unique_id;
+            
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid, 'type' => 'new']);
         }
-                
-        return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid]);
     }
 
+    // add to channel
     public function backendSettingAddUser(Request $request, $unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
@@ -310,10 +314,12 @@ class ChatroomController extends Controller
                 $chatroomUser->chatroom_id = $chatroom->id;
                 $chatroomUser->user_id = $userId;
                 $chatroomUser->side = $mySide['side'];
-                $chatroomUser->save();    
+                $chatroomUser->save();
+
+                $chatroom->touch();
             }
         }
-        return redirect()->route('login.chatroom.setting', ['unique_id' => $unique_id]);
+        return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id, 'type' => 'new']);
     }
 
     public function backendMessageSeen($unique_id){
@@ -335,7 +341,7 @@ class ChatroomController extends Controller
         }
         $input = $request->only('chatroomUniqid', 'message');
 
-        $chatroom = Chatroom::select('id')->where('unique_id', $input['chatroomUniqid'])->first();
+        $chatroom = $this->checkChatroomPermission($input['chatroomUniqid']);
         $chatroom->touch();
 
         $message = new Message;
@@ -351,6 +357,9 @@ class ChatroomController extends Controller
     }
 
     public function ajaxCreateChannel(Request $request){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
         $input = $request->only('name', 'description', 'selectedUser');
         $selectedUserUniqid = array_keys($input['selectedUser']);
 
@@ -377,21 +386,26 @@ class ChatroomController extends Controller
         $addMe->save();
 
         $output['result'] = "true";
-        $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id]);
+        $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id, 'type' => 'new']);
         
         return response()->json(compact('output'));
     }
     public function ajaxSetting(Request $request, $mode){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
         if ($mode == 'direct') {
             $input = $request->only('uniqid', 'description');
 
-            $chatroom = Chatroom::where('unique_id', $input['uniqid'])->first();
+            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+
             $chatroom->description = $input['description'];
             $chatroom->save();
         }elseif ($mode == 'channel') {
             $input = $request->only('uniqid', 'name', 'description', 'userSide');
             
-            $chatroom = Chatroom::where('unique_id', $input['uniqid'])->first();
+            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+            
             $chatroom->name = $input['name'];
             $chatroom->description = $input['description'];
             $chatroom->save();
@@ -407,5 +421,12 @@ class ChatroomController extends Controller
         $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id]);
         
         return response()->json(compact('output'));
+    }
+
+    public function ajaxGetChatroomList(){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        return response()->json(ChatroomController::getChatroom());
     }
 }

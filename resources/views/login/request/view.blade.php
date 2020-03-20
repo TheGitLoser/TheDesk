@@ -63,9 +63,9 @@
             if(item.companyName){
                 item.requesterName += " <small>@" + item.companyName + "</small>";
             }
-            if(item.status == 1){
+            if(item.status == 2){
                 status = "Waiting to response";
-            }else{
+            }else if(item.status == 1){
                 status = "Ongoing";
             }
             tempHtml += '<tr><td>' + item.requesterName + ' </td><td>' + item.title 

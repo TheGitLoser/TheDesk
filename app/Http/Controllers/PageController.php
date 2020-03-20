@@ -11,10 +11,12 @@ class PageController extends Controller
     {
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
-        }else{
+        }elseif(userTypeAccess(['indi'])){
             return redirect()->route('login.chatroom.discover');
-            return view('login.home');
+        }else{
+            return redirect()->route('login.request.view');
         }
+        return view('login.home');
     }
     public function editPassword()
     {

@@ -81,6 +81,8 @@
                         </div>
                         <div class="card-footer">
                             <div class="stats">
+                                Please add user to your contact list before adding to channel, 
+
                                 Hide
                                 <i class="far fa-minus-square info-icon"></i>
 

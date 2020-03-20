@@ -153,6 +153,16 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         $('#message-body').append(outputHtml);
     }
 
+    function checkType(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        if(urlParams.get('type') ==='new'){
+            messageSend['socketType'] = "notiNewInvitation";
+            Socket.send(JSON.stringify(messageSend));
+        }
+        console.log('s');
+    }
+
     $(function() {
         // style adjust
         $("#pageTitle").hide();    
@@ -160,6 +170,11 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         $('.message-body').height($(window).height() * 0.65);
         $( "footer" ).remove("footer");
         $('a.navbar-brand').remove();
+
+        // check if is new chatroom
+        Socket.onopen = function(event){
+            checkType();
+        }
 
         message = {!! $message !!};
         $('#message-body').html('');

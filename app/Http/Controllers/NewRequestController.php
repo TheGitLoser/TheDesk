@@ -37,7 +37,7 @@ class NewRequestController extends Controller
                                         LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
                                         LEFT JOIN business_plan bp ON bu.business_plan_id = bp.id AND bp.status = 1
                                         WHERE req.user_id = :myId 
-                                            AND (req.status = 1 OR req.status = 3)
+                                            AND (req.status = 1 OR req.status = 2)
                                         ORDER BY req.status, req.create_at desc
                                         ", ['myId' => \getMyId()]);
         }else{
@@ -47,7 +47,7 @@ class NewRequestController extends Controller
                                         LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
                                         LEFT JOIN business_plan bp ON bu.business_plan_id = bp.id AND bp.status = 1
                                         WHERE req.business_plan_id = :businessPlanId 
-                                            AND (req.status = 1 OR req.status = 3)
+                                            AND (req.status = 1 OR req.status = 2)
                                         ORDER BY req.status, req.create_at desc
                                         ", ['businessPlanId' => \getMyBusinessPlanId()]);
         }
@@ -73,7 +73,7 @@ class NewRequestController extends Controller
             $addMe->side = '0';
             $addMe->save();
         }
-        $newRequest->status = 3;
+        $newRequest->status = 1;
         $newRequest->save();
         return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
     }
