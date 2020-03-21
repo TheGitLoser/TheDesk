@@ -18,15 +18,23 @@ console.log(response);
                 // if not send by myself
                 pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
             }
+
         }else if(response['socketType'] == "notiNewChatroomMessage"){
             updateChatroomList(response, true);
             pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
+            unseenMessage.unshift({chatroomUniqid: response['chatroomUniqid'],
+                                    chatroomName: chatroomName,
+                                    chatroomType: response['chatroomType'],
+                                    senderName: response['senderName'],
+                                    unique_id: response['messageUniqid'],
+                                    message: response['message'],
+                                    update_at: response['messageUpdateAt']});
+            outputNotification(unseenMessage);
         }else if(response['socketType'] == "notiNewInvitation"){
             indexToBeUpdate = chatroomList.findIndex( ({ unique_id }) => unique_id === response['chatroomUniqid'] );
             if(indexToBeUpdate == -1){
                 // is new invitation
                 getChatroomList();
-                
             }
 
         }
@@ -43,6 +51,7 @@ console.log(response);
 function getChatroomURL(chatroomUniqid){
     return window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + chatroomUniqid;
 }
+
 
 function updateChatroomList(response, unseen){ 
     indexToBeUpdate = chatroomList.findIndex( ({ unique_id }) => unique_id === response['chatroomUniqid'] );
@@ -65,7 +74,6 @@ function newNoti(title, body, url, current){
     var notify = new Notification(title, {
         body: body
     });
-    console.log(current);
     if(current){
         // current page = this chatroom
         notify.onclick = function(event) {

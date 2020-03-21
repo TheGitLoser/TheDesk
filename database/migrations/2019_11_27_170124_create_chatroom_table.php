@@ -18,6 +18,7 @@ class CreateChatroomTable extends Migration
             $table->string('unique_id', 50);
             $table->string('name', 50)->nullable();
             $table->mediumText('description')->nullable();
+            $table->string('type', 10);
 
             $table->timestamp('create_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('update_at')->default(\DB::raw('CURRENT_TIMESTAMP'));

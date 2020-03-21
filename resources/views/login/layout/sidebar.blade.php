@@ -115,7 +115,7 @@
                 <li class="nav-item{{ $activePage == 'profile' ? ' active' : '' }}">
                     <a class="nav-link" href="">
                         <span class="sidebar-mini user-name-icon"> </span>
-                        <span class="sidebar-normal">Loding... </span>
+                        <span class="sidebar-normal">Loading... </span>
                     </a>
                 </li>
             </div>

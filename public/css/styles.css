@@ -26,6 +26,11 @@ table{
     background: #555;
 }
 
+.unseenMsgNotification{
+    height: 500px;
+    overflow: auto;
+    width: 300px;
+}
 
 .sidebar-search-input {
     width: 200px !important;

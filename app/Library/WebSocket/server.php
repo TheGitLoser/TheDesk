@@ -67,7 +67,9 @@ var_dump($message);
             // $id = client's id assigned by socket
             $output['socketType'] = 'newChatroomMessage';
             $output['chatroomUniqid'] = $message->chatroomUniqid;
+            $output['chatroomType'] = $message->chatroomType;
             $output['senderUniqid'] = $message->myUniqid;
+            $output['senderName'] = $message->myName;
             $output['senderSide'] = $message->mySide;
             // for output message
             $output['messageUniqid'] = $message->messageUniqid;
@@ -118,6 +120,8 @@ var_dump($message);
         case 'notiNewInvitation':
             $output['socketType'] = $message->socketType;
             $output['chatroomUniqid'] = $message->chatroomUniqid;
+            $output['chatroomType'] = $message->chatroomType;
+            $output['senderName'] = $message->myName;
 
             $chatroomParticipantInSocket = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
             foreach ($chatroomParticipantInSocket as $id) {

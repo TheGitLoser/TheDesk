@@ -14,7 +14,7 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId, 
+        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.type, c.update_at, u2.name as userName, 
                                         count(msg.id) - count(msgSeen.id) as unseen
                                     FROM chatroom c
                                         JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
@@ -22,14 +22,13 @@ class ChatroomController extends Controller
                                         LEFT JOIN user u2 ON cu2.user_id = u2.id 
                                         LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
                                         LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
-                                            AND msgSeen.seen_status = 1 AND msg.id = msgSeen.message_id
+                                            AND msg.id = msgSeen.message_id AND msgSeen.seen_status = 1 
                                     WHERE c.status = 1 and cu.status = 1 
                                     GROUP BY c.unique_id, c.name, c.update_at
                                     ORDER BY c.update_at DESC',
                             ['myUserId' => \getMyId()]);
         foreach ($myChatroom as $item) {
-            // if chatroom Name = null, use participate name
-            if(is_null($item->chatroomName)){
+            if($item->type == "DM"){
                 $item->name = $item->userName;
             }else{
                 $item->name = $item->chatroomName;
@@ -44,6 +43,24 @@ class ChatroomController extends Controller
     // call from view
     static function getChatroomList(){
         return json_encode(ChatroomController::getChatroom());
+    }
+    
+    // call from view
+    static function getUnseenMessage(){
+        $myChatroom = DB::select('SELECT c.unique_id as chatroomUniqid, c.name as chatroomName, c.type as chatroomType, u2.name as senderName, 
+                                        msg.unique_id, msg.content as message, msg.update_at
+                                FROM chatroom c
+                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = 9
+                                    LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
+                                    LEFT JOIN user u2 ON cu2.user_id = u2.id 
+                                    LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                    LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
+                                        AND msg.id = msgSeen.message_id AND msgSeen.seen_status is null
+                                WHERE c.status = 1 and cu.status = 1 
+                                GROUP BY c.unique_id, c.name, c.update_at, msg.content
+                                ORDER BY msg.update_at DESC',
+                                ['myUserId' => \getMyId()]);
+        return json_encode($myChatroom);
     }
     
     private function checkChatroomPermission($chatroomUniqid){
@@ -94,12 +111,11 @@ class ChatroomController extends Controller
                                     ["chatroomId" => $chatroomId, "myId" => $myId]);
 
         $participationSide = [];
-     //  dd($message); 
+
         foreach ($chatroomUser as $participant) {
             $participant->initials = \initials($participant->name);
             if($participant->unique_id == $myUniqid){
                 // current user
-                $participant->name = "You";
                 $participant->currentUser = true;
                 $mySide = $participant->side;
             }else{
@@ -108,7 +124,7 @@ class ChatroomController extends Controller
             }
         }
 
-        if (empty($chatroom->name)) {
+        if ($chatroom->type == "DM") {
             // DM
             // get chat room name
             foreach ($chatroomUser as $user) {
@@ -179,7 +195,7 @@ class ChatroomController extends Controller
         }
 
         // check is DM or Channel
-        if(is_null($chatroom['name'])){
+        if($chatroom->type == "DM"){
             if(empty($chatroom->name)){
                 foreach ($chatroomUser as $user) {
                     if($user->unique_id != $myUniqid){
@@ -264,6 +280,7 @@ class ChatroomController extends Controller
             // create new chatroom
             $chatroom = new Chatroom;
             $chatroom->unique_id = \getUniqid();
+            $chatroom->type = "DM";
             $chatroom->save();
             
             // add user into chatroom
@@ -371,6 +388,7 @@ class ChatroomController extends Controller
         $chatroom->unique_id = \getUniqid();
         $chatroom->name = $input['name'];
         $chatroom->description = $input['description'];
+        $chatroom->type = "Channel";
         $chatroom->save();
 
         foreach ($user as $item) {

@@ -20,7 +20,11 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <div class="card-category chatroom-info-left">
                             <h4>{{ $chatroomDetails['name'] }}</h4>
                             @foreach ($chatroomUserDetails as $userDetails)
-                            {{ $userDetails['name'] }},
+                            @if ($userDetails['currentUser'] == true)
+                                You,                            
+                            @else
+                                {{ $userDetails['name'] }},
+                            @endif
                             @endforeach
                         </div>
                         {{-- <div class="card-category chatroom-info-right" style="height: 0;">
@@ -60,6 +64,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 {{-- socket --}}
 <script>
     chatroomUniqid = '{{ $chatroomUniqid }}';
+    chatroomType = '{{ $chatroomDetails["type"] }}';
     chatroomUser = {!! $chatroomUser !!};
 
     // for socket
@@ -74,6 +79,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         temp['unique_id'] = item['unique_id'];
         temp['side'] = item['side'];
         if(item['unique_id'] == myUniqid){
+            myName = item['name'];
             mySide = item['side'];
         }
         currentChatroomUser.push(temp);
@@ -82,7 +88,9 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
     });
     messageSend = {socketType: "initChatroom",
                         chatroomUniqid: chatroomUniqid,
+                        chatroomType: chatroomType,
                         myUniqid: myUniqid,
+                        myName: myName,
                         mySide: mySide,
                         currentChatroomUser: currentChatroomUser};
 
