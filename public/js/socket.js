@@ -63,9 +63,8 @@ function updateChatroomList(response, unseen){
     }
 
     // sort chatroom list by update_at desc
-    chatroomList.sort(function (a, b) {
-        return b.update_at.localeCompare(a.update_at);
-    });
+    chatroomList.sort((a, b) => (a.update_at > b.update_at) ? 1 : -1);
+
     outputChatroomList(chatroomList);
 }
 
