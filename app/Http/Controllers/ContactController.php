@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    private function getContact($searchType, $name, $displayId){
+    public function getContact($searchType, $name, $displayId){
         $myUserId = getMyId();
         if ($searchType == 'indi') {
             $result = DB::select(
@@ -23,12 +23,12 @@ class ContactController extends Controller
         }elseif($searchType == 'business'){
             $result = DB::select(
                 "SELECT u.unique_id, u.name, u.display_id 
-                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
-                                JOIN business_user bu ON u.id = bu.user_id
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id AND u.status = 1
+                                JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
                                 WHERE c.user_id = :myUserId 
                                     AND bu.business_plan_id != :businessPlanId
                                     and u.type LIKE 'business%' and u.name LIKE :name and u.display_id LIKE :display_id
-                                    and c.status = 1 and u.status = 1",
+                                    and c.status = 1",
                 ["businessPlanId" => \getMyBusinessPlanId(), 
                 'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
             );
@@ -51,7 +51,7 @@ class ContactController extends Controller
     // shared form this@addContact & Chatroom@addToChat
     function checkContactExists($unique_id){
         $myId = getMyId();
-        $contactUserId = uniqueIdToId($unique_id);
+        $contactUserId = \userUniqidToId($unique_id);
         $contact = Contact::where('user_id', $myId) 
                             ->where('contact_user_id', $contactUserId)
                             ->get();
@@ -86,7 +86,7 @@ class ContactController extends Controller
                                                 ->with('searchType', $searchType);
     }
     
-    public function addContact($unique_id){
+    public function backendAddContact($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
@@ -95,13 +95,13 @@ class ContactController extends Controller
         return redirect()->route('login.chatroom.contacts');
     }
 
-    public function hideContact($unique_id){
+    public function backendHideContact($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
 
         $myId = getMyId();
-        $contactUserId = uniqueIdToId($unique_id);
+        $contactUserId = \userUniqidToId($unique_id);
         $contact = Contact::where('user_id', $myId) 
                             ->where('contact_user_id', $contactUserId)
                             ->first();

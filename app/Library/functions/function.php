@@ -29,20 +29,17 @@
     function getMyBusinessPlanId(){
         return session('user.info.businessPlanId');
     }
-    function uniqueIdToId($uniqueId){
-        $uniqueId = User::select('id')->where('unique_id', $uniqueId)->get()->toArray();
-        return $uniqueId[0]['id'];
-    }
-    function displayIdToId($displayId){
-        $uniqueId = User::select('id')->where('display_id', $displayId)->get()->toArray();
-        return $uniqueId[0]['id'];
+    function userUniqidToId($uniqueId){
+        $uniqueId = User::select('id')->where('unique_id', $uniqueId)->first();
+        return $uniqueId['id'];
     }
 
     function initials($name){
         $words = explode(" ", $name);
         $initials = null;
         foreach ($words as $w) {
-            $initials .= $w[0];
+            if ($w[0] != "@")
+                $initials .= $w[0];
         }
         return $initials;
     }

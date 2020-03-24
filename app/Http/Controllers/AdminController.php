@@ -20,7 +20,7 @@ class AdminController extends Controller
         if (!userTypeAccess(['admin'])) {
             return redirect()->route('logout.login');
         }
-        $businessPlan = BusinessPlan::select('unique_id', 'company_name', 'profile')->where('status', 1)->get();
+        $businessPlan = BusinessPlan::select('unique_id', 'name', 'profile')->where('status', 1)->get();
         
         $output = $businessPlan;
 
@@ -37,7 +37,7 @@ class AdminController extends Controller
         if (!userTypeAccess(['admin'])) {
             return redirect()->route('logout.login');
         }
-        $businessPlan = BusinessPlan::select('unique_id', 'company_name', 'profile', 'id')
+        $businessPlan = BusinessPlan::select('unique_id', 'name', 'profile', 'id')
                         -> where('unique_id', $unique_id)
                         ->where('status', 1)
                         ->first();
@@ -55,8 +55,8 @@ class AdminController extends Controller
     public function ajaxSearchBusinessPlan(Request $request){
         $input = $request->only('name');
         
-        $output = BusinessPlan::select('unique_id', 'company_name', 'profile')
-                        -> where('company_name', 'LIKE', "%{$input['name']}%")
+        $output = BusinessPlan::select('unique_id', 'name', 'profile')
+                        -> where('name', 'LIKE', "%{$input['name']}%")
                         ->where('status', 1)
                         ->get();
 
@@ -66,7 +66,7 @@ class AdminController extends Controller
     public function ajaxCreateBusinessPlan(Request $request){
         $input = $request->only('companyName', 'companyProfile', 'name', 'displayId', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
 
-        $checkCompanyName = BusinessPlan::where('company_name', $input['companyName'])->count();
+        $checkCompanyName = BusinessPlan::where('name', $input['companyName'])->count();
         $checkUserEmail = User::where('email', $input['email'])->count();
         $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
 
@@ -88,7 +88,7 @@ class AdminController extends Controller
             $uniqid = \getUniqid();
             $businessPlan = new BusinessPlan;
             $businessPlan->unique_id = $uniqid;
-            $businessPlan->company_name = $input['companyName'];
+            $businessPlan->name = $input['companyName'];
             $businessPlan->profile = $input['companyProfile'];
             $businessPlan->save();
 

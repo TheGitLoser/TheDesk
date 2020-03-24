@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'adminViewBusinessPlan', 'title' => ''])
+@extends('login.layout.app', ['activePage' => 'adminViewBusinessPlan', 'title' => 'Business plan details'])
 
 @section('content')
 <div class="content">
@@ -18,7 +18,7 @@
                             <tbody>
                                 <tr>
                                     <td style="width:30%">Business name: </td>
-                                    <td>{{$businessPlan->company_name}}</td>
+                                    <td>{{$businessPlan->name}}</td>
                                 </tr>
                                 <tr>
                                     <td style="width:30%">Profile: </td>

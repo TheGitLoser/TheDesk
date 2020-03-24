@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'adminCreateBusinessPlan', 'title' => ''])
+@extends('login.layout.app', ['activePage' => 'adminCreateBusinessPlan', 'title' => 'Create new business plan'])
 
 @section('content')
 <div class="content">

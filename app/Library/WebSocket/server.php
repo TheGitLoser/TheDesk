@@ -26,8 +26,8 @@ var_dump($message);
             // $id = client's id assigned by socket
             $output['socketType'] = 'newChatroomMessage';
             $output['chatroomUniqid'] = $message->chatroomUniqid;
-            $output['userUniqid'] = $message->myUniqid;
-            $output['userType'] = $message->myUserType;
+            $output['senderUniqid'] = $message->myUniqid;
+            $output['senderSide'] = $message->mySide;
             // for output message
             $output['messageUniqid'] = $message->messageUniqid;
             $output['messageCreateAt'] = $message->messageCreateAt;
@@ -38,25 +38,28 @@ var_dump($message);
             foreach ($Server->wsClients as $id => $client) {
                 // echo 'open   ';
                 // var_dump($newMessageChatroomUser);
+                $userInfo = $client[50];
                 foreach ($message->currentChatroomUser as $newMessageChatroomUser) {
+                    // current message's chatroom's participants
                     // echo 'id='.$id.'   ';
-                    $userInfo = $client[50];
                     // var_dump($userInfo);
-                    // echo $userInfo['userUniqid'] .'                '. $newMessageChatroomUser->unique_id.'        ';
+                    // echo $userInfo['senderUniqid'] .'                '. $newMessageChatroomUser->unique_id.'        ';
                     // echo $userInfo['currentChatroomUniqid'] .'                '. $output['chatroomUniqid'];
-                    // if user in this chatroom
                     if ($userInfo['userUniqid'] == $newMessageChatroomUser->unique_id) {
-                        // if user in viewing this chatroom
+                        // if user in this chatroom
                         if ($userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
+                            // if user is viewing this chatroom
                             $output['socketType'] = 'newChatroomMessage';
-                            if ($userInfo['userUniqid'] == $output['userUniqid']) {
+                            if ($userInfo['userUniqid'] == $output['senderUniqid']) { // = sender uniqid
                                 $output['messageType'] = 'myMessage';
-                            } elseif ($userInfo['userType'] == $output['userType']) {
+                            } elseif ($userInfo['side'] == $output['senderSide']) { 
                                 $output['messageType'] = 'sameType';
                             } else {
                                 $output['messageType'] = 'oppositeType';
                             }
+                            echo "uniqid = ".$userInfo['userUniqid'] . " side = ".$userInfo['side']." sender side = ".$output['senderSide'];
                         } else {
+                            // if user is not viewing this chatroom
                             $output['socketType'] = 'notiNewChatroomMessage';
                         }
                         print_r($output);
@@ -67,10 +70,9 @@ var_dump($message);
             break;
         case 'initChatroom':
             $customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer
-            $customUserInfo['userUniqid'] = $message->myUniqid;
-            $customUserInfo['userType'] = $message->myUserType;
             $customUserInfo['currentChatroomUniqid'] = $message->chatroomUniqid;
-
+            $customUserInfo['userUniqid'] = $message->myUniqid;
+            $customUserInfo['side'] = $message->mySide;
             break;
         case 'initNoti':
             # code...

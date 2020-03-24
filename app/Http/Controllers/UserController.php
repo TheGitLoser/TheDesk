@@ -19,7 +19,8 @@ class UserController extends Controller
             -> where('id', '<>', \getMyId())
             ->get();
         }elseif($searchType == 'business'){
-            $user = BusinessPlan::select('unique_id', 'company_name as name')
+            $user = BusinessPlan::select('unique_id', 'name')
+                    -> where('name', 'LIKE', "%{$name}%")
                     -> where('status', '1')
                     ->get();
         }elseif($searchType == 'colleague'){
@@ -38,7 +39,7 @@ class UserController extends Controller
             );
         }else{  // extact
             $user = User::select('unique_id', 'name', 'display_id')
-                ->where(function($q) {
+                ->where(function($q)use($name, $displayId) {
                     $q->where('name', $name)
                     ->orWhere('display_id', $displayId);
                 })
