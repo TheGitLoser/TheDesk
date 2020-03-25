@@ -67,7 +67,7 @@
             if(item.chatroomType == "DM" ){
                 tempMessage = item.senderName + ':  ' + item.message;
             }else{
-                tempMessage = item.senderName + ' (' + item.chatroomName + '):<br>  /t' + item.message;
+                tempMessage = item.senderName + ' (' + item.chatroomName + '):<br>' + item.message;
             }
             tempHtml += '<a class="dropdown-item" href="' + link +'">' + tempMessage + "</a>";
         });

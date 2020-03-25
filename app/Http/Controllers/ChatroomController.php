@@ -50,16 +50,16 @@ class ChatroomController extends Controller
         $myChatroom = DB::select('SELECT c.unique_id as chatroomUniqid, c.name as chatroomName, c.type as chatroomType, u2.name as senderName, 
                                         msg.unique_id, msg.content as message, msg.update_at
                                 FROM chatroom c
-                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = 9
-                                    LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
-                                    LEFT JOIN user u2 ON cu2.user_id = u2.id 
+                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
                                     LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                    JOIN user u2 ON msg.user_id = u2.id
                                     LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
-                                        AND msg.id = msgSeen.message_id AND msgSeen.seen_status is null
-                                WHERE c.status = 1 and cu.status = 1 
+                                        AND msg.id = msgSeen.message_id 
+                                WHERE c.status = 1 and cu.status = 1 AND msgSeen.seen_status is null
                                 GROUP BY c.unique_id, c.name, c.update_at, msg.content
                                 ORDER BY msg.update_at DESC',
                                 ['myUserId' => \getMyId()]);
+// dd($myChatroom);
         return json_encode($myChatroom);
     }
     
@@ -67,16 +67,17 @@ class ChatroomController extends Controller
         // get chatroom id
         $chatroom = Chatroom::where('unique_id', $chatroomUniqid)->first();
         if(!$chatroom){
-            return redirect()->route('login.chatroom.contacts');
+            header('Location: /');
+            exit();
         }
-
         // check permission, whether you are in this chatroom
         $checkPermission = ChatroomUser::where('chatroom_id', $chatroom->id)
-                    -> where('user_id', \getMyId())
-                    -> where('status', 1)
-                    ->first();
+                                        -> where('user_id', \getMyId())
+                                        -> where('status', 1)
+                                        ->first();
         if(!$checkPermission){
-            return redirect()->route('login.chatroom.contacts');
+            header('Location: /');
+            exit();
         }
 
         return $chatroom;
