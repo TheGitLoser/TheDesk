@@ -31,9 +31,10 @@ Route::get('/login/account/logout', 'AuthController@logout') -> name('login.acco
 // chatroom
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
 Route::get('/chatroom/setting/{unique_id}', 'ChatroomController@setting') -> name('login.chatroom.setting');
-Route::get('/chatroom/setting/addUser/{unique_id}', 'ChatroomController@settingAddUser') -> name('login.chatroom.settingAddUser');
-Route::post('/backend/chatroom/setting/addUser/{unique_id}', 'ChatroomController@backendSettingAddUser') -> name('backend.chatroom.settingAddUser');
-Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
+Route::get('/backend/chatroom/setting/switchType/{unique_id}', 'ChatroomController@backendSwitchType') -> name('backend.chatroom.switchType');
+Route::get('/chatroom/setting/channelAddUser/{unique_id}', 'ChatroomController@channelAddUser') -> name('login.chatroom.channelAddUser');
+Route::post('/backend/chatroom/channelAddUser/{unique_id}', 'ChatroomController@backendChannelAddUser') -> name('backend.chatroom.channelAddUser');
+Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');    // update chatroom info
 Route::post('/ajax/chatroom/getChatroomList', 'ChatroomController@ajaxGetChatroomList') -> name('ajax.chatroom.getChatroomList');
 
 Route::post('/ajax/newMessage', 'ChatroomController@ajaxNewMessage') -> name('ajax.chatroom.newMessage');

@@ -8877,15 +8877,15 @@ a.text-dark:focus {
 }
 
 .btn.btn-secondary {
-  color: #454c52;
-  background-color: #fafafa;
+  /* color: #454c52; */
+  /* background-color: #fafafa; */
   border-color: #ccc;
   box-shadow: 0 2px 2px 0 rgba(250, 250, 250, 0.14), 0 3px 1px -2px rgba(250, 250, 250, 0.2), 0 1px 5px 0 rgba(250, 250, 250, 0.12);
 }
 
 .btn.btn-secondary:hover {
   color: #454c52;
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
   border-color: #adadad;
 }
 

@@ -137,15 +137,28 @@ class ChatroomController extends Controller
         }
 
         // get message side
-        foreach ($message as $item) {
-            if($item->senderUniqid == $myUniqid){
-                $item->messageSide = 'myMessage';
-            }elseif($participationSide[$item->senderUniqid] == $mySide){
-                $item->messageSide = 'sameSide';
-            }else{
-                $item->messageSide = 'oppositeSide';
+        if ($chatroom->type == "Group"){
+            foreach ($message as $item) {
+                if ($item->senderUniqid == $myUniqid) {
+                    $item->messageSide = 'myMessage';
+                } else {
+                    $item->messageSide = 'oppositeSide';
+                }
             }
+        }else{
+            // type = Channel or DM
+            foreach ($message as $item) {
+                if ($item->senderUniqid == $myUniqid) {
+                    $item->messageSide = 'myMessage';
+                } elseif ($participationSide[$item->senderUniqid] == $mySide) {
+                    $item->messageSide = 'sameSide';
+                } else {
+                    $item->messageSide = 'oppositeSide';
+                }
+            }
+        }
 
+        foreach ($message as $item) {
             // message seen
             if(!$item->seen){
                 // not seen
@@ -216,7 +229,7 @@ class ChatroomController extends Controller
         }
     }
 
-    public function settingAddUser($unique_id){
+    public function channelAddUser($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
@@ -240,8 +253,13 @@ class ChatroomController extends Controller
             return redirect()->route('logout.login');
         }
         $input = $request->input();
+        $createMethod = $input['createMethod'];
         unset($input["_token"]);
+        unset($input["createMethod"]);
         $selectedUser = [];
+        if(count($input) == 0) {
+            return redirect()->back();
+        }
         foreach ($input as $key => $value) {
             array_push($selectedUser, $key);
         }
@@ -249,7 +267,8 @@ class ChatroomController extends Controller
                     -> whereIn('unique_id', $selectedUser)
                     -> where('status', '1')
                     -> get();
-        return view('login.chatroom.createChannel')->with('selectedUser', json_encode($user));
+        return view('login.chatroom.createChannel')->with('selectedUser', json_encode($user))
+                                                    ->with('createMethod', $createMethod);
     }
 
     // add to DM
@@ -303,7 +322,7 @@ class ChatroomController extends Controller
     }
 
     // add to channel
-    public function backendSettingAddUser(Request $request, $unique_id){
+    public function backendChannelAddUser(Request $request, $unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
@@ -340,6 +359,21 @@ class ChatroomController extends Controller
             }
         }
         return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id, 'type' => 'new']);
+    }
+
+    public function backendSwitchType(Request $request, $unique_id){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        
+        $chatroom = $this->checkChatroomPermission($unique_id);
+        if($chatroom->type == "Channel"){
+            $chatroom->type = "Group";
+        }elseif($chatroom->type == "Group"){
+            $chatroom->type = "Channel";
+        }
+        $chatroom->save();
+        return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id]);
     }
 
     public function backendMessageSeen($unique_id){
@@ -380,17 +414,17 @@ class ChatroomController extends Controller
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        $input = $request->only('name', 'description', 'selectedUser');
-        $selectedUserUniqid = array_keys($input['selectedUser']);
-
-        $user = User::select('id', 'unique_id')->whereIn('unique_id', $selectedUserUniqid)->get()->toArray();
+        $input = $request->only('createMethod', 'name', 'description', 'selectedUser');
 
         $chatroom = new Chatroom;
         $chatroom->unique_id = \getUniqid();
         $chatroom->name = $input['name'];
         $chatroom->description = $input['description'];
-        $chatroom->type = "Channel";
+        $chatroom->type = $input['createMethod'];
         $chatroom->save();
+
+        $selectedUserUniqid = array_keys($input['selectedUser']);
+        $user = User::select('id', 'unique_id')->whereIn('unique_id', $selectedUserUniqid)->get()->toArray();
 
         foreach ($user as $item) {
             $chatroomUser = new ChatroomUser;

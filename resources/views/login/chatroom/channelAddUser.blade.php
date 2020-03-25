@@ -58,7 +58,7 @@
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{ route('backend.chatroom.settingAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
+                <form action="{{ route('backend.chatroom.channelAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
                     @csrf
                     <div class="card card-stats">
                         <div class="card-header card-header-warning card-header-icon">

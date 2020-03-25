@@ -66,7 +66,8 @@
                                 <i class="material-icons">content_copy</i>
                             </div>
                             <div class="card-category" style="height: 0;">
-                                <button type="submit" class="btn btn-primary">Create channel</button>
+                                <button type="submit" class="btn btn-primary" name="createMethod" value="Group">Create Group</button>
+                                <button type="submit" class="btn btn-primary" name="createMethod" value="Channel">Create Channel</button>
                             </div>
                         </div>
                         <div class="card-body">
