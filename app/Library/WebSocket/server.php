@@ -135,7 +135,7 @@ var_dump($message);
             break;
         case 'backend':
             var_dump($Server->wsClients);
-            $Server->wsSend($clientID, json_encode($Server->wsClients[50]));
+            $Server->wsSend($clientID, json_encode($Server->wsClients));
             break;
         default:
             # code...
