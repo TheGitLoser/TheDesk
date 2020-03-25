@@ -36,15 +36,17 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
 echo "\n   checkThisParticipant : ";
             if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $chatrooomUniqid) {
                 // is viewing THIS chatroom
-                $tempThisParticipant[] = $id;
+                $tempThisParticipant[$userIP] = $id;
                 break;
             } else {
-                $tempThisParticipant = $id;
+                $tempThisParticipant[$userIP] = $id;
             }
         }
         if($checkThisParticipant){
             // is participant
-            array_push($chatroomParticipantInSocket, $tempThisParticipant);
+            foreach ($tempThisParticipant as $tempId) {
+                array_push($chatroomParticipantInSocket, $tempId);
+            }
         }
     }
     var_dump($chatroomParticipantInSocket);
