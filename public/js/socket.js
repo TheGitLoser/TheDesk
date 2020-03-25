@@ -18,14 +18,20 @@ $(function () {
             updateChatroomList(response, false);
             if (response['messageSide'] != 'myMessage') {
                 // if not send by myself
-                // pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
-    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                if (location.protocol == 'https:') {
+                    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                }else{
+                    pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+                }
             }
 
         } else if (response['socketType'] == "notiNewChatroomMessage") {
             updateChatroomList(response, true);
-            // pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
-    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+            if (location.protocol == 'https:') {
+                pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+            }else{
+                pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
+            }
             unseenMessage.unshift({
                 chatroomUniqid: response['chatroomUniqid'],
                 chatroomName: chatroomName,
@@ -44,7 +50,20 @@ $(function () {
                 // is new invitation
                 getChatroomList();
             }
-
+        } else if (response['socketType'] == "updateUINewMessage") {
+            updateChatroomList(response, true);
+            unseenMessage.unshift({
+                chatroomUniqid: response['chatroomUniqid'],
+                chatroomName: chatroomName,
+                chatroomType: response['chatroomType'],
+                senderName: response['senderName'],
+                unique_id: response['messageUniqid'],
+                message: response['message'],
+                update_at: response['messageUpdateAt']
+            });
+            outputNotification(unseenMessage);
+        } else if (response['socketType'] == "updateUINewInvitation") {
+            updateChatroomList(response, true);
         }
     }
 

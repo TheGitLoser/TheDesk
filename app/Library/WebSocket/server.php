@@ -8,17 +8,18 @@ require 'config.php';
 
 function getChatroomParticipantInSocket($currentChatroomUser, $chatrooomUniqid){
     global $Server;
-    $chatroomParticipantInSocket = [];
+    $chatroomParticipantInSocket = [];  // (all) 
+    $chatroomParticipantInSocketInCurrentChatroom = [];  // (in current chatroom) 
 
     // for each chatroom participant
     foreach ($currentChatroomUser as $newMessageChatroomUser) {
-        $tempThisParticipant;   // server->clientId to be send socket msg
+        $tempThisParticipantInCurrentChatroom =[];   // server->clientId to be send socket msg (in current chatroom)
+      
         $checkThisParticipant = false;
 echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
         // for each connected participant
         foreach ($Server->wsClients as $id => $clientInfo) {
-            $tempThisParticipant = [];
-            echo "D";
+        echo "D";
         var_dump($Server->wsClients) ;
             if (!isset($clientInfo[50])) {
                 // this socket is not a user
@@ -31,26 +32,29 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
                 // if socket is not a participant
                 continue;
             }
+
             // if socket is a participant
             $checkThisParticipant = true;
 echo "\n   checkThisParticipant : ";
             if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $chatrooomUniqid) {
                 // is viewing THIS chatroom
-                $tempThisParticipant[$userIP] = $id;
-                break;
+                $tempThisParticipantInCurrentChatroom[$userIP] = $id;
             } else {
-                $tempThisParticipant[$userIP] = $id;
+                $tempThisParticipantInCurrentChatroom[$userIP] = $id;
             }
+            array_push($chatroomParticipantInSocket, $id);
         }
         if($checkThisParticipant){
             // is participant
-            foreach ($tempThisParticipant as $tempId) {
-                array_push($chatroomParticipantInSocket, $tempId);
+            foreach ($tempThisParticipantInCurrentChatroom as $tempId) {
+                array_push($chatroomParticipantInSocketInCurrentChatroom, $tempId);
             }
         }
     }
-    var_dump($chatroomParticipantInSocket);
-    return $chatroomParticipantInSocket;
+    $output = ['chatroomParticipantInSocketInCurrentChatroom' => $chatroomParticipantInSocketInCurrentChatroom, 
+                'chatroomParticipantInSocket' => $chatroomParticipantInSocket];
+var_dump($output);
+    return $output;
 }
 
 // when a client sends data to the server
@@ -80,9 +84,11 @@ var_dump($message);
             $output['messageUpdateAt'] = $message->messageUpdateAt;
             $output['message'] = $message->message;
             
-            $chatroomParticipantInSocket = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
-            
-            foreach ($chatroomParticipantInSocket as $id) {
+            $tempOutput = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
+            $chatroomParticipantInSocketInCurrentChatroom = $tempOutput['chatroomParticipantInSocketInCurrentChatroom']; // send noti
+            $chatroomParticipantInSocket = $tempOutput['chatroomParticipantInSocket'];   // update ui only
+
+            foreach ($chatroomParticipantInSocketInCurrentChatroom as $id) {
                 $userInfo = $Server->wsClients[$id][50];
                 // default socket msg
                 $output['socketType'] = 'notiNewChatroomMessage';
@@ -106,6 +112,15 @@ var_dump($message);
                 print_r($output);
                 $Server->wsSend($id, json_encode($output));     // send socket message
             }
+            $chatroomParticipantUpdateUI = array_diff($chatroomParticipantInSocket, $chatroomParticipantInSocketInCurrentChatroom);    // to update ui
+        var_dump($chatroomParticipantInSocket);
+        var_dump($chatroomParticipantInSocketInCurrentChatroom);
+        var_dump($chatroomParticipantUpdateUI);
+            foreach ($chatroomParticipantUpdateUI as $id) {
+                $output['socketType'] = 'updateUINewMessage';
+        print_r($output);
+                $Server->wsSend($id, json_encode($output));     // send socket message
+            }
             break;
         case 'initChatroom':
             $customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer
@@ -127,13 +142,23 @@ var_dump($message);
             $output['chatroomType'] = $message->chatroomType;
             $output['senderName'] = $message->myName;
 
-            $chatroomParticipantInSocket = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
-            foreach ($chatroomParticipantInSocket as $id) {
+            $tempOutput = getChatroomParticipantInSocket($message->currentChatroomUser, $output['chatroomUniqid']);
+            $chatroomParticipantInSocketInCurrentChatroom = $tempOutput['chatroomParticipantInSocketInCurrentChatroom']; // send noti
+            $chatroomParticipantInSocket = $tempOutput['chatroomParticipantInSocket'];   // update ui only
+
+            foreach ($chatroomParticipantInSocketInCurrentChatroom as $id) {
                 $userInfo = $Server->wsClients[$id][50];
                 if ($userInfo['userUniqid'] != $message->myUniqid) { // = sender uniqid
-                    print_r($output);
+            print_r($output);
                     $Server->wsSend($id, json_encode($output));     // send socket message
                 }
+            }
+
+            $chatroomParticipantUpdateUI = array_diff($chatroomParticipantInSocket, $chatroomParticipantInSocketInCurrentChatroom);    // to update ui
+            foreach ($chatroomParticipantUpdateUI as $id) {
+                $output['socketType'] = 'updateUINewInvitation';
+        print_r($output);
+                $Server->wsSend($id, json_encode($output));     // send socket message
             }
 
             break;
