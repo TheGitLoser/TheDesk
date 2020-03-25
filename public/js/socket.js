@@ -18,14 +18,14 @@ $(function () {
             updateChatroomList(response, false);
             if (response['messageSide'] != 'myMessage') {
                 // if not send by myself
-                pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
-                pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                // pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
             }
 
         } else if (response['socketType'] == "notiNewChatroomMessage") {
             updateChatroomList(response, true);
-            pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
-            pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+            // pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
+    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
             unseenMessage.unshift({
                 chatroomUniqid: response['chatroomUniqid'],
                 chatroomName: chatroomName,
@@ -78,26 +78,7 @@ function updateChatroomList(response, unseen) {
     outputChatroomList(chatroomList);
 }
 
-function newNoti(title, body, url, current) {
-    // show notification here
-    var notify = new Notification(title, {
-        body: body
-    });
-    if (current) {
-        // current page = this chatroom
-        notify.onclick = function (event) {
-            event.preventDefault(); // prevent the browser from focusing the Notification's tab
-        };
-    } else {
-        notify.onclick = function (event) {
-            event.preventDefault(); // prevent the browser from focusing the Notification's tab
-            window.open(url, '_blank');
-        };
-    }
-}
-
-
-function showNotification(title, body, url, current, type) {
+function pushServiceWorkerNoti(title, body, url, current, type) {
     console.log('showNoti');
     if ('serviceWorker' in navigator) {
         serviceWorkerRegistration.then(function (registration) {
@@ -119,6 +100,24 @@ function showNotification(title, body, url, current, type) {
                 console.log("Service Worker Failed to Register", err);
             })
 
+    }
+}
+
+function newNoti(title, body, url, current) {
+    // show notification here
+    var notify = new Notification(title, {
+        body: body
+    });
+    if (current) {
+        // current page = this chatroom
+        notify.onclick = function (event) {
+            event.preventDefault(); // prevent the browser from focusing the Notification's tab
+        };
+    } else {
+        notify.onclick = function (event) {
+            event.preventDefault(); // prevent the browser from focusing the Notification's tab
+            window.open(url, '_blank');
+        };
     }
 }
 

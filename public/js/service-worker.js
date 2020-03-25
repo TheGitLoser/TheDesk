@@ -1,7 +1,6 @@
 function openNoti(event) {
     /**** START notificationOpenWindow ****/
-console.log(event.notification.data);
-console.log('openNoti');
+    console.log('openNoti');
 
     promiseChain = clients.openWindow(event.notification.data.action.url);
     event.waitUntil(promiseChain);
@@ -9,7 +8,7 @@ console.log('openNoti');
 }
 
 function focusWindow(event) {
-console.log('focus');
+    console.log('focus');
     /**** START notificationFocusWindow ****/
     /**** START urlToOpen ****/
     urlToOpen = new URL(event.notification.data.action.url, self.location.origin).href;
@@ -45,107 +44,22 @@ console.log('focus');
     /**** END notificationFocusWindow ****/
 }
 
-function dataNotification(event) {
-    /**** START printNotificationData ****/
-    const notificationData = event.notification.data;
-    console.log('');
-    console.log('The data notification had the following parameters:');
-    Object.keys(notificationData).forEach((key) => {
-        console.log(`  ${key}: ${notificationData[key]}`);
-    });
-    console.log('');
-    /**** END printNotificationData ****/
-}
 
-/**** START isClientFocused ****/
-function isClientFocused() {
-    return clients.matchAll({
-            type: 'window',
-            includeUncontrolled: true
-        })
-        .then((windowClients) => {
-            let clientIsFocused = false;
-
-            for (let i = 0; i < windowClients.length; i++) {
-                const windowClient = windowClients[i];
-                if (windowClient.focused) {
-                    clientIsFocused = true;
-                    break;
-                }
-            }
-
-            return clientIsFocused;
-        });
-}
-/**** END isClientFocused ****/
-
-function demoMustShowNotificationCheck(event) {
-    /**** START showNotificationRequired ****/
-    const promiseChain = isClientFocused()
-        .then((clientIsFocused) => {
-            if (clientIsFocused) {
-                console.log('Don\'t need to show a notification.');
-                return;
-
-            }
-
-            // Client isn't focused, we need to show a notification.
-            return self.registration.showNotification('Had to show a notification.');
-        });
-
-    event.waitUntil(promiseChain);
-    /**** END showNotificationRequired ****/
-}
-
-function demoSendMessageToPage(event) {
-    /**** START sendPageMessage ****/
-    const promiseChain = isClientFocused()
-        .then((clientIsFocused) => {
-            if (clientIsFocused) {
-                windowClients.forEach((windowClient) => {
-                    windowClient.postMessage({
-                        message: 'Received a push message.',
-                        time: new Date().toString()
-                    });
-                });
-            } else {
-                return self.registration.showNotification('No focused windows', {
-                    body: 'Had to show a notification instead of messaging each page.'
-                });
-            }
-        });
-
-    event.waitUntil(promiseChain);
-    /**** END sendPageMessage ****/
-}
-
-self.addEventListener('push', function (event) {
-    if (event.data) {
-        switch (event.data.text()) {
-            case 'must-show-notification':
-                demoMustShowNotificationCheck(event);
-                break;
-            case 'send-message-to-page':
-                demoSendMessageToPage(event);
-                break;
-            default:
-                console.warn('Unsure of how to handle push event: ', event.data);
-                break;
-        }
-    }
-});
 
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
     console.log(event.notification.data.action.type);
     switch (event.notification.data.action.type) {
         case 'noti-new':
+            console.log('new');
             openNoti(event);
             break;
         case 'noti-focus':
+            console.log('new');
             focusWindow(event);
             break;
         default:
+            console.log(event.notification.data.action.type);
             // NOOP
             break;
     }
@@ -163,22 +77,3 @@ self.addEventListener('notificationclose', function (event) {
     event.waitUntil(promiseChain);
 });
 /**** END notificationCloseEvent ****/
-
-self.addEventListener('message', function (event) {
-    console.log('Received message from page.', event.data);
-    switch (event.data) {
-        case 'must-show-notification-demo':
-            self.dispatchEvent(new PushEvent('push', {
-                data: 'must-show-notification'
-            }));
-            break;
-        case 'send-message-to-page-demo':
-            self.dispatchEvent(new PushEvent('push', {
-                data: 'send-message-to-page'
-            }));
-            break;
-        default:
-            console.warn('Unknown message received in service-worker.js');
-            break;
-    }
-});

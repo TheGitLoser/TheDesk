@@ -17,6 +17,7 @@ function getChatroomParticipantInSocket($currentChatroomUser, $chatrooomUniqid){
 echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
         // for each connected participant
         foreach ($Server->wsClients as $id => $clientInfo) {
+            $tempThisParticipant = [];
             echo "D";
         var_dump($Server->wsClients) ;
             if (!isset($clientInfo[50])) {
@@ -24,6 +25,7 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
                 continue;
             }
             // this socket is a user
+            $userIP = $clientInfo[6]; // IP
             $userInfo = $clientInfo[50];
             if ($userInfo['userUniqid'] != $newMessageChatroomUser->unique_id) {
                 // if socket is not a participant
@@ -34,7 +36,7 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
 echo "\n   checkThisParticipant : ";
             if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $chatrooomUniqid) {
                 // is viewing THIS chatroom
-                $tempThisParticipant = $id;
+                $tempThisParticipant[] = $id;
                 break;
             } else {
                 $tempThisParticipant = $id;
