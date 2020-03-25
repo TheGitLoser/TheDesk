@@ -9,13 +9,14 @@ console.log('openNoti');
 }
 
 function focusWindow(event) {
+console.log('focus');
     /**** START notificationFocusWindow ****/
     /**** START urlToOpen ****/
-    const urlToOpen = new URL(event.notification.data.action.url, self.location.origin).href;
+    urlToOpen = new URL(event.notification.data.action.url, self.location.origin).href;
     /**** END urlToOpen ****/
 
     /**** START clientsMatchAll ****/
-    const promiseChain = clients.matchAll({
+    promiseChain = clients.matchAll({
             type: 'window',
             includeUncontrolled: true
         })
@@ -133,11 +134,11 @@ self.addEventListener('push', function (event) {
         }
     }
 });
- 
+
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
-  console.log(event.notification.data.action.type);
-    switch (event.notification.tag) {
+    console.log(event.notification.data.action.type);
+    switch (event.notification.data.action.type) {
         case 'noti-new':
             openNoti(event);
             break;

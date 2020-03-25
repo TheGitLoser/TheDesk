@@ -1,5 +1,5 @@
 $(function () {
-    navigator.serviceWorker.register('/js/service-worker.js');
+    serviceWorkerRegistration = navigator.serviceWorker.register('/js/service-worker.js');
 
     Socket = new WebSocket(socketUrl);
 
@@ -19,13 +19,13 @@ $(function () {
             if (response['messageSide'] != 'myMessage') {
                 // if not send by myself
                 pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
-pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
             }
 
         } else if (response['socketType'] == "notiNewChatroomMessage") {
             updateChatroomList(response, true);
             pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
-pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+            pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
             unseenMessage.unshift({
                 chatroomUniqid: response['chatroomUniqid'],
                 chatroomName: chatroomName,
@@ -98,24 +98,28 @@ function newNoti(title, body, url, current) {
 
 
 function showNotification(title, body, url, current, type) {
-console.log('showNoti');
-    Notification.requestPermission(function (result) {
-        if (result === 'granted') {
-            navigator.serviceWorker.ready.then(function (registration) {
-                registration.showNotification(title, {
-                    body: body,
-                    vibrate: [200, 100, 200, 100, 200, 100, 200],
-                    tag: 'noti',
-                    data: {
-                        action: {
-                            url: url,
-                            type: type
+    console.log('showNoti');
+    if ('serviceWorker' in navigator) {
+        serviceWorkerRegistration.then(function (registration) {
+                console.log("Service Worker Registered");
+                setTimeout(() => {
+                    registration.showNotification(title, {
+                        body: body,
+                        data: {
+                            action: {
+                                url: url,
+                                type: type
+                            }
                         }
-                      }
-                });
-            });
-        }
-    });
+                    });
+                    registration.update();
+                }, 100);
+            })
+            .catch(function (err) {
+                console.log("Service Worker Failed to Register", err);
+            })
+
+    }
 }
 
 function pushNoti(title, body, url, current) {
