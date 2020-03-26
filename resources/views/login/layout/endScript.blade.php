@@ -45,7 +45,7 @@
 <script>
     var myUniqid = "@php echo getMyUniqid(); @endphp";
     socketUrl = '{{ $wsConnection }}';
-    messageSend = {socketType: "initConnection", myUniqid: myUniqid};
+    messageSend = {socketType: "initConnection", myUniqid: myUniqid, id: "{{ session()->getId() }}"};
 </script>
 
 {{-- Custom js --}}

@@ -72,7 +72,13 @@
             tempHtml += '<a class="dropdown-item" href="' + link +'">' + tempMessage + "</a>";
         });
         $('#notification').html(tempHtml);
-        $('#notificationCount').html(unseenMessage.length);
+
+        if(unseenMessage.length){
+            $('#notificationCount').hide();
+        }else{
+            $('#notificationCount').show();
+            $('#notificationCount').html(unseenMessage.length);
+        }
 
     }
 

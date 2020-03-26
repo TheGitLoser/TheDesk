@@ -13,57 +13,64 @@ $(function () {
     Socket.onmessage = function (event) {
         response = JSON.parse(event['data']);
         console.log(response);
-        if (response['socketType'] == "newChatroomMessage") { // in current chatroom
-            socketNewChatroomMessage(response); // show msg
-            updateChatroomList(response, false);
-            if (response['messageSide'] != 'myMessage') {
-                // if not send by myself
-                if (location.protocol == 'https:') {
-                    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
-                }else{
-                    pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+        switch (response['socketType']) {
+            case "newChatroomMessage":  // in current chatroom
+                socketNewChatroomMessage(response); // show msg
+                updateChatroomList(response, false);
+                if (response['messageSide'] != 'myMessage') {
+                    // if not send by myself
+                    if (location.protocol == 'https:') {
+                        pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                    }else{
+                        pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+                    }
                 }
-            }
-
-        } else if (response['socketType'] == "notiNewChatroomMessage") {
-            updateChatroomList(response, true);
-            if (location.protocol == 'https:') {
-                pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
-            }else{
-                pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
-            }
-            unseenMessage.unshift({
-                chatroomUniqid: response['chatroomUniqid'],
-                chatroomName: chatroomName,
-                chatroomType: response['chatroomType'],
-                senderName: response['senderName'],
-                unique_id: response['messageUniqid'],
-                message: response['message'],
-                update_at: response['messageUpdateAt']
-            });
-            outputNotification(unseenMessage);
-        } else if (response['socketType'] == "notiNewInvitation") {
-            indexToBeUpdate = chatroomList.findIndex(({
-                unique_id
-            }) => unique_id === response['chatroomUniqid']);
-            if (indexToBeUpdate == -1) {
-                // is new invitation
-                getChatroomList();
-            }
-        } else if (response['socketType'] == "updateUINewMessage") {
-            updateChatroomList(response, true);
-            unseenMessage.unshift({
-                chatroomUniqid: response['chatroomUniqid'],
-                chatroomName: chatroomName,
-                chatroomType: response['chatroomType'],
-                senderName: response['senderName'],
-                unique_id: response['messageUniqid'],
-                message: response['message'],
-                update_at: response['messageUpdateAt']
-            });
-            outputNotification(unseenMessage);
-        } else if (response['socketType'] == "updateUINewInvitation") {
-            updateChatroomList(response, true);
+                break;
+            case "notiNewChatroomMessage":
+                updateChatroomList(response, true);
+                if (location.protocol == 'https:') {
+                    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+                }else{
+                    pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
+                }
+                unseenMessage.unshift({
+                    chatroomUniqid: response['chatroomUniqid'],
+                    chatroomName: chatroomName,
+                    chatroomType: response['chatroomType'],
+                    senderName: response['senderName'],
+                    unique_id: response['messageUniqid'],
+                    message: response['message'],
+                    update_at: response['messageUpdateAt']
+                });
+                outputNotification(unseenMessage);
+                break;
+            case "notiNewInvitation":
+                indexToBeUpdate = chatroomList.findIndex(({
+                    unique_id
+                }) => unique_id === response['chatroomUniqid']);
+                if (indexToBeUpdate == -1) {
+                    // is new invitation
+                    getChatroomList();
+                }
+                break;
+            case "updateUINewMessage":
+                updateChatroomList(response, true);
+                unseenMessage.unshift({
+                    chatroomUniqid: response['chatroomUniqid'],
+                    chatroomName: chatroomName,
+                    chatroomType: response['chatroomType'],
+                    senderName: response['senderName'],
+                    unique_id: response['messageUniqid'],
+                    message: response['message'],
+                    update_at: response['messageUpdateAt']
+                });
+                outputNotification(unseenMessage);
+                break;
+            case "updateUINewMessage":
+                updateChatroomList(response, true);
+                break;
+            default:
+                break;
         }
     }
 
@@ -71,7 +78,7 @@ $(function () {
         console.log("Socket is closed now (onclose())");
         setTimeout(function () {
             Socket = new WebSocket(socketUrl);
-        }, 10);
+        }, 10000);  // 10sec
     }
 });
 

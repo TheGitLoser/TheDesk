@@ -87,6 +87,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         participantInfo[item['unique_id']] = item;
     });
     messageSend = {socketType: "initChatroom",
+                        id: "{{ session()->getId() }}",
                         chatroomUniqid: chatroomUniqid,
                         chatroomType: chatroomType,
                         myUniqid: myUniqid,

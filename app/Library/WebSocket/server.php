@@ -26,7 +26,6 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
                 continue;
             }
             // this socket is a user
-            $userIP = $clientInfo[6]; // IP
             $userInfo = $clientInfo[50];
             if ($userInfo['userUniqid'] != $newMessageChatroomUser->unique_id) {
                 // if socket is not a participant
@@ -38,9 +37,9 @@ echo "\n\nnewMessageChatroomUser: ".$newMessageChatroomUser->unique_id;
 echo "\n   checkThisParticipant : ";
             if (isset($userInfo['currentChatroomUniqid']) && $userInfo['currentChatroomUniqid'] == $chatrooomUniqid) {
                 // is viewing THIS chatroom
-                $tempThisParticipantInCurrentChatroom[$userIP] = $id;
+                $tempThisParticipantInCurrentChatroom[$userInfo['sessionId']] = $id;
             } else {
-                $tempThisParticipantInCurrentChatroom[$userIP] = $id;
+                $tempThisParticipantInCurrentChatroom[$userInfo['sessionId']] = $id;
             }
             array_push($chatroomParticipantInSocket, $id);
         }
@@ -129,12 +128,14 @@ var_dump($message);
             $customUserInfo['currentChatroomUniqid'] = $message->chatroomUniqid;
             $customUserInfo['userUniqid'] = $message->myUniqid;
             $customUserInfo['side'] = $message->mySide;
+            $customUserInfo['sessionId'] = $message->id;
             break;
         case 'initConnection':
             $customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer
 
             $customUserInfo['connectionType'] = $message->socketType;
             $customUserInfo['userUniqid'] = $message->myUniqid;
+            $customUserInfo['sessionId'] = $message->id;
             break;
         case 'notiNewInvitation':
             $output['socketType'] = $message->socketType;
@@ -164,7 +165,12 @@ var_dump($message);
             break;
         case 'backend':
             var_dump($Server->wsClients);
-            $Server->wsSend($clientID, json_encode($Server->wsClients));
+            $output = [];
+            foreach ($Server->wsClients as $key => $value) {
+                array_push($output, $value[50]);
+                print_r($value[50]);
+            }
+            $Server->wsSend($clientID, json_encode($output));
             break;
         default:
             # code...
