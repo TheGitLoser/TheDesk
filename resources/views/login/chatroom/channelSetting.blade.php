@@ -32,7 +32,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     <form id="form">
                     @csrf
                     <div class="card-body message-body" id="message-body">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tr><td>name</td>
                                 <td>
                                     <div class="form-group">
@@ -149,7 +149,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <p class="card-category"></p>
                     </div>
                     <div class="card-body ">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tbody>
                                 <tr><td>Name</td><td>{{ $userDetails['name'] }}</td></tr>
                                 <tr><td>Display ID</td><td>{{ $userDetails['display_id'] }}</td></tr>

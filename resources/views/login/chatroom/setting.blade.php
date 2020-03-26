@@ -31,7 +31,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     </div>
                     <form class="form" id="form">
                     <div class="card-body message-body" id="message-body">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tr><td>Chat room type</td><td>Direct message</td></tr>
                             <tr><td>Create at</td><td>{{ $chatroomDetails['create_at'] }}</td></tr>
                             <tr><td>Last update at</td><td>{{ $chatroomDetails['update_at'] }}</td></tr>
@@ -71,7 +71,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <p class="card-category"></p>
                     </div>
                     <div class="card-body ">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tbody>
                                 <tr><td>Name</td><td>{{ $userDetails['name'] }}</td></tr>
                                 <tr><td>Display ID</td><td>{{ $userDetails['display_id'] }}</td></tr>

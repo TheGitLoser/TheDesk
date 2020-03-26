@@ -65,13 +65,13 @@
                             <div class="card-icon">
                                 <i class="material-icons">content_copy</i>
                             </div>
-                            <div class="card-category" style="height: 0;">
+                            <div class="card-category" style="height: 100px; overflow: auto">
                                 <button type="submit" class="btn btn-primary" name="createMethod" value="Group">Create Group</button>
                                 <button type="submit" class="btn btn-primary" name="createMethod" value="Channel">Create Channel</button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <table class="table" id="ajaxTable">
+                            <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
                                 <tbody>
                                     <tr>
                                         <td>Loading...</td>

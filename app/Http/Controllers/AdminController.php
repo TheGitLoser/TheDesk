@@ -16,7 +16,7 @@ class AdminController extends Controller
         }
         return view('login.admin.home');
     }
-    public function viweBusinessPlan(){
+    public function viewBusinessPlan(){
         if (!userTypeAccess(['admin'])) {
             return redirect()->route('logout.login');
         }
@@ -33,7 +33,7 @@ class AdminController extends Controller
         return view('login.admin.createBusinessPlan');
     }
 
-    public function viweBusinessPlanDetails($unique_id){
+    public function viewBusinessPlanDetails($unique_id){
         if (!userTypeAccess(['admin'])) {
             return redirect()->route('logout.login');
         }
@@ -53,6 +53,9 @@ class AdminController extends Controller
     }
 
     public function ajaxSearchBusinessPlan(Request $request){
+        if (!userTypeAccess(['admin'])) {
+            return redirect()->route('logout.login');
+        }
         $input = $request->only('name');
         
         $output = BusinessPlan::select('unique_id', 'name', 'profile')
@@ -64,6 +67,9 @@ class AdminController extends Controller
     }
 
     public function ajaxCreateBusinessPlan(Request $request){
+        if (!userTypeAccess(['admin'])) {
+            return redirect()->route('logout.login');
+        }
         $input = $request->only('companyName', 'companyProfile', 'name', 'displayId', 'email', 'password', 'passwordConfirmation', 'phone', 'DOB');
 
         $checkCompanyName = BusinessPlan::where('name', $input['companyName'])->count();
@@ -110,7 +116,8 @@ class AdminController extends Controller
             $businessUser->save();
 
             $output['result'] = 'true';
-            $output['redirect'] = route('login.businessAdmin.viewUser');
+            $output['redirect'] = route('login.admin.viewBusinessPlanDetails');
+            
             
         }
         return response()->json(compact('output'));

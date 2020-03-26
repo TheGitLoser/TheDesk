@@ -76,9 +76,9 @@ Route::post('/ajax/createBusinessUser', 'BusinessAdminController@ajaxCreateBusin
 
 // admin
 Route::get('/admin/home', 'AdminController@index') -> name('login.admin.dashboard');
-Route::get('/admin/businessPlan', 'AdminController@viweBusinessPlan') -> name('login.admin.viewBusinessPlan');
+Route::get('/admin/businessPlan', 'AdminController@viewBusinessPlan') -> name('login.admin.viewBusinessPlan');
 Route::post('/ajax/searchBusinessPlan', 'AdminController@ajaxSearchBusinessPlan') -> name('ajax.searchBusinessPlan');
-Route::get('/admin/businessPlanDetails/{unique_id}', 'AdminController@viweBusinessPlanDetails') -> name('login.admin.viewBusinessPlanDetails');
+Route::get('/admin/businessPlanDetails/{unique_id}', 'AdminController@viewBusinessPlanDetails') -> name('login.admin.viewBusinessPlanDetails');
 
 Route::get('/admin/createBusinessPlan', 'AdminController@createBusinessPlan') -> name('login.admin.createBusinessPlan');
 Route::post('/ajax/createBusinessPlan', 'AdminController@ajaxCreateBusinessPlan') -> name('ajax.createBusinessPlan');

@@ -19,7 +19,7 @@
                                     <div class="form-group bmd-form-group">
                                         <select id="type" class="form-control">
                                             <option value="business" selected>Staff</option>
-                                            <option value="businessAdmin">Admin</option>
+                                            <option value="business admin">Admin</option>
                                           </select>
                                     </div>
                                 </div>

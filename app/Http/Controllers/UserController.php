@@ -106,6 +106,13 @@ class UserController extends Controller
     public function ajaxUpdateProfile(Request $request){
         $input = $request->only('name', 'displayId', 'phone', 'DOB', 'profile');
 
+        $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
+        if($checkUserDisplayId) {
+            $output['result'] = 'false';
+            $output['message'] = 'Your Display ID has been used';
+            return response()->json(compact('output'));
+        }
+
         $user = User::where('id', \getMyId())->first();
         $user->name = $input['name'];
         $user->display_id = $input['displayId'];
