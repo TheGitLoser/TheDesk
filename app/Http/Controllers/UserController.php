@@ -28,8 +28,7 @@ class UserController extends Controller
             $user = DB::select(
                 'SELECT u.unique_id, u.name, u.display_id, bu.business_plan_id
                                         FROM user u JOIN business_user bu ON u.id = bu.user_id
-                                        WHERE (u.type = "business" OR u.type = "business admin")
-                                        AND bu.business_plan_id = :businessPlanId
+                                        WHERE bu.business_plan_id = :businessPlanId
                                         AND u.name LIKE :name
                                         AND u.display_id LIKE :displayId
                                         AND u.id != :myId

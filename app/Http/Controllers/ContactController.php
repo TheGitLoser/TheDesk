@@ -29,7 +29,7 @@ class ContactController extends Controller
                                 JOIN business_user bu ON u.id = bu.user_id
                                 WHERE c.user_id = :myUserId 
                                     AND bu.business_plan_id = :businessPlanId
-                                    and u.type LIKE 'business%' and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and u.name LIKE :name and u.display_id LIKE :display_id
                                     and c.status = 1 and u.status = 1",
                 ["businessPlanId" => \getMyBusinessPlanId(), 
                 'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]

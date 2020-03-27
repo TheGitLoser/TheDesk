@@ -165,7 +165,6 @@
                 break;
             case 'business':
                 $('#discover-business').addClass("active show");
-                $('#discover-colleague').hide();
                 break;
             case 'colleague':
                 $('#discover-colleague').addClass("active show");
