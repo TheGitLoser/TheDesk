@@ -67,8 +67,19 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     @else
                         <div class="card-header card-header-info">
                     @endif
-                        <h4 class="card-title">{{ $userDetails['name'] }}</h4>
-                        <p class="card-category"></p>
+                        <div class="row">
+                            <div class="col-10">
+                                <h4 class="card-title">{{ $userDetails['name'] }}</h4>
+                            </div>
+                            <div class="col-2">
+                                @if ($userDetails['contact'] == false && $userDetails['currentUser'] == false)
+                                    <a href="{{ route('backend.chatroom.addContact',['uniqueId'=> $userDetails['unique_id']]) }}">
+                                    <button type="button" title="Add to contact list" class="btn btn-primary btn-link btn-sm" style="padding:0px;">
+                                    <i class="material-icons td-icon">playlist_add</i>
+                                    </button></a>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body ">
                         <table class="table table-responsive w-100 d-block d-md-table">

@@ -15,18 +15,13 @@
                                     <span class="nav-tabs-title">Search:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-indi" data-toggle="tab">
-                                                <i class="material-icons">emoji_people</i> Individual 
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="discover-business" data-toggle="tab">
-                                                <i class="material-icons">business</i> Business
+                                            <a class="nav-link" id="discover-user" data-toggle="tab">
+                                                <i class="material-icons">emoji_people</i> Bookmarked Users 
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="discover-colleague" data-toggle="tab">
-                                                <i class="material-icons">business_center</i> Colleague
+                                                <i class="material-icons">business_center</i> Bookmarked Colleagues
                                             </a>
                                         </li>
                                     </ul>
@@ -150,12 +145,8 @@
     $(function() {
         outputList(contactList);
         switch(searchType) {
-            case 'indi':
-                $('#discover-indi').addClass("active show");
-                $('#discover-colleague').hide();
-                break;
-            case 'business':
-                $('#discover-business').addClass("active show");
+            case 'user':
+                $('#discover-user').addClass("active show");
                 $('#discover-colleague').hide();
                 break;
             case 'colleague':
@@ -163,6 +154,7 @@
                 break;
             default:
                 $('#discover-indi').addClass("active show");
+                break;
         }
     });
 
@@ -172,10 +164,8 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        if($("#discover-indi").hasClass("show")){
-            searchType = 'indi';
-        }else if($("#discover-business").hasClass("show")){
-            searchType = 'business';
+        if($("#discover-user").hasClass("show")){
+            searchType = 'user';
         }else{
             searchType = 'colleague';
         }

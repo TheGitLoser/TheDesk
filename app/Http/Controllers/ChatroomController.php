@@ -189,10 +189,12 @@ class ChatroomController extends Controller
 
         $chatroomUser = DB::select('SELECT cu.create_at as chatroomUserCreateAt, cu.update_at as chatroomUserUpdateAt, cu.side,
                                     u.unique_id, u.name, u.display_id, u.email,
-                                    u.type, u.profile, u.profile_picture, u.status, u.phone, u.DOB
-                                    FROM chatroom_user cu JOIN user u ON cu.user_id = u.id AND u.status = 1
+                                    u.type, u.profile, u.profile_picture, u.status, u.phone, u.DOB, CASE WHEN c.id is null THEN 0 ELSE 1 END as contact
+                                    FROM chatroom_user cu 
+                                    JOIN user u ON cu.user_id = u.id AND u.status = 1
+                                    LEFT JOIN contact_list c ON c.user_id = :myId AND c.contact_user_id = u.id
                                     WHERE cu.chatroom_id = :chatroomId AND cu.status = 1',
-                                    ["chatroomId" => $chatroom->id]);
+                                    ["chatroomId" => $chatroom->id, "myId" => \getMyId()]);
         unset($chatroom->id);
 
         $myUniqid = \getMyUniqid();

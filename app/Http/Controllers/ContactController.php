@@ -11,23 +11,13 @@ class ContactController extends Controller
 {
     public function getContact($searchType, $name, $displayId){
         $myUserId = getMyId();
-        if ($searchType == 'indi') {
+        if ($searchType == 'user'){
             $result = DB::select(
-                "SELECT u.unique_id, u.name, u.display_id 
-                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
-                                WHERE c.user_id = :myUserId 
-                                    and u.type = 'indi' and u.name LIKE :name and u.display_id LIKE :display_id
-                                    and c.status = 1 and u.status = 1",
-                ['myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
-            );
-        }elseif($searchType == 'business'){
-            $result = DB::select(
-                "SELECT u.unique_id, u.name, u.display_id 
+                "SELECT u.unique_id, u.name, u.display_id ,bu.user_id, u.id
                                 FROM contact_list c JOIN user u ON c.contact_user_id = u.id AND u.status = 1
-                                JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
-                                WHERE c.user_id = :myUserId 
-                                    AND bu.business_plan_id != :businessPlanId
-                                    and u.type LIKE 'business%' and u.name LIKE :name and u.display_id LIKE :display_id
+                                LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1 
+                                WHERE c.user_id = :myUserId AND (bu.business_plan_id is null OR bu.business_plan_id != :businessPlanId)
+                                    and (u.type = 'indi' OR u.type LIKE 'business%') and u.name LIKE :name and u.display_id LIKE :display_id
                                     and c.status = 1",
                 ["businessPlanId" => \getMyBusinessPlanId(), 
                 'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
@@ -76,7 +66,7 @@ class ContactController extends Controller
         }
         
         if (session('user.auth') == 'indi') {
-            $searchType = 'indi';
+            $searchType = 'user';
         }else{
             $searchType = 'colleague';
         }
