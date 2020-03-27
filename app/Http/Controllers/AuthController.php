@@ -67,8 +67,9 @@ class AuthController extends Controller
         if($count == 1 && password_verify($input['password'], $user[0]['password'])){
             $user = $user[0];
             $userInfo = array('id' => $user->id, 'uniqid' => $user->unique_id, 'name' => $user->name, 'displayId' => $user->display_id);
-            // get user's company's id if "business / business admin"
-            if($user->type == "business" || $user->type == "business admin"){
+            
+            if($user->type != "indi"){
+                // for non indi user
                 $businessUser = BusinessUser::select('business_plan_id')
                                 ->where('user_id', $user->id)
                                 ->where('status', '1')

@@ -56,8 +56,6 @@ class UserController extends Controller
         
         if(session('user.auth') == 'indi'){
             $searchType = 'indi';
-        }elseif(session('user.auth') == 'admin'){
-            $searchType = 'business';
         }else{
             $searchType = 'colleague';
         }
