@@ -30,10 +30,10 @@ class PHPWebSocket
 	const WS_TIMEOUT_PONG = 5;
 
 	// the maximum length, in bytes, of a frame's payload data (a message consists of 1 or more frames), this is also internally limited to 2,147,479,538
-	const WS_MAX_FRAME_PAYLOAD_RECV = 100000;
+	const WS_MAX_FRAME_PAYLOAD_RECV = 100000000;
 
 	// the maximum length, in bytes, of a message's payload data, this is also internally limited to 2,147,483,647
-	const WS_MAX_MESSAGE_PAYLOAD_RECV = 500000;
+	const WS_MAX_MESSAGE_PAYLOAD_RECV = 50000000;
 
 
 

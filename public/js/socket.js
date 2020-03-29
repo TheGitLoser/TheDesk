@@ -1,85 +1,88 @@
 $(function () {
     serviceWorkerRegistration = navigator.serviceWorker.register('/js/service-worker.js');
 
-    Socket = new WebSocket(socketUrl);
+    function setupWebSocket(){
+        Socket = new WebSocket(socketUrl);
 
-    Socket.onopen = function (event) {
-        // init connection message
-        console.log(Socket.readyState);
-        Socket.send(JSON.stringify(messageSend));
-    }
+        Socket.onopen = function (event) {
+            // init connection message
+            console.log(Socket.readyState);
+            Socket.send(JSON.stringify(messageSend));
+        }
 
-    // when message comes form server
-    Socket.onmessage = function (event) {
-        response = JSON.parse(event['data']);
-        console.log(response);
-        switch (response['socketType']) {
-            case "newChatroomMessage":  // in current chatroom
-                socketNewChatroomMessage(response); // show msg
-                updateChatroomList(response, false);
-                if (response['messageSide'] != 'myMessage') {
-                    // if not send by myself
-                    if (location.protocol == 'https:') {
-                        pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
-                    }else{
-                        pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+        // when message comes form server
+        Socket.onmessage = function (event) {
+            response = JSON.parse(event['data']);
+            console.log(response);
+            switch (response['socketType']) {
+                case "newChatroomMessage":  // in current chatroom
+                    socketNewChatroomMessage(response); // show msg
+                    updateChatroomList(response, false);
+                    if (response['messageSide'] != 'myMessage') {
+                        // if not send by myself
+                        if (location.protocol == 'https:') {
+                            pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true, "noti-focus");
+                        }else{
+                            pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
+                        }
                     }
-                }
-                break;
-            case "notiNewChatroomMessage":
-                updateChatroomList(response, true);
-                if (location.protocol == 'https:') {
-                    pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
-                }else{
-                    pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
-                }
-                unseenMessage.unshift({
-                    chatroomUniqid: response['chatroomUniqid'],
-                    chatroomName: chatroomName,
-                    chatroomType: response['chatroomType'],
-                    senderName: response['senderName'],
-                    unique_id: response['messageUniqid'],
-                    message: response['message'],
-                    update_at: response['messageUpdateAt']
-                });
-                outputNotification(unseenMessage);
-                break;
-            case "notiNewInvitation":
-                indexToBeUpdate = chatroomList.findIndex(({
-                    unique_id
-                }) => unique_id === response['chatroomUniqid']);
-                if (indexToBeUpdate == -1) {
-                    // is new invitation
-                    getChatroomList();
-                }
-                break;
-            case "updateUINewMessage":
-                updateChatroomList(response, true);
-                unseenMessage.unshift({
-                    chatroomUniqid: response['chatroomUniqid'],
-                    chatroomName: chatroomName,
-                    chatroomType: response['chatroomType'],
-                    senderName: response['senderName'],
-                    unique_id: response['messageUniqid'],
-                    message: response['message'],
-                    update_at: response['messageUpdateAt']
-                });
-                outputNotification(unseenMessage);
-                break;
-            case "updateUINewMessage":
-                updateChatroomList(response, true);
-                break;
-            default:
-                break;
+                    break;
+                case "notiNewChatroomMessage":
+                    updateChatroomList(response, true);
+                    if (location.protocol == 'https:') {
+                        pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
+                    }else{
+                        pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false);
+                    }
+                    unseenMessage.unshift({
+                        chatroomUniqid: response['chatroomUniqid'],
+                        chatroomName: chatroomName,
+                        chatroomType: response['chatroomType'],
+                        senderName: response['senderName'],
+                        unique_id: response['messageUniqid'],
+                        message: response['message'],
+                        update_at: response['messageUpdateAt']
+                    });
+                    outputNotification(unseenMessage);
+                    break;
+                case "notiNewInvitation":
+                    indexToBeUpdate = chatroomList.findIndex(({
+                        unique_id
+                    }) => unique_id === response['chatroomUniqid']);
+                    if (indexToBeUpdate == -1) {
+                        // is new invitation
+                        getChatroomList();
+                    }
+                    break;
+                case "updateUINewMessage":
+                    updateChatroomList(response, true);
+                    unseenMessage.unshift({
+                        chatroomUniqid: response['chatroomUniqid'],
+                        chatroomName: chatroomName,
+                        chatroomType: response['chatroomType'],
+                        senderName: response['senderName'],
+                        unique_id: response['messageUniqid'],
+                        message: response['message'],
+                        update_at: response['messageUpdateAt']
+                    });
+                    outputNotification(unseenMessage);
+                    break;
+                case "updateUINewMessage":
+                    updateChatroomList(response, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        Socket.onclose = function (event) {
+            console.log("Socket is closed now (onclose())");
+            setTimeout(function () {
+                setupWebSocket();
+            }, 1000);  // 1sec
         }
     }
-
-    Socket.onclose = function (event) {
-        console.log("Socket is closed now (onclose())");
-        setTimeout(function () {
-            Socket = new WebSocket(socketUrl);
-        }, 10000);  // 10sec
-    }
+    setupWebSocket();
 });
 
 function getChatroomURL(chatroomUniqid) {
