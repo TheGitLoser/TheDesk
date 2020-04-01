@@ -20,7 +20,11 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <div class="card-category chatroom-info-left">
                             <h4>{{ $chatroomDetails['name'] }}</h4>
                             @foreach ($chatroomUserDetails as $userDetails)
-                            {{ $userDetails['name'] }},
+                            @if ($userDetails['currentUser'] == true)
+                                You,                            
+                            @else
+                                {{ $userDetails['name'] }},
+                            @endif
                             @endforeach
                         </div>
                         {{-- <div class="card-category chatroom-info-right" style="height: 0;">
@@ -55,24 +59,19 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 </div>
 @endsection
 
-@push('js')
-<script>
-    $("#pageTitle").hide();
-</script>
-@endpush
 
 @push('js')
 {{-- socket --}}
 <script>
     chatroomUniqid = '{{ $chatroomUniqid }}';
+    chatroomType = '{{ $chatroomDetails["type"] }}';
     chatroomUser = {!! $chatroomUser !!};
-    var myUniqid = "@php echo getMyUniqid(); @endphp";
 
     // for socket
     var currentChatroomUser = [];
     var responseFromDB;
 
-    // for html output
+    // for html output (process participant info in JS)
     var participantInfo = [];
     $.each(chatroomUser, function(i, item) {
         // for socket
@@ -80,26 +79,119 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         temp['unique_id'] = item['unique_id'];
         temp['side'] = item['side'];
         if(item['unique_id'] == myUniqid){
+            myName = item['name'];
             mySide = item['side'];
         }
         currentChatroomUser.push(temp);
         // for html output
         participantInfo[item['unique_id']] = item;
     });
-    var messageSend = {socketType: "initChatroom",
+    messageSend = {socketType: "initChatroom",
+                        id: "{{ session()->getId() }}",
                         chatroomUniqid: chatroomUniqid,
+                        chatroomType: chatroomType,
                         myUniqid: myUniqid,
+                        myName: myName,
                         mySide: mySide,
                         currentChatroomUser: currentChatroomUser};
 
-    $(function(){
-        var socketUrl = '{{ $wsConnection }}';
-        var Socket = new WebSocket(socketUrl);
-        console.log(Socket.readyState);
+</script>
 
-        Socket.onopen = function(event){
+{{-- output message to html --}}
+<script>
+    function socketNewChatroomMessage(response){
+        try {
+            outputMessage(response);
+            $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
+        } catch (error) {
+            location.reload();                    
+        }
+        $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
+    }
+
+    function messageLeft(tempMessage){
+        var name = participantInfo[tempMessage['senderUniqid']]['name'];
+        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
+        if(profilePic == null){
+            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
+            profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+        }
+
+        var tempHtml = '';
+        tempHtml += '<div class="row message-item">';
+        tempHtml += '<div class="col-1" id="message:' + tempMessage["messageUniqid"] +'">';
+        tempHtml += profilePic;
+        tempHtml += '</div><div class="col-9 message-left">';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageUpdateAt'] + '</small>';
+        tempHtml += '</div></div>';
+        return tempHtml;
+        
+    }
+    function messageRight(tempMessage){
+        var name = participantInfo[tempMessage['senderUniqid']]['name'];
+        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
+        if(profilePic == null){
+            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
+            if (participantInfo[tempMessage['senderUniqid']]['currentUser'] == true) {
+                profilePic = '<img src="https://placehold.it/50/1169F7/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+            }else{
+                profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
+            }
+        }
+
+        var tempHtml = '';
+        tempHtml += '<div class="row message-item">';
+        tempHtml += '<div class="col-2"></div><div class="col-9 message-right" id="message:' + tempMessage["messageUniqid"] +'">';
+        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageUpdateAt'] + '</small>';
+        tempHtml += '</div><div class="col-1">';
+        tempHtml += profilePic;
+        tempHtml += '</div></div>';
+        return tempHtml;
+    }
+    
+    function outputMessage(message){
+        var outputHtml = '';
+        if(message['messageSide'] == 'myMessage'){
+            outputHtml += messageRight(message);
+        }else if(message['messageSide'] == 'sameSide'){
+            outputHtml += messageRight(message);
+        }else{
+            //oppositeSide
+            outputHtml += messageLeft(message);
+        }
+        $('#message-body').append(outputHtml);
+    }
+
+    function checkType(){
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        if(urlParams.get('type') ==='new'){
+            messageSend['socketType'] = "notiNewInvitation";
             Socket.send(JSON.stringify(messageSend));
         }
+    }
+
+    $(function() {
+        // style adjust
+        $("#pageTitle").hide();    
+
+        $('.message-body').height($(window).height() * 0.65);
+        $( "footer" ).remove("footer");
+        $('a.navbar-brand').remove();
+
+        // check if is new chatroom
+        Socket.onopen = function(event){
+            console.log(Socket.readyState);
+            Socket.send(JSON.stringify(messageSend));
+            checkType();
+        }
+
+        message = {!! $message !!};
+        $('#message-body').html('');
+        $.each(message, function(i, item) {
+            outputMessage(item);
+        });
+        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
 
         // send chatroom message
         $('#inputMessage').on('keypress', function (e) {
@@ -124,8 +216,10 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     success: function(response){
                         responseFromDB =  response['output'];
                         messageSend['messageUniqid'] = responseFromDB['messageUniqid'];
-                        messageSend['messageCreateAt'] = responseFromDB['messageCreateAt'];
+                        messageSend['messageUpdateAt'] = responseFromDB['messageUpdateAt'];
                         Socket.send(JSON.stringify(messageSend));
+
+                        console.log('messageSend to socket');
                         console.log(messageSend);
                     }
                 });
@@ -133,104 +227,6 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                 $(this).removeAttr("disabled");
             }
         });
-
-        // when message comes form server
-        Socket.onmessage = function(event){
-            response = JSON.parse(event['data']);
-            if(response['socketType'] == "newChatroomMessage"){
-                try {
-                    outputMessage(response);
-                } catch (error) {
-                    location.reload();                    
-                }
-                $.get("{{ route('backend.chatroom.messageSeen', ['unqiue_id'=>''] )}}" + "/" + response["messageUniqid"]);
-            }else{
-console.log('noti only');
-            }
-        }
-
-        Socket.onclose = function(event){
-            console.log("Socket is closed now (onclose())");
-        }
-    });
-
-</script>
-
-{{-- output message to html --}}
-<script>
-    function messageLeft(tempMessage){
-        var name = participantInfo[tempMessage['senderUniqid']]['name'];
-        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
-        if(profilePic == null){
-            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
-            profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
-        }
-
-        var tempHtml = '';
-        tempHtml += '<div class="row message-item">';
-        tempHtml += '<div class="col-1" id="message:' + tempMessage["messageUniqid"] +'">';
-        tempHtml += profilePic;
-        tempHtml += '</div><div class="col-9 message-left">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
-        tempHtml += '</div></div>';
-        return tempHtml;
-        
-    }
-    function messageRight(tempMessage){
-        var name = participantInfo[tempMessage['senderUniqid']]['name'];
-        var profilePic = participantInfo[tempMessage['senderUniqid']]['profile_picture'];
-        if(profilePic == null){
-            var initials = participantInfo[tempMessage['senderUniqid']]['initials'];
-            if (participantInfo[tempMessage['senderUniqid']]['currentUser'] == true) {
-                profilePic = '<img src="https://placehold.it/50/1169F7/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
-            }else{
-                profilePic = '<img src="https://placehold.it/50/FA6F57/fff&amp;text=' + initials + '" alt="' + initials + '" class="rounded-circle mx-auto d-block">'
-            }
-        }
-
-        var tempHtml = '';
-        tempHtml += '<div class="row message-item">';
-        tempHtml += '<div class="col-2"></div><div class="col-9 message-right" id="message:' + tempMessage["messageUniqid"] +'">';
-        tempHtml += tempMessage['message'] + '<br><small class="message-time">'+ name + ' @'+ tempMessage['messageCreateAt'] + '</small>';
-        tempHtml += '</div><div class="col-1">';
-        tempHtml += profilePic;
-        tempHtml += '</div></div>';
-        return tempHtml;
-    }
-    function outputMessage(message){
-        var outputHtml = '';
-        if(chatroomUser.length == 2){
-            if(message['senderUniqid'] == myUniqid){
-                outputHtml += messageRight(message);    
-            }
-            else{
-                outputHtml += messageLeft(message);
-            }
-        }else{
-            if(message['messageType'] == 'myMessage'){
-                outputHtml += messageRight(message);
-            }else if(message['messageType'] == 'sameType'){
-                outputHtml += messageRight(message);
-            }else{
-                //oppositeType
-                outputHtml += messageLeft(message);
-            }
-        }
-        $('#message-body').append(outputHtml);
-        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
-    }
-    $(function() {
-        // style adjust
-        $('.message-body').height($(window).height() * 0.65);
-        $( "footer" ).remove("footer");
-        $('a.navbar-brand').remove();
-
-        message = {!! $message !!};
-        $('#message-body').html('');
-        $.each(message, function(i, item) {
-            outputMessage(item);
-        });
-        $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
     });
 
 </script>

@@ -28,8 +28,7 @@ class UserController extends Controller
             $user = DB::select(
                 'SELECT u.unique_id, u.name, u.display_id, bu.business_plan_id
                                         FROM user u JOIN business_user bu ON u.id = bu.user_id
-                                        WHERE (u.type = "business" OR u.type = "business admin")
-                                        AND bu.business_plan_id = :businessPlanId
+                                        WHERE bu.business_plan_id = :businessPlanId
                                         AND u.name LIKE :name
                                         AND u.display_id LIKE :displayId
                                         AND u.id != :myId
@@ -57,8 +56,6 @@ class UserController extends Controller
         
         if(session('user.auth') == 'indi'){
             $searchType = 'indi';
-        }elseif(session('user.auth') == 'admin'){
-            $searchType = 'business';
         }else{
             $searchType = 'colleague';
         }
@@ -105,6 +102,13 @@ class UserController extends Controller
     
     public function ajaxUpdateProfile(Request $request){
         $input = $request->only('name', 'displayId', 'phone', 'DOB', 'profile');
+
+        $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
+        if($checkUserDisplayId) {
+            $output['result'] = 'false';
+            $output['message'] = 'Your Display ID has been used';
+            return response()->json(compact('output'));
+        }
 
         $user = User::where('id', \getMyId())->first();
         $user->name = $input['name'];

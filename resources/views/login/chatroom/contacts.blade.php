@@ -15,18 +15,13 @@
                                     <span class="nav-tabs-title">Search:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-indi" data-toggle="tab">
-                                                <i class="material-icons">emoji_people</i> Individual 
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="discover-business" data-toggle="tab">
-                                                <i class="material-icons">business</i> Business
+                                            <a class="nav-link" id="discover-user" data-toggle="tab">
+                                                <i class="material-icons">emoji_people</i> Bookmarked Users 
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="discover-colleague" data-toggle="tab">
-                                                <i class="material-icons">business_center</i> Colleague
+                                                <i class="material-icons">business_center</i> Bookmarked Colleagues
                                             </a>
                                         </li>
                                     </ul>
@@ -65,12 +60,13 @@
                             <div class="card-icon">
                                 <i class="material-icons">content_copy</i>
                             </div>
-                            <div class="card-category" style="height: 0;">
-                                <button type="submit" class="btn btn-primary">Create channel</button>
+                            <div class="card-category" style="height: 100px; overflow: auto">
+                                <button type="submit" class="btn btn-primary" name="createMethod" value="Group">Create Group</button>
+                                <button type="submit" class="btn btn-primary" name="createMethod" value="Channel">Create Channel</button>
                             </div>
                         </div>
                         <div class="card-body">
-                            <table class="table" id="ajaxTable">
+                            <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
                                 <tbody>
                                     <tr>
                                         <td>Loading...</td>
@@ -81,6 +77,8 @@
                         </div>
                         <div class="card-footer">
                             <div class="stats">
+                                Please add user to your contact list before adding to channel, 
+
                                 Hide
                                 <i class="far fa-minus-square info-icon"></i>
 
@@ -136,7 +134,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small></td>'
+        tempHtml += '<tr><td style="width: 10%;">' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small></td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });
@@ -147,12 +145,8 @@
     $(function() {
         outputList(contactList);
         switch(searchType) {
-            case 'indi':
-                $('#discover-indi').addClass("active show");
-                $('#discover-colleague').hide();
-                break;
-            case 'business':
-                $('#discover-business').addClass("active show");
+            case 'user':
+                $('#discover-user').addClass("active show");
                 $('#discover-colleague').hide();
                 break;
             case 'colleague':
@@ -160,6 +154,7 @@
                 break;
             default:
                 $('#discover-indi').addClass("active show");
+                break;
         }
     });
 
@@ -169,10 +164,8 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        if($("#discover-indi").hasClass("show")){
-            searchType = 'indi';
-        }else if($("#discover-business").hasClass("show")){
-            searchType = 'business';
+        if($("#discover-user").hasClass("show")){
+            searchType = 'user';
         }else{
             searchType = 'colleague';
         }

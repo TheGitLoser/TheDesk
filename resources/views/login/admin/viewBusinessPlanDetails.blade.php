@@ -14,7 +14,7 @@
                         </p>
                     </div>
                     <div class="card-body">
-                        <table class="table" id="ajaxTable">
+                        <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
                             <tbody>
                                 <tr>
                                     <td style="width:30%">Business name: </td>

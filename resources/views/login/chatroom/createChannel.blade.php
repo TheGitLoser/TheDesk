@@ -2,7 +2,7 @@
 $selectedUser = json_decode($selectedUser, true);
 @endphp
 
-@extends('login.layout.app', ['activePage' => '', 'title' => ''])
+@extends('login.layout.app', ['activePage' => '', 'title' => 'Create New '.$createMethod])
 
 @section('content')
 <div class="content">
@@ -13,12 +13,12 @@ $selectedUser = json_decode($selectedUser, true);
                     @csrf
                     <div class="card">
                         <div class="card-header card-header-primary">
-                            <h4 class="card-title">Create new channel</h4>
+                            <h4 class="card-title">Create new {{ $createMethod }}</h4>
                             <p class="card-category"></p>
                         </div>
                         <div class="card-body ">
                             <div class="row">
-                                <label class="col-sm-2 col-form-label">Channel name</label>
+                                <label class="col-sm-2 col-form-label">{{ $createMethod }} name</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
                                         <input class="form-control" type="text" id="name" placeholder="Channel name" required>
@@ -29,53 +29,58 @@ $selectedUser = json_decode($selectedUser, true);
                                 <label class="col-sm-2 col-form-label" for="input-password-confirmation">User to be added</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <div class="row">
-                                            <div class="col">
-                                                <h5 class="card-title">
-                                                Select the side of participant shown in chat room
-                                                </h5>
+                                        @if ($createMethod == "Channel")
+                                            <div class="row">
+                                                <div class="col">
+                                                    <h5 class="card-title">
+                                                    Select the side of participant shown in chat room
+                                                    </h5>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row" style="padding-top: 5px;">
-                                            <div class="col-2">
-                                                <h5>
-                                                    Opposite side
-                                                </h5>
-                                            </div>
-                                            <div class="col-8">
-                                            </div>
-                                            <div class="col-2">
-                                                <h5>
-                                                    Same side with you
-                                                </h5>
-                                            </div>
-                                        </div>
-                                        {{-- Current user --}}
-                                        <div class="row" style="padding-top: 5px;">
-                                            <div class="col-2"></div>
-                                            <div class="col-8">
-                                                {{ session('user.info.name') }} @ {{ session('user.info.displayId') }}
-                                            </div>
-                                            <div class="col-2">
-                                                Here
-                                            </div>
-                                        </div>
-                                    
-                                    @foreach ($selectedUser as $item)
-                                        <div class="form-group bmd-form-group">
                                             <div class="row" style="padding-top: 5px;">
                                                 <div class="col-2">
-                                                    <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                    <h5>
+                                                        Opposite side
+                                                    </h5>
                                                 </div>
                                                 <div class="col-8">
-                                                    {{ $item['name'] }} @ {{ $item['display_id'] }}
                                                 </div>
                                                 <div class="col-2">
-                                                    <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
+                                                    <h5>
+                                                        Same side with you
+                                                    </h5>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                            {{-- Current user --}}
+                                            <div class="row" style="padding-top: 5px;">
+                                                <div class="col-2">
+                                                    <input class="form-control" type="radio" disabled>
+                                                </div>
+                                                <div class="col-8">
+                                                    {{ session('user.info.name') }} @ {{ session('user.info.displayId') }}
+                                                </div>
+                                                <div class="col-2">
+                                                    <input class="form-control" type="radio" checked disabled>
+                                                </div>
+                                            </div>
+                                        
+                                        @foreach ($selectedUser as $item)
+                                            <div class="form-group bmd-form-group">
+                                                <div class="row" style="padding-top: 5px;">
+                                                    <div class="col-2">
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        {{ $item['name'] }} @ {{ $item['display_id'] }}
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                        @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -106,6 +111,9 @@ $selectedUser = json_decode($selectedUser, true);
         userSide = {};
         @foreach ($selectedUser as $item)
             userSide['{{$item['unique_id']}}'] = $('input[name={{$item["unique_id"]}}]:checked').val();
+            if(userSide['{{$item['unique_id']}}'] == null){
+                userSide['{{$item['unique_id']}}'] = 0;
+            }
         @endforeach
 
         e.preventDefault();
@@ -118,6 +126,7 @@ $selectedUser = json_decode($selectedUser, true);
             url: "{{ route('ajax.createChannel') }}",
             method: 'post',
             data: {
+                createMethod: "{{ $createMethod }}",
                 name: $('#name').val(),
                 description: $('#description').val(),
                 selectedUser: userSide

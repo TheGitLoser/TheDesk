@@ -31,9 +31,11 @@ Route::get('/login/account/logout', 'AuthController@logout') -> name('login.acco
 // chatroom
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
 Route::get('/chatroom/setting/{unique_id}', 'ChatroomController@setting') -> name('login.chatroom.setting');
-Route::get('/chatroom/setting/addUser/{unique_id}', 'ChatroomController@settingAddUser') -> name('login.chatroom.settingAddUser');
-Route::post('/backend/chatroom/setting/addUser/{unique_id}', 'ChatroomController@backendSettingAddUser') -> name('backend.chatroom.settingAddUser');
-Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');
+Route::get('/backend/chatroom/setting/switchType/{unique_id}', 'ChatroomController@backendSwitchType') -> name('backend.chatroom.switchType');
+Route::get('/chatroom/setting/channelAddUser/{unique_id}', 'ChatroomController@channelAddUser') -> name('login.chatroom.channelAddUser');
+Route::post('/backend/chatroom/channelAddUser/{unique_id}', 'ChatroomController@backendChannelAddUser') -> name('backend.chatroom.channelAddUser');
+Route::post('/ajax/chatroom/setting/{mode}', 'ChatroomController@ajaxSetting') -> name('ajax.chatroom.setting');    // update chatroom info
+Route::post('/ajax/chatroom/getChatroomList', 'ChatroomController@ajaxGetChatroomList') -> name('ajax.chatroom.getChatroomList');
 
 Route::post('/ajax/newMessage', 'ChatroomController@ajaxNewMessage') -> name('ajax.chatroom.newMessage');
 Route::get('/backend/chatroom/messageSeen/{unique_id}', 'ChatroomController@backendMessageSeen') -> name('backend.chatroom.messageSeen');
@@ -74,9 +76,9 @@ Route::post('/ajax/createBusinessUser', 'BusinessAdminController@ajaxCreateBusin
 
 // admin
 Route::get('/admin/home', 'AdminController@index') -> name('login.admin.dashboard');
-Route::get('/admin/businessPlan', 'AdminController@viweBusinessPlan') -> name('login.admin.viewBusinessPlan');
+Route::get('/admin/businessPlan', 'AdminController@viewBusinessPlan') -> name('login.admin.viewBusinessPlan');
 Route::post('/ajax/searchBusinessPlan', 'AdminController@ajaxSearchBusinessPlan') -> name('ajax.searchBusinessPlan');
-Route::get('/admin/businessPlanDetails/{unique_id}', 'AdminController@viweBusinessPlanDetails') -> name('login.admin.viewBusinessPlanDetails');
+Route::get('/admin/businessPlanDetails/{unique_id}', 'AdminController@viewBusinessPlanDetails') -> name('login.admin.viewBusinessPlanDetails');
 
 Route::get('/admin/createBusinessPlan', 'AdminController@createBusinessPlan') -> name('login.admin.createBusinessPlan');
 Route::post('/ajax/createBusinessPlan', 'AdminController@ajaxCreateBusinessPlan') -> name('ajax.createBusinessPlan');

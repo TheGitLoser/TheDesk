@@ -32,7 +32,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     <form id="form">
                     @csrf
                     <div class="card-body message-body" id="message-body">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tr><td>name</td>
                                 <td>
                                     <div class="form-group">
@@ -40,7 +40,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                                     </div>
                                 </td>
                             </tr>
-                            <tr><td>Chat room type</td><td>Channel</td></tr>
+                            <tr><td>Chat room type</td><td>{{ $chatroomDetails['type'] }}</td></tr>
                             <tr><td>Create at</td><td>{{ $chatroomDetails['create_at'] }}</td></tr>
                             <tr><td>Last update at</td><td>{{ $chatroomDetails['update_at'] }}</td></tr>
                             <tr><td>Description</td>
@@ -53,50 +53,61 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                             <tr><td>User side</td>
                                 <td>
                                     <div class="form-group bmd-form-group">
-                                        <div class="row">
-                                            <div class="col">
-                                                <h5 class="card-title">
-                                                Select the side of participant shown in chat room
-                                                </h5>
+                                        @if ($chatroomDetails['type'] == "Group")
+                                            <div class="row">
+                                                <div class="col">
+                                                    <h5 class="card-title">
+                                                    Switch to Channel in order to select participant's side
+                                                    </h5>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="row" style="padding-top: 5px;">
-                                            <div class="col-2">
-                                                <h5>
-                                                    Opposite side
-                                                </h5>
+                                        @else
+                                            <div class="row">
+                                                <div class="col">
+                                                    <h5 class="card-title">
+                                                    Select the side of participant shown in chat room
+                                                    </h5>
+                                                </div>
                                             </div>
-                                            <div class="col-8">
-                                            </div>
-                                            <div class="col-2">
-                                                <h5>
-                                                    My side
-                                                </h5>
-                                            </div>
-                                        </div>
-                                    @foreach ($chatroomUserDetails as $item)
-                                        <div class="form-group bmd-form-group">
                                             <div class="row" style="padding-top: 5px;">
                                                 <div class="col-2">
-                                                    @if ($item['side'] != $mySide)
-                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required checked>
-                                                    @else
-                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
-                                                    @endif
+                                                    <h5>
+                                                        Opposite side
+                                                    </h5>
                                                 </div>
                                                 <div class="col-8">
-                                                    {{ $item['name'] }} @ {{ $item['display_id'] }}
                                                 </div>
                                                 <div class="col-2">
-                                                    @if ($item['side'] == $mySide)
-                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required checked>
-                                                    @else
-                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
-                                                    @endif
+                                                    <h5>
+                                                        My side
+                                                    </h5>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                            @foreach ($chatroomUserDetails as $item)
+                                                <div class="form-group bmd-form-group">
+                                                    <div class="row" style="padding-top: 5px;">
+                                                        <div class="col-2">
+                                                            @if ($item['side'] != $mySide)
+                                                                <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required checked>
+                                                            @else
+                                                                <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                            @endif
+                                                        </div>
+                                                        <div class="col-8">
+                                                            {{ $item['name'] }} @ {{ $item['display_id'] }}
+                                                        </div>
+                                                        <div class="col-2">
+                                                            @if ($item['side'] == $mySide)
+                                                                <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required checked>
+                                                            @else
+                                                                <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="1" required>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+
                                     </div>
                                 </td>
                             </tr>
@@ -107,10 +118,15 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
                             <button type="submit" class="btn btn-primary">Update</button>
-                            <a href="{{route('login.chatroom.settingAddUser', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">
-                                <button type="button" class="btn btn-info">
-                                    Add User
-                                </button>
+                            <a href="{{route('login.chatroom.channelAddUser', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">
+                                <button type="button" class="btn btn-info">Add User</button>
+                            </a>
+                            <a href="{{route('backend.chatroom.switchType', ['unique_id'=>$chatroomDetails['unique_id']])}}" style="color: #fafafa;">
+                                @if ($chatroomDetails['type'] == "Channel")
+                                    <button type="button" class="btn btn-secondary">Switch to Group</button>
+                                @else
+                                    <button type="button" class="btn btn-secondary">Switch to Channel</button>
+                                @endif
                             </a>
                         </div>
                     </div>
@@ -129,11 +145,22 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     @else
                         <div class="card-header card-header-info">
                     @endif
-                        <h4 class="card-title">{{ $userDetails['name'] }}</h4>
-                        <p class="card-category"></p>
+                        <div class="row">
+                            <div class="col-10">
+                                <h4 class="card-title">{{ $userDetails['name'] }}</h4>
+                            </div>
+                            <div class="col-2">
+                                @if ($userDetails['contact'] == false && $userDetails['currentUser'] == false)
+                                    <a href="{{ route('backend.chatroom.addContact',['uniqueId'=> $userDetails['unique_id']]) }}">
+                                    <button type="button" title="Add to contact list" class="btn btn-primary btn-link btn-sm" style="padding:0px;">
+                                    <i class="material-icons td-icon">playlist_add</i>
+                                    </button></a>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body ">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tbody>
                                 <tr><td>Name</td><td>{{ $userDetails['name'] }}</td></tr>
                                 <tr><td>Display ID</td><td>{{ $userDetails['display_id'] }}</td></tr>

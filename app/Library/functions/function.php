@@ -27,7 +27,11 @@
         return session('user.info.uniqid');
     }
     function getMyBusinessPlanId(){
-        return session('user.info.businessPlanId');
+        if(session('user.info.businessPlanId')){
+            return session('user.info.businessPlanId');
+        }else{
+            return false;
+        }
     }
     function userUniqidToId($uniqueId){
         $uniqueId = User::select('id')->where('unique_id', $uniqueId)->first();

@@ -31,7 +31,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     </div>
                     <form class="form" id="form">
                     <div class="card-body message-body" id="message-body">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tr><td>Chat room type</td><td>Direct message</td></tr>
                             <tr><td>Create at</td><td>{{ $chatroomDetails['create_at'] }}</td></tr>
                             <tr><td>Last update at</td><td>{{ $chatroomDetails['update_at'] }}</td></tr>
@@ -67,11 +67,22 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     @else
                         <div class="card-header card-header-info">
                     @endif
-                        <h4 class="card-title">{{ $userDetails['name'] }}</h4>
-                        <p class="card-category"></p>
+                        <div class="row">
+                            <div class="col-10">
+                                <h4 class="card-title">{{ $userDetails['name'] }}</h4>
+                            </div>
+                            <div class="col-2">
+                                @if ($userDetails['contact'] == false && $userDetails['currentUser'] == false)
+                                    <a href="{{ route('backend.chatroom.addContact',['uniqueId'=> $userDetails['unique_id']]) }}">
+                                    <button type="button" title="Add to contact list" class="btn btn-primary btn-link btn-sm" style="padding:0px;">
+                                    <i class="material-icons td-icon">playlist_add</i>
+                                    </button></a>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body ">
-                        <table class="table">
+                        <table class="table table-responsive w-100 d-block d-md-table">
                             <tbody>
                                 <tr><td>Name</td><td>{{ $userDetails['name'] }}</td></tr>
                                 <tr><td>Display ID</td><td>{{ $userDetails['display_id'] }}</td></tr>

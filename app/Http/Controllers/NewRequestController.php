@@ -30,27 +30,18 @@ class NewRequestController extends Controller
             return redirect()->route('logout.login');
         }
 
-        if(userTypeAccess(['indi', 'admin'])){
-            $newRequest = DB::select("SELECT u.name as requesterName, bp.name as companyName,
+        $newRequest = DB::select("SELECT u.name as requesterName, bp.name as companyName,
                                             req.title, req.details, req.unique_id, req.status
                                         FROM request req JOIN user u ON req.user_id = u.id AND u.status = 1
                                         LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
                                         LEFT JOIN business_plan bp ON bu.business_plan_id = bp.id AND bp.status = 1
-                                        WHERE req.user_id = :myId 
-                                            AND (req.status = 1 OR req.status = 3)
-                                        ORDER BY req.status, req.create_at desc
-                                        ", ['myId' => \getMyId()]);
-        }else{
-            $newRequest = DB::select("SELECT u.name as requesterName, bp.name as companyName,
-                                            req.title, req.details, req.unique_id, req.status
-                                        FROM request req JOIN user u ON req.user_id = u.id AND u.status = 1
-                                        LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
-                                        LEFT JOIN business_plan bp ON bu.business_plan_id = bp.id AND bp.status = 1
-                                        WHERE req.business_plan_id = :businessPlanId 
-                                            AND (req.status = 1 OR req.status = 3)
-                                        ORDER BY req.status, req.create_at desc
-                                        ", ['businessPlanId' => \getMyBusinessPlanId()]);
-        }
+                                        WHERE (req.user_id = :myId OR req.business_plan_id = :businessPlanId )
+                                            AND (req.status = 1 OR req.status = 2)
+                                        ORDER BY req.status desc, req.create_at desc
+                                        ", ['myId' => \getMyId(), 'businessPlanId' => \getMyBusinessPlanId()]);
+
+
+
         return view('login.request.view')->with('newRequest', json_encode($newRequest));
     }
 
@@ -73,9 +64,14 @@ class NewRequestController extends Controller
             $addMe->side = '0';
             $addMe->save();
         }
-        $newRequest->status = 3;
-        $newRequest->save();
-        return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
+        if($newRequest->status == 2){
+            // first response
+            $newRequest->status = 1;
+            $newRequest->save();
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id, 'type' => 'new']);
+        }else{
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
+        }
     }
 
     public function ajaxNewRequest(Request $request){

@@ -115,7 +115,7 @@
                 <li class="nav-item{{ $activePage == 'profile' ? ' active' : '' }}">
                     <a class="nav-link" href="">
                         <span class="sidebar-mini user-name-icon"> </span>
-                        <span class="sidebar-normal">Loding... </span>
+                        <span class="sidebar-normal">Loading... </span>
                     </a>
                 </li>
             </div>
@@ -136,17 +136,37 @@
             }else{
                 active = '';
             }
-            var initials = item.initials;
-            var chatroomName = item.name;
 
             tempHtml += '<li class="nav-item ' + active +'">';
             tempHtml += '<a class="nav-link" href="' + link +'">';
-            tempHtml += '<span class="sidebar-mini user-name-icon"> ' + initials +' </span>';
-            tempHtml += '<span class="sidebar-normal">' + chatroomName +' </span>';
+            if(item.unseen){
+                tempHtml += '<span class="sidebar-mini user-name-icon sidebar-noti"> ' + item.unseen +' </span>';
+            }else{
+                tempHtml += '<span class="sidebar-mini user-name-icon"> ' + item.initials +' </span>';
+            }
+            tempHtml += '<span class="sidebar-normal">' + item.name.substring(0, 23) +' </span>';
             tempHtml += '</a></li>';
         });
         $('#chatroom').html(tempHtml);
     }
+
+    function getChatroomList(){
+        $.ajaxSetup({
+            headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: "{{ route('ajax.chatroom.getChatroomList') }}",
+            method: 'post',
+            success: function(response){
+                chatroomList = response;
+                outputChatroomList(chatroomList);
+                pushNoti(chatroomList[0].name, "Start chatting with "+ chatroomList[0].name, getChatroomURL(response['chatroomUniqid']), false);
+            }
+        });
+    }
+
     $(function() {
         currentChatroomName = '';
         @php
@@ -156,21 +176,22 @@
         @endphp
         
         outputChatroomList(chatroomList);
-    });
-    // search chatroom
-    $("#searchChatroomList").on("keyup", function() {
-        var value = $(this).val();
-        tempChatroomList = [];
-        $.each(chatroomList, function(i, item) {
-            if(item.name.toLowerCase().includes(value.toLowerCase())){
-                tempChatroomList.push(item);
-            }
+        
+        // search chatroom
+        $("#searchChatroomList").on("keyup", function() {
+            var value = $(this).val();
+            tempChatroomList = [];
+            $.each(chatroomList, function(i, item) {
+                if(item.name.toLowerCase().includes(value.toLowerCase())){
+                    tempChatroomList.push(item);
+                }
+            });
+            outputChatroomList(tempChatroomList);
         });
-        outputChatroomList(tempChatroomList);
-    });
-    $('#searchChatroomListForm').submit(function(e){
-        console.log($('#searchChatroomList').val());
-
+        $('#searchChatroomListForm').submit(function(e){
+            console.log($('#searchChatroomList').val());
+            
+        });
     });
 
 </script>

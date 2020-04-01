@@ -27,17 +27,13 @@
                     <a class="nav-link" href="" id="navbarDropdownMenuLink" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <i class="material-icons">notifications</i>
-                        <span class="notification"></span>
+                        <span class="notification" id="notificationCount"></span>
                         <p class="d-lg-none d-md-block">
                             Notifications
                         </p>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">{{ __('Mike John responded to your email') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('You have 5 new tasks') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('You\'re now friend with Andrew') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('Another Notification') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('Another One') }}</a>
+                    <div class="dropdown-menu dropdown-menu-right unseenMsgNotification" aria-labelledby="navbarDropdownMenuLink" id="notification">
+                        {{-- <a class="dropdown-item" href="#">{{ __('Another One') }}</a> --}}
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -60,3 +56,34 @@
         </div>
     </div>
 </nav>
+
+@push('js')
+<script>
+    var unseenMessage = {!! App\Http\Controllers\ChatroomController::getUnseenMessage() !!};
+    function outputNotification(unseenMessage){
+        tempHtml = "";
+        $.each(unseenMessage, function(i, item) {
+            var link = '{{ route('login.chatroom.chat',['unique_id'=> '']) }}/' + item.chatroomUniqid;
+            if(item.chatroomType == "DM" ){
+                tempMessage = item.senderName + ':  ' + item.message;
+            }else{
+                tempMessage = item.senderName + ' (' + item.chatroomName + '):<br>' + item.message;
+            }
+            tempHtml += '<a class="dropdown-item" href="' + link +'">' + tempMessage + "</a>";
+        });
+        $('#notification').html(tempHtml);
+
+        if(unseenMessage.length){
+            $('#notificationCount').hide();
+        }else{
+            $('#notificationCount').show();
+            $('#notificationCount').html(unseenMessage.length);
+        }
+
+    }
+
+    $(function(){
+        outputNotification(unseenMessage);
+    });
+</script>
+@endpush

@@ -14,23 +14,28 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.update_at, u2.name as userName, u2.display_id as displayId
-                                FROM chatroom c
-                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
-                                    LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> :myUserId2 AND cu2.status = 1
-                                    LEFT JOIN user u2 ON cu2.user_id = u2.id 
-                                WHERE c.status = 1 and cu.status = 1 
-                                GROUP BY c.unique_id, c.name, c.update_at
-                                ORDER BY c.update_at DESC',
-                            ['myUserId' => \getMyId(), 'myUserId2' => \getMyId()]);
+        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.type, c.update_at, u2.name as userName, 
+                                        count(msg.id) - count(msgSeen.id) as unseen
+                                    FROM chatroom c
+                                        JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
+                                        LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
+                                        LEFT JOIN user u2 ON cu2.user_id = u2.id 
+                                        LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                        LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
+                                            AND msg.id = msgSeen.message_id AND msgSeen.seen_status = 1 
+                                    WHERE c.status = 1 and cu.status = 1 
+                                    GROUP BY c.unique_id, c.name, c.update_at
+                                    ORDER BY c.update_at DESC',
+                            ['myUserId' => \getMyId()]);
         foreach ($myChatroom as $item) {
-            // if chatroom Name = null, use participate name
-            if(is_null($item->chatroomName)){
+            if($item->type == "DM"){
                 $item->name = $item->userName;
             }else{
                 $item->name = $item->chatroomName;
             }
             $item->initials = \initials($item->name);
+            
+            unset($item->chatroomName);
         }
         return $myChatroom;
     }
@@ -40,20 +45,39 @@ class ChatroomController extends Controller
         return json_encode(ChatroomController::getChatroom());
     }
     
+    // call from view
+    static function getUnseenMessage(){
+        $myChatroom = DB::select('SELECT c.unique_id as chatroomUniqid, c.name as chatroomName, c.type as chatroomType, u2.name as senderName, 
+                                        msg.unique_id, msg.content as message, msg.update_at
+                                FROM chatroom c
+                                    JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
+                                    LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                    JOIN user u2 ON msg.user_id = u2.id
+                                    LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
+                                        AND msg.id = msgSeen.message_id 
+                                WHERE c.status = 1 and cu.status = 1 AND msgSeen.seen_status is null
+                                GROUP BY c.unique_id, c.name, c.update_at, msg.content
+                                ORDER BY msg.update_at DESC',
+                                ['myUserId' => \getMyId()]);
+// dd($myChatroom);
+        return json_encode($myChatroom);
+    }
+    
     private function checkChatroomPermission($chatroomUniqid){
         // get chatroom id
         $chatroom = Chatroom::where('unique_id', $chatroomUniqid)->first();
         if(!$chatroom){
-            return redirect()->route('login.chatroom.contacts');
+            header('Location: /');
+            exit();
         }
-
         // check permission, whether you are in this chatroom
         $checkPermission = ChatroomUser::where('chatroom_id', $chatroom->id)
-                    -> where('user_id', \getMyId())
-                    -> where('status', 1)
-                    ->first();
+                                        -> where('user_id', \getMyId())
+                                        -> where('status', 1)
+                                        ->first();
         if(!$checkPermission){
-            return redirect()->route('login.chatroom.contacts');
+            header('Location: /');
+            exit();
         }
 
         return $chatroom;
@@ -77,22 +101,22 @@ class ChatroomController extends Controller
                                     FROM chatroom_user cu JOIN user u ON cu.user_id = u.id AND u.status = 1
                                     WHERE cu.chatroom_id = :chatroomId AND cu.status = 1',
                                     ["chatroomId" => $chatroomId]);
-        $message = DB::select('SELECT m.id, m.unique_id as messageUniqid, m.content as message, m.create_at as messageCreateAt,
-                                    m.update_at as messageUpdateAt,u.unique_id as senderUniqid, 
+        $message = DB::select('SELECT m.id, m.unique_id as messageUniqid, m.content as message,  
+                                    m.update_at as messageUpdateAt, u.unique_id as senderUniqid, 
                                     CASE WHEN seen.id is not null THEN 1 ELSE 0 END as seen
                                     FROM message m 
                                     JOIN user u ON m.user_id = u.id AND u.status = 1
                                     LEFT JOIN message_seen seen ON m.id = seen.message_id AND seen.user_id = :myId
-                                    WHERE m.chatroom_id = :chatroomId AND m.status = 1',
+                                    WHERE m.chatroom_id = :chatroomId AND m.status = 1
+                                    ORDER BY m.update_at',
                                     ["chatroomId" => $chatroomId, "myId" => $myId]);
 
         $participationSide = [];
-        
+
         foreach ($chatroomUser as $participant) {
             $participant->initials = \initials($participant->name);
             if($participant->unique_id == $myUniqid){
                 // current user
-                $participant->name = "You";
                 $participant->currentUser = true;
                 $mySide = $participant->side;
             }else{
@@ -101,66 +125,56 @@ class ChatroomController extends Controller
             }
         }
 
-        if(empty($chatroom->name)){
-            // for DM
+        if ($chatroom->type == "DM") {
+            // DM
             // get chat room name
             foreach ($chatroomUser as $user) {
-                if($user->unique_id != $myUniqid){
+                if ($user->unique_id != $myUniqid) {
                     $chatroom->name = $user->name;
                     break;
                 }
             }
-            foreach ($message as $item){
-                // get message side
-                if($item->senderUniqid == $myUniqid){
-                    $item->messageType = 'myMessage';
-                }else{
-                    $item->messageType = 'oppositeType';
+        }
+
+        // get message side
+        if ($chatroom->type == "Group"){
+            foreach ($message as $item) {
+                if ($item->senderUniqid == $myUniqid) {
+                    $item->messageSide = 'myMessage';
+                } else {
+                    $item->messageSide = 'oppositeSide';
                 }
-                
-                // message seen
-                if(!$item->seen){
-                    // not seen
-                    $messageSeen = new MessageSeen;
-                    $messageSeen->chatroom_id = $chatroomId;
-                    $messageSeen->message_id = $item->id;
-                    $messageSeen->user_id = $myId;
-                    $messageSeen->save();
-                }
-                unset($item->id);
             }
         }else{
-            // for channel
+            // type = Channel or DM
             foreach ($message as $item) {
-                // get message side
-                if($item->senderUniqid == $myUniqid){
-                    $item->messageType = 'myMessage';
-                }elseif($participationSide[$item->senderUniqid] == $mySide){
-                    $item->messageType = 'sameType';
-                }else{
-                    $item->messageType = 'oppositeType';
+                if ($item->senderUniqid == $myUniqid) {
+                    $item->messageSide = 'myMessage';
+                } elseif ($participationSide[$item->senderUniqid] == $mySide) {
+                    $item->messageSide = 'sameSide';
+                } else {
+                    $item->messageSide = 'oppositeSide';
                 }
-
-                // message seen
-                if(!$item->seen){
-                    // not seen
-                    $messageSeen = new MessageSeen;
-                    $messageSeen->chatroom_id = $chatroomId;
-                    $messageSeen->message_id = $item->id;
-                    $messageSeen->user_id = $myId;
-                    $messageSeen->save();
-                }
-                unset($item->id);
             }
+        }
+
+        foreach ($message as $item) {
+            // message seen
+            if(!$item->seen){
+                // not seen
+                $messageSeen = new MessageSeen;
+                $messageSeen->chatroom_id = $chatroomId;
+                $messageSeen->message_id = $item->id;
+                $messageSeen->user_id = $myId;
+                $messageSeen->save();
+            }
+            unset($item->id);
         }
 
         unset($chatroom->id);
 
-        // ws connection details
-        $wsConnection = env('WS_Protocol') ."://". env('WS_URL');
-        
-        return view('login.chatroom.chat')->with('wsConnection', $wsConnection)
-                                            ->with('chatroom', json_encode($chatroom))
+
+        return view('login.chatroom.chat')->with('chatroom', json_encode($chatroom))
                                             ->with('chatroomUser', json_encode($chatroomUser))
                                             ->with('message', json_encode($message));
     }
@@ -175,10 +189,12 @@ class ChatroomController extends Controller
 
         $chatroomUser = DB::select('SELECT cu.create_at as chatroomUserCreateAt, cu.update_at as chatroomUserUpdateAt, cu.side,
                                     u.unique_id, u.name, u.display_id, u.email,
-                                    u.type, u.profile, u.profile_picture, u.status, u.phone, u.DOB
-                                    FROM chatroom_user cu JOIN user u ON cu.user_id = u.id AND u.status = 1
+                                    u.type, u.profile, u.profile_picture, u.status, u.phone, u.DOB, CASE WHEN c.id is null THEN 0 ELSE 1 END as contact
+                                    FROM chatroom_user cu 
+                                    JOIN user u ON cu.user_id = u.id AND u.status = 1
+                                    LEFT JOIN contact_list c ON c.user_id = :myId AND c.contact_user_id = u.id
                                     WHERE cu.chatroom_id = :chatroomId AND cu.status = 1',
-                                    ["chatroomId" => $chatroom->id]);
+                                    ["chatroomId" => $chatroom->id, "myId" => \getMyId()]);
         unset($chatroom->id);
 
         $myUniqid = \getMyUniqid();
@@ -195,7 +211,7 @@ class ChatroomController extends Controller
         }
 
         // check is DM or Channel
-        if(is_null($chatroom['name'])){
+        if($chatroom->type == "DM"){
             if(empty($chatroom->name)){
                 foreach ($chatroomUser as $user) {
                     if($user->unique_id != $myUniqid){
@@ -215,7 +231,7 @@ class ChatroomController extends Controller
         }
     }
 
-    public function settingAddUser($unique_id){
+    public function channelAddUser($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
@@ -239,8 +255,13 @@ class ChatroomController extends Controller
             return redirect()->route('logout.login');
         }
         $input = $request->input();
+        $createMethod = $input['createMethod'];
         unset($input["_token"]);
+        unset($input["createMethod"]);
         $selectedUser = [];
+        if(count($input) == 0) {
+            return redirect()->back();
+        }
         foreach ($input as $key => $value) {
             array_push($selectedUser, $key);
         }
@@ -248,9 +269,11 @@ class ChatroomController extends Controller
                     -> whereIn('unique_id', $selectedUser)
                     -> where('status', '1')
                     -> get();
-        return view('login.chatroom.createChannel')->with('selectedUser', json_encode($user));
+        return view('login.chatroom.createChannel')->with('selectedUser', json_encode($user))
+                                                    ->with('createMethod', $createMethod);
     }
 
+    // add to DM
     public function backendAddToChat($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
@@ -268,8 +291,10 @@ class ChatroomController extends Controller
         
         if($checkChatroom){
             // already exists
-            $chatroomUniqid = Chatroom::select('unique_id')->where('id', $checkChatroom[0]->chatroom_id)->first();
-            $chatroomUniqid = $chatroomUniqid->unique_id;
+            $chatroom = Chatroom::select('unique_id')->where('id', $checkChatroom[0]->chatroom_id)->first();
+            $chatroomUniqid = $chatroom->unique_id;
+
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid]);
         }else{
             // check is it on Contact list
             app()->call('App\Http\Controllers\ContactController@checkContactExists', [$unique_id]); 
@@ -277,25 +302,29 @@ class ChatroomController extends Controller
             // create new chatroom
             $chatroom = new Chatroom;
             $chatroom->unique_id = \getUniqid();
+            $chatroom->type = "DM";
             $chatroom->save();
             
             // add user into chatroom
             $addMe = new ChatroomUser;
             $addMe->chatroom_id = $chatroom->id;
             $addMe->user_id = $myId;
+            $addMe->side = '1';
             $addMe->save();
             
             $addContactUser = new ChatroomUser;
             $addContactUser->chatroom_id = $chatroom->id;
             $addContactUser->user_id = $contactUserId;
+            $addContactUser->side = '0';
             $addContactUser->save();
             $chatroomUniqid = $chatroom->unique_id;
+
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid, 'type' => 'new']);
         }
-                
-        return redirect()->route('login.chatroom.chat', ['uniqueId'=> $chatroomUniqid]);
     }
 
-    public function backendSettingAddUser(Request $request, $unique_id){
+    // add to channel
+    public function backendChannelAddUser(Request $request, $unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
@@ -326,10 +355,27 @@ class ChatroomController extends Controller
                 $chatroomUser->chatroom_id = $chatroom->id;
                 $chatroomUser->user_id = $userId;
                 $chatroomUser->side = $mySide['side'];
-                $chatroomUser->save();    
+                $chatroomUser->save();
+
+                $chatroom->touch();
             }
         }
-        return redirect()->route('login.chatroom.setting', ['unique_id' => $unique_id]);
+        return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id, 'type' => 'new']);
+    }
+
+    public function backendSwitchType(Request $request, $unique_id){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        
+        $chatroom = $this->checkChatroomPermission($unique_id);
+        if($chatroom->type == "Channel"){
+            $chatroom->type = "Group";
+        }elseif($chatroom->type == "Group"){
+            $chatroom->type = "Channel";
+        }
+        $chatroom->save();
+        return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id]);
     }
 
     public function backendMessageSeen($unique_id){
@@ -351,7 +397,7 @@ class ChatroomController extends Controller
         }
         $input = $request->only('chatroomUniqid', 'message');
 
-        $chatroom = Chatroom::select('id')->where('unique_id', $input['chatroomUniqid'])->first();
+        $chatroom = $this->checkChatroomPermission($input['chatroomUniqid']);
         $chatroom->touch();
 
         $message = new Message;
@@ -362,21 +408,25 @@ class ChatroomController extends Controller
         $message->save();
         
         $output['messageUniqid'] = $message['unique_id'];
-        $output['messageCreateAt'] = $message['create_at']->format('Y-m-d H:i:s');
+        $output['messageUpdateAt'] = $message['update_at']->format('Y-m-d H:i:s');
         return response()->json(compact('output'));
     }
 
     public function ajaxCreateChannel(Request $request){
-        $input = $request->only('name', 'description', 'selectedUser');
-        $selectedUserUniqid = array_keys($input['selectedUser']);
-
-        $user = User::select('id', 'unique_id')->whereIn('unique_id', $selectedUserUniqid)->get()->toArray();
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        $input = $request->only('createMethod', 'name', 'description', 'selectedUser');
 
         $chatroom = new Chatroom;
         $chatroom->unique_id = \getUniqid();
         $chatroom->name = $input['name'];
         $chatroom->description = $input['description'];
+        $chatroom->type = $input['createMethod'];
         $chatroom->save();
+
+        $selectedUserUniqid = array_keys($input['selectedUser']);
+        $user = User::select('id', 'unique_id')->whereIn('unique_id', $selectedUserUniqid)->get()->toArray();
 
         foreach ($user as $item) {
             $chatroomUser = new ChatroomUser;
@@ -393,21 +443,26 @@ class ChatroomController extends Controller
         $addMe->save();
 
         $output['result'] = "true";
-        $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id]);
+        $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id, 'type' => 'new']);
         
         return response()->json(compact('output'));
     }
     public function ajaxSetting(Request $request, $mode){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
         if ($mode == 'direct') {
             $input = $request->only('uniqid', 'description');
 
-            $chatroom = Chatroom::where('unique_id', $input['uniqid'])->first();
+            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+
             $chatroom->description = $input['description'];
             $chatroom->save();
         }elseif ($mode == 'channel') {
             $input = $request->only('uniqid', 'name', 'description', 'userSide');
             
-            $chatroom = Chatroom::where('unique_id', $input['uniqid'])->first();
+            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+            
             $chatroom->name = $input['name'];
             $chatroom->description = $input['description'];
             $chatroom->save();
@@ -423,5 +478,12 @@ class ChatroomController extends Controller
         $output['redirect'] = route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id]);
         
         return response()->json(compact('output'));
+    }
+
+    public function ajaxGetChatroomList(){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        return response()->json(ChatroomController::getChatroom());
     }
 }

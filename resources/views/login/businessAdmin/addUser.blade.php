@@ -14,6 +14,17 @@
                         </div>
                         <div class="card-body ">
                             <div class="row">
+                                <label class="col-sm-2 col-form-label">User type</label>
+                                <div class="col-sm-7">
+                                    <div class="form-group bmd-form-group">
+                                        <select id="type" class="form-control">
+                                            <option value="business" selected>Staff</option>
+                                            <option value="business admin">Admin</option>
+                                          </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <label class="col-sm-2 col-form-label">Name</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
@@ -75,6 +86,7 @@
             url: "{{ route('ajax.createBusinessUser') }}",
             method: 'post',
             data: {
+                type: $('#type').val(),
                 name: $('#name').val(),
                 displayId: $('#displayId').val(),
                 email: $('#email').val(),

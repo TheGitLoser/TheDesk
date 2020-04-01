@@ -72,7 +72,7 @@
                         </p>
                     </div>
                     <div class="card-body">
-                        <table class="table" id="ajaxTable">
+                        <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
                             <tbody>
                                 <tr>
                                     <td>Loading...</td>
@@ -165,7 +165,6 @@
                 break;
             case 'business':
                 $('#discover-business').addClass("active show");
-                $('#discover-colleague').hide();
                 break;
             case 'colleague':
                 $('#discover-colleague').addClass("active show");

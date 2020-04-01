@@ -157,7 +157,7 @@
                     <div class="card-body">
                         <div class="tab-content">
                             <div class="tab-pane active" id="profile">
-                                <table class="table">
+                                <table class="table table-responsive w-100 d-block d-md-table">
                                     <tbody>
                                         <tr>
                                             <td>
@@ -260,7 +260,7 @@
                                 </table>
                             </div>
                             <div class="tab-pane" id="messages">
-                                <table class="table">
+                                <table class="table table-responsive w-100 d-block d-md-table">
                                     <tbody>
                                         <tr>
                                             <td>
@@ -316,7 +316,7 @@
                                 </table>
                             </div>
                             <div class="tab-pane" id="settings">
-                                <table class="table">
+                                <table class="table table-responsive w-100 d-block d-md-table">
                                     <tbody>
                                         <tr>
                                             <td>

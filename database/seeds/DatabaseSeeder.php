@@ -13,17 +13,16 @@ class DatabaseSeeder extends Seeder
     {
         DB::table('business_plan')->insert(
             [
-                'unique_id' => 'sjhkfrot3524se',
-                'name' => 'Business Name',
-                'status' => '1'
+                'unique_id' => '52K3J99W9JSWSWGCK',
+                'name' => 'HKPU',
+                'profile' => 'The Hong Kong Polytechnic University'
             ]
         );
 
         DB::table('business_user')->insert(
             [
                 'business_plan_id' => '1',
-                'user_id' => '2',
-                'status' => '1'
+                'user_id' => '2'
             ]
         );
 
@@ -32,34 +31,12 @@ class DatabaseSeeder extends Seeder
                 ['id' => '1', 'status_name' => 'Normal'],
                 ['id' => '2', 'status_name' => 'Pending'],
                 ['id' => '3', 'status_name' => 'Expired'],
-                ['id' => '4', 'status_name' => 'Deleted'],
-                ['id' => '5', 'status_name' => 'Message seen'],
-                ['id' => '6', 'status_name' => 'Message not seen']
+                ['id' => '4', 'status_name' => 'Deleted']
             ]
         );
 
         DB::table('user')->insert(
             [
-                [
-                    'unique_id' => 'ajkdh',
-                    'name' => 'Tommy',
-                    'display_id' => 'Tommy',
-                    'email' => 'tommy@example.com',
-                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
-                    'type' => 'indi',
-                    'phone' => '12345678',
-                    'status' => '1'
-                ],
-                [
-                    'unique_id' => 'dfghhroegdf',
-                    'name' => 'business user',
-                    'display_id' => 'Business user',
-                    'email' => 'buesinessuser@example.com',
-                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
-                    'type' => 'business admin',
-                    'phone' => '12345678',
-                    'status' => '1'
-                ],
                 [
                     'unique_id' => '1KDVJS5MU44KWWOCSO',
                     'name' => 'Admin',
@@ -67,8 +44,16 @@ class DatabaseSeeder extends Seeder
                     'email' => 'admin@example.com',
                     'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
                     'type' => 'admin',
-                    'phone' => '12345678',
-                    'status' => '1'
+                    'phone' => '12345678'
+                ],
+                [
+                    'unique_id' => '3U5GVI06RKOW8WOKC',
+                    'name' => 'PolyU admin',
+                    'display_id' => 'polyuadmin',
+                    'email' => 'polyu@example.com',
+                    'password' => '$2y$11$ZkuaFJ7rgmmSVAsn4D7XnudVhPWk9DW3I0tg0baa.KbmPlWwdBSN6',
+                    'type' => 'business admin',
+                    'phone' => '12345678'
                 ]
             ]
         );

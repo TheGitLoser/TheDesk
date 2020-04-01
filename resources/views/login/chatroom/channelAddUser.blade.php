@@ -58,7 +58,7 @@
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{ route('backend.chatroom.settingAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
+                <form action="{{ route('backend.chatroom.channelAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
                     @csrf
                     <div class="card card-stats">
                         <div class="card-header card-header-warning card-header-icon">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table class="table" id="ajaxTable">
+                            <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
                                 <tbody>
                                     <tr>
                                         <td>Loading...</td>
@@ -81,6 +81,8 @@
                         </div>
                         <div class="card-footer">
                             <div class="stats">
+                                Please add user to your contact list before adding to channel, 
+
                                 Hide
                                 <i class="far fa-minus-square info-icon"></i>
 
@@ -136,7 +138,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td>' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
+        tempHtml += '<tr><td style="width: 10%;">' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });
