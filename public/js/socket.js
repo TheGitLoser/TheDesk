@@ -2,7 +2,10 @@ $(function () {
     serviceWorkerRegistration = navigator.serviceWorker.register('/js/service-worker.js');
 
     function setupWebSocket(){
-        Socket = new WebSocket(socketUrl);
+        try {
+            Socket = new WebSocket(socketUrl);
+        } catch (error) {
+        }
 
         Socket.onopen = function (event) {
             // init connection message
@@ -28,7 +31,7 @@ $(function () {
                     }
                     break;
                 case "notiNewChatroomMessage":
-                    updateChatroomList(response, true);
+                    updateChatroomList(response, 1);
                     if (location.protocol == 'https:') {
                         pushServiceWorkerNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), false, "noti-new");
                     }else{
@@ -55,7 +58,7 @@ $(function () {
                     }
                     break;
                 case "updateUINewMessage":
-                    updateChatroomList(response, true);
+                    updateChatroomList(response, 1);
                     unseenMessage.unshift({
                         chatroomUniqid: response['chatroomUniqid'],
                         chatroomName: chatroomName,
@@ -67,8 +70,24 @@ $(function () {
                     });
                     outputNotification(unseenMessage);
                     break;
-                case "updateUINewMessage":
-                    updateChatroomList(response, true);
+                case "updateUISeenMessage":
+                    updateChatroomList(response, "seen");
+
+                    unseenMessage.forEach(element => {
+                        if(element['chatroomUniqid'] == response['chatroomUniqid']){
+
+                        }
+                    });
+                    var temp = [];
+                    unseenMessage.forEach(function(item, index, object) {
+                        if(item['chatroomUniqid'] == response['chatroomUniqid']){
+                            temp.push(index);
+                        }
+                    });
+                    temp.forEach(element => {
+                        unseenMessage.splice(element,1);
+                    });
+                    outputNotification(unseenMessage);
                     break;
                 default:
                     break;
@@ -90,15 +109,26 @@ function getChatroomURL(chatroomUniqid) {
 }
 
 
-function updateChatroomList(response, unseen) {
+function updateChatroomList(response, unseenNumber) {
     indexToBeUpdate = chatroomList.findIndex(({
         unique_id
     }) => unique_id === response['chatroomUniqid']);
-    chatroomName = chatroomList[indexToBeUpdate].name;
-    chatroomList[indexToBeUpdate].update_at = response['messageUpdateAt'];
-    if (unseen) {
-        // not current chatroom
-        chatroomList[indexToBeUpdate].unseen++;
+    chatroomName = chatroomList[indexToBeUpdate].name;  // global
+    if (typeof response['messageUpdateAt'] !== 'undefined') {
+        chatroomList[indexToBeUpdate].update_at = response['messageUpdateAt'];
+    }
+    
+    switch (unseenNumber) {
+        case false:
+            // this chatroom
+            break;
+        case "seen":
+            chatroomList[indexToBeUpdate].unseen = 0;
+            break;
+        default:
+            // not current chatroom
+            chatroomList[indexToBeUpdate].unseen += unseenNumber;
+            break;
     }
 
     // sort chatroom list by update_at desc

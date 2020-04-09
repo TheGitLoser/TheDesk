@@ -129,6 +129,24 @@ var_dump($message);
             $customUserInfo['userUniqid'] = $message->myUniqid;
             $customUserInfo['side'] = $message->mySide;
             $customUserInfo['sessionId'] = $message->id;
+
+            // update user's other page UI
+            foreach ($Server->wsClients as $id => $clientInfo) {
+                if (!isset($clientInfo[50])) {
+                    // this socket is not a user
+                    continue;
+                }
+                // this socket is a user
+                $userInfo = $clientInfo[50];
+                if($userInfo['userUniqid'] == $message->myUniqid && $id != $clientID){
+                    // same user, other than this socket
+                    $output['socketType'] = 'updateUISeenMessage';
+                    $output['chatroomUniqid'] = $message->chatroomUniqid;
+
+                    $Server->wsSend($id, json_encode($output));
+                }
+            }
+
             break;
         case 'initConnection':
             $customUserInfo = &$Server->wsClients[$clientID][50];	// & = pointer

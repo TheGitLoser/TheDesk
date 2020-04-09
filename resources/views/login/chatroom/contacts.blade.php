@@ -66,7 +66,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <table class="table table-responsive w-100 d-block d-md-table" id="ajaxTable">
+                            <table class="table w-100 d-md-table" id="ajaxTable">
                                 <tbody>
                                     <tr>
                                         <td>Loading...</td>

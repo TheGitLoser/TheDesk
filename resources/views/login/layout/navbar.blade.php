@@ -74,10 +74,10 @@
         $('#notification').html(tempHtml);
 
         if(unseenMessage.length){
-            $('#notificationCount').hide();
-        }else{
             $('#notificationCount').show();
             $('#notificationCount').html(unseenMessage.length);
+        }else{
+            $('#notificationCount').hide();
         }
 
     }

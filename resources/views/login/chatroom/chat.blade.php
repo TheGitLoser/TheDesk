@@ -46,7 +46,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                             @csrf
                             <div class="form-group">
                                 <input type="text" class="form-control col-10" id="inputMessage"
-                                    placeholder="message...">
+                                    placeholder="message..." autofocus>
                             </div>
                             {{-- </form> --}}
                         </div>
@@ -225,6 +225,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                 });
                 $(this).val('');
                 $(this).removeAttr("disabled");
+                $(this).focus();
             }
         });
     });
