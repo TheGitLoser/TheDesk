@@ -91,8 +91,8 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         myUniqid: myUniqid,
                         myName: myName,
                         mySide: mySide,
-                        currentChatroomUser: currentChatroomUser};
-
+                        currentChatroomUser: currentChatroomUser,
+                        chatroomTypingParticipate: chatroomTypingParticipate};
 </script>
 
 {{-- output message to html --}}

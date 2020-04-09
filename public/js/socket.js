@@ -102,6 +102,7 @@ $(function () {
                 case "checkSocketTypingStatus":
                     messageSend['socketType'] = "replySocketTypingStatus";
                     messageSend['updateSocketId'] = response['updateSocketId'];
+                    messageSend['chatroomTypingParticipate'] = chatroomTypingParticipate;
                     messageSend['typing'] = typingMessage.toString();
                     Socket.send(JSON.stringify(messageSend));
                     console.log(messageSend);
@@ -136,7 +137,7 @@ function updateChatroomParticipate(){
     if(chatroomTypingParticipate.length){   // no current typing
         setTimeout(function () {
             checkSocketTypingStatus();
-        }, 10000);  // 10sec
+        }, 1000);  // 10sec
     }
 }
 
@@ -144,6 +145,8 @@ function checkSocketTypingStatus(){
     messageSend['socketType'] = "checkSocketTypingStatus";
     Socket.send(JSON.stringify(messageSend));
     console.log('checkstatus');
+    // chatroomTypingParticipate = [];
+    // updateChatroomParticipate();
 }
 
 

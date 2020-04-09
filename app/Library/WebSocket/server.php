@@ -206,25 +206,35 @@ var_dump($message);
             break;
         case 'checkSocketTypingStatus':
             $output['socketType'] = 'checkSocketTypingStatus';
+            $output['chatroomUniqid'] = $message->chatroomUniqid;
+            $chatroomTypingParticipate = $message->chatroomTypingParticipate;
 
             $tempOutput = getChatroomParticipantInSocket($message->currentChatroomUser, $message->chatroomUniqid);
             $chatroomParticipantInSocketInCurrentChatroom = $tempOutput['chatroomParticipantInSocketInCurrentChatroom']; // send noti
-            
+            $tempRemove = [];
             foreach ($chatroomParticipantInSocketInCurrentChatroom as $id) {
                 $userInfo = $Server->wsClients[$id][50];
                 // if user is viewing chatroom && THIS chatroom
-                if ($userInfo['socketType'] == "initChatroom" && $userInfo['currentChatroomUniqid'] == $message->chatroomUniqid) {
+                if ($userInfo['socketType'] == "initChatroom" && $userInfo['currentChatroomUniqid'] == $output['chatroomUniqid']) {
                     if ($userInfo['userUniqid'] != $message->myUniqid) {  // != sender uniqid
                         $output['updateSocketId'] = $clientID;
                         $Server->wsSend($id, json_encode($output));     // send socket message
+                        array_push($tempRemove, $userInfo['userUniqid']);
                     }
                 }
+            }
+            $chatroomTypingParticipate = array_diff($chatroomTypingParticipate, $tempRemove);
+
+            // if other chatroom typing participate closed socket connection
+            $output['socketType'] = "stopTypingMessageInThisChatroom";
+            foreach ($chatroomTypingParticipate as $value) {
+                $output['senderUniqid'] = $value;
+                $Server->wsSend($clientID, json_encode($output));
             }
             break;
         case 'replySocketTypingStatus':
             $output['chatroomUniqid'] = $message->chatroomUniqid;
             $output['senderUniqid'] = $message->myUniqid;
-            echo "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss";
             var_dump ($message->typing);
             if($message->typing == "true"){
                 $output['socketType'] = "startTypingMessageInThisChatroom";
@@ -232,7 +242,7 @@ var_dump($message);
                 $output['socketType'] = "stopTypingMessageInThisChatroom";
             }
             $Server->wsSend($message->updateSocketId, json_encode($output));
-            var_dump($output);
+            // var_dump($output);
             break;
         case 'backend':
             var_dump($Server->wsClients);
