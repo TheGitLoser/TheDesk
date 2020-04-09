@@ -5,6 +5,7 @@ $(function () {
         try {
             Socket = new WebSocket(socketUrl);
         } catch (error) {
+            console.log(error);
         }
 
         Socket.onopen = function (event) {
@@ -16,7 +17,7 @@ $(function () {
         // when message comes form server
         Socket.onmessage = function (event) {
             response = JSON.parse(event['data']);
-            console.log(response);
+        console.log(response);
             switch (response['socketType']) {
                 case "newChatroomMessage":  // in current chatroom
                     socketNewChatroomMessage(response); // show msg
@@ -89,6 +90,22 @@ $(function () {
                     });
                     outputNotification(unseenMessage);
                     break;
+                case "startTypingMessageInThisChatroom":
+                    chatroomTypingParticipate.push(response['senderUniqid']);
+                    chatroomTypingParticipate = chatroomTypingParticipate.filter((v, i, a) => a.indexOf(v) === i); 
+                    updateChatroomParticipate();
+                    break;
+                case "stopTypingMessageInThisChatroom":
+                    chatroomTypingParticipate.pop(response['senderUniqid']);
+                    updateChatroomParticipate();
+                    break;
+                case "checkSocketTypingStatus":
+                    messageSend['socketType'] = "replySocketTypingStatus";
+                    messageSend['updateSocketId'] = response['updateSocketId'];
+                    messageSend['typing'] = typingMessage.toString();
+                    Socket.send(JSON.stringify(messageSend));
+                    console.log(messageSend);
+                    break;
                 default:
                     break;
             }
@@ -102,7 +119,33 @@ $(function () {
         }
     }
     setupWebSocket();
+
 });
+function updateChatroomParticipate(){
+    chatroomParticipate = "";
+    $.each(chatroomUser, function(i, item) {
+        if(chatroomTypingParticipate.includes(item['unique_id'])){
+            chatroomParticipate += item['name']+'(typing...), ';
+        }else if(item['currentUser']){
+        }else{
+            chatroomParticipate += item['name']+', ';
+        }
+    });
+    chatroomParticipate += 'You';
+    $("#chatroomParticipate").text(chatroomParticipate);
+    if(chatroomTypingParticipate.length){   // no current typing
+        setTimeout(function () {
+            checkSocketTypingStatus();
+        }, 10000);  // 10sec
+    }
+}
+
+function checkSocketTypingStatus(){
+    messageSend['socketType'] = "checkSocketTypingStatus";
+    Socket.send(JSON.stringify(messageSend));
+    console.log('checkstatus');
+}
+
 
 function getChatroomURL(chatroomUniqid) {
     return window.location.protocol + "//" + window.location.hostname + "/chatroom/chat/" + chatroomUniqid;
@@ -115,6 +158,7 @@ function updateChatroomList(response, unseenNumber) {
     }) => unique_id === response['chatroomUniqid']);
     chatroomName = chatroomList[indexToBeUpdate].name;  // global
     if (typeof response['messageUpdateAt'] !== 'undefined') {
+        // if != user viewing this chatroom in other tab
         chatroomList[indexToBeUpdate].update_at = response['messageUpdateAt'];
     }
     

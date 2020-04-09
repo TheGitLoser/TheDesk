@@ -145,6 +145,14 @@
                 tempHtml += '<span class="sidebar-mini user-name-icon"> ' + item.initials +' </span>';
             }
             tempHtml += '<span class="sidebar-normal">' + item.name.substring(0, 23) +' </span>';
+            if(item['typing'].length){
+                temp = "";
+                item['typing'].forEach(element => {
+                    temp += element + ", ";
+                });
+                temp = temp.substr(0, temp.length -2);
+                tempHtml += '<span class="sidebar-normal" style="padding-left: 45px;"><small>' + temp.substring(0, 23) +' is typing </small></span>';
+            }
             tempHtml += '</a></li>';
         });
         $('#chatroom').html(tempHtml);

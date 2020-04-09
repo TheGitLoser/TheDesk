@@ -19,13 +19,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                         </div>
                         <div class="card-category chatroom-info-left">
                             <h4>{{ $chatroomDetails['name'] }}</h4>
-                            @foreach ($chatroomUserDetails as $userDetails)
-                            @if ($userDetails['currentUser'] == true)
-                                You,                            
-                            @else
-                                {{ $userDetails['name'] }},
-                            @endif
-                            @endforeach
+                            <div id="chatroomParticipate"></div>
                         </div>
                         {{-- <div class="card-category chatroom-info-right" style="height: 0;">
                             {{ $chatroomDetails['description'] }}
@@ -70,6 +64,8 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
     // for socket
     var currentChatroomUser = [];
     var responseFromDB;
+    var typingMessage = false;
+    chatroomTypingParticipate = [];
 
     // for html output (process participant info in JS)
     var participantInfo = [];
@@ -86,6 +82,8 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         // for html output
         participantInfo[item['unique_id']] = item;
     });
+    updateChatroomParticipate();
+
     messageSend = {socketType: "initChatroom",
                         id: "{{ session()->getId() }}",
                         chatroomUniqid: chatroomUniqid,
@@ -183,6 +181,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         Socket.onopen = function(event){
             console.log(Socket.readyState);
             Socket.send(JSON.stringify(messageSend));
+            checkSocketTypingStatus();
             checkType();
         }
 
@@ -193,9 +192,9 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         });
         $("#message-body").animate({ scrollTop: $("#message-body")[0].scrollHeight}, 1000);
 
-        // send chatroom message
-        $('#inputMessage').on('keypress', function (e) {
+        $('#inputMessage').on('keyup', function (e) {
             if(e.which === 13){
+                // send new chatroom message
                 $(this).attr("disabled", "disabled");
                 message = $('#inputMessage').val()
                 messageSend['socketType'] = "sendMessage";
@@ -221,11 +220,29 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
 
                         console.log('messageSend to socket');
                         console.log(messageSend);
+
+                        // stop typing
+                        messageSend['socketType'] = "stopTypingMessage";
+                        Socket.send(JSON.stringify(messageSend));
+                        typingMessage = false;
                     }
                 });
+                typingMessage = false;
                 $(this).val('');
                 $(this).removeAttr("disabled");
                 $(this).focus();
+            }else{
+                if(!typingMessage){
+                    // start to typing
+                    messageSend['socketType'] = "startTypingMessage";
+                    Socket.send(JSON.stringify(messageSend));
+                    typingMessage = true;
+                }else if($(this).val().length == 0){
+                    // stop typing
+                    messageSend['socketType'] = "stopTypingMessage";
+                    Socket.send(JSON.stringify(messageSend));
+                    typingMessage = false;
+                }
             }
         });
     });

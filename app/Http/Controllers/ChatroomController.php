@@ -36,6 +36,7 @@ class ChatroomController extends Controller
             $item->initials = \initials($item->name);
             
             unset($item->chatroomName);
+            $item->typing = [];
         }
         return $myChatroom;
     }
