@@ -15,12 +15,12 @@
                                     <span class="nav-tabs-title">Search:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-user" data-toggle="tab">
+                                            <a class="nav-link" id="contact-user" data-toggle="tab">
                                                 <i class="material-icons">emoji_people</i> Bookmarked Users 
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-colleague" data-toggle="tab">
+                                            <a class="nav-link" id="contact-colleague" data-toggle="tab">
                                                 <i class="material-icons">business_center</i> Bookmarked Colleagues
                                             </a>
                                         </li>
@@ -146,14 +146,13 @@
         outputList(contactList);
         switch(searchType) {
             case 'user':
-                $('#discover-user').addClass("active show");
-                $('#discover-colleague').hide();
+                $('#contact-user').addClass("active show");
+                $('#contact-colleague').hide();
                 break;
             case 'colleague':
-                $('#discover-colleague').addClass("active show");
+                $('#contact-colleague').addClass("active show");
                 break;
             default:
-                $('#discover-indi').addClass("active show");
                 break;
         }
     });
@@ -164,7 +163,7 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        if($("#discover-user").hasClass("show")){
+        if($("#contact-user").hasClass("show")){
             searchType = 'user';
         }else{
             searchType = 'colleague';

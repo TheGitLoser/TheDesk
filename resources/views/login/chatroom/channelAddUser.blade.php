@@ -15,18 +15,13 @@
                                     <span class="nav-tabs-title">Search:</span>
                                     <ul class="nav nav-tabs" data-tabs="tabs">
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-indi" data-toggle="tab">
-                                                <i class="material-icons">emoji_people</i> Individual 
+                                            <a class="nav-link" id="contact-user" data-toggle="tab">
+                                                <i class="material-icons">emoji_people</i> Bookmarked Users 
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-business" data-toggle="tab">
-                                                <i class="material-icons">business</i> Business
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="discover-colleague" data-toggle="tab">
-                                                <i class="material-icons">business_center</i> Colleague
+                                            <a class="nav-link" id="contact-colleague" data-toggle="tab">
+                                                <i class="material-icons">business_center</i> Bookmarked Colleagues
                                             </a>
                                         </li>
                                     </ul>
@@ -149,19 +144,15 @@
     $(function() {
         outputList(contactList);
         switch(searchType) {
-            case 'indi':
-                $('#discover-indi').addClass("active show");
-                $('#discover-colleague').hide();
-                break;
-            case 'business':
-                $('#discover-business').addClass("active show");
-                $('#discover-colleague').hide();
+            case 'user':
+                $('#contact-user').addClass("active show");
+                $('#contact-colleague').hide();
                 break;
             case 'colleague':
-                $('#discover-colleague').addClass("active show");
+                $('#contact-colleague').addClass("active show");
                 break;
             default:
-                $('#discover-indi').addClass("active show");
+                break;
         }
     });
 
@@ -171,10 +162,8 @@
 @push('js')
 <script>
     $('#form').submit(function(e){
-        if($("#discover-indi").hasClass("show")){
-            searchType = 'indi';
-        }else if($("#discover-business").hasClass("show")){
-            searchType = 'business';
+        if($("#contact-user").hasClass("show")){
+            searchType = 'user';
         }else{
             searchType = 'colleague';
         }

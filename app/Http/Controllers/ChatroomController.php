@@ -14,18 +14,24 @@ class ChatroomController extends Controller
 {
     // return user's chatroom list
     private static function getChatroom(){
-        $myChatroom = DB::select('SELECT c.unique_id, c.name as chatroomName, c.type, c.update_at, u2.name as userName, 
-                                        count(msg.id) - count(msgSeen.id) as unseen
-                                    FROM chatroom c
-                                        JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
-                                        LEFT JOIN chatroom_user cu2 ON c.id = cu2.chatroom_id AND cu2.user_id <> cu.user_id AND cu2.status = 1
-                                        LEFT JOIN user u2 ON cu2.user_id = u2.id 
-                                        LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
-                                        LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
-                                            AND msg.id = msgSeen.message_id AND msgSeen.seen_status = 1 
-                                    WHERE c.status = 1 and cu.status = 1 
-                                    GROUP BY c.unique_id, c.name, c.update_at
-                                    ORDER BY c.update_at DESC',
+        $myChatroom = DB::select('SELECT chatroomList.unique_id, chatroomList.chatroomName, chatroomList.type, chatroomList.update_at, u2.name as userName, chatroomList.unseen
+                                    FROM 
+                                        (SELECT c.unique_id, c.name as chatroomName, c.type, c.update_at, count(msg.id) - count(msgSeen.id) as unseen,
+                                                                                c.id as chatroom_id, cu.user_id
+                                        FROM chatroom c
+                                            JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
+                                            LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                            LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
+                                                AND msg.id = msgSeen.message_id AND msgSeen.seen_status = 1 
+                                        WHERE c.status = 1 and cu.status = 1 
+                                        GROUP BY c.unique_id, c.name, c.update_at
+                                        ) chatroomList
+                                    
+                                    LEFT JOIN chatroom_user cu2 ON 
+                                        (CASE WHEN chatroomList.type = "DM" THEN cu2.chatroom_id = chatroomList.chatroom_id 
+                                                AND cu2.user_id <> chatroomList.user_id AND cu2.status = 1 END)
+                                    LEFT JOIN user u2 ON cu2.user_id = u2.id 
+                                    ORDER BY chatroomList.update_at DESC',
                             ['myUserId' => \getMyId()]);
         foreach ($myChatroom as $item) {
             if($item->type == "DM"){
@@ -376,7 +382,7 @@ class ChatroomController extends Controller
             $chatroom->type = "Channel";
         }
         $chatroom->save();
-        return redirect()->route('login.chatroom.chat', ['unique_id' => $unique_id]);
+        return redirect()->back();
     }
 
     public function backendMessageSeen($unique_id){
@@ -452,27 +458,41 @@ class ChatroomController extends Controller
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        if ($mode == 'direct') {
-            $input = $request->only('uniqid', 'description');
+        switch ($mode) {
+            case 'direct':
+                $input = $request->only('uniqid', 'description');
 
-            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+                $chatroom = $this->checkChatroomPermission($input['uniqid']);
 
-            $chatroom->description = $input['description'];
-            $chatroom->save();
-        }elseif ($mode == 'channel') {
-            $input = $request->only('uniqid', 'name', 'description', 'userSide');
+                $chatroom->description = $input['description'];
+                $chatroom->save();
+                break;
+            case 'channel':
+                $input = $request->only('uniqid', 'name', 'description', 'userSide');
             
-            $chatroom = $this->checkChatroomPermission($input['uniqid']);
+                $chatroom = $this->checkChatroomPermission($input['uniqid']);
+                
+                $chatroom->name = $input['name'];
+                $chatroom->description = $input['description'];
+                $chatroom->save();
+                foreach ($input['userSide'] as $key => $value) {
+                    $id = \userUniqidToId($key);
+                    $chatroomUser = ChatroomUser::where('user_id', $id)->where('chatroom_id', $chatroom->id)->first();
+                    $chatroomUser->side = $value;
+                    $chatroomUser->save();
+                }
+                break;
+            case 'group':
+                $input = $request->only('uniqid', 'name', 'description');
             
-            $chatroom->name = $input['name'];
-            $chatroom->description = $input['description'];
-            $chatroom->save();
-            foreach ($input['userSide'] as $key => $value) {
-                $id = \userUniqidToId($key);
-                $chatroomUser = ChatroomUser::where('user_id', $id)->where('chatroom_id', $chatroom->id)->first();
-                $chatroomUser->side = $value;
-                $chatroomUser->save();
-            }
+                $chatroom = $this->checkChatroomPermission($input['uniqid']);
+                
+                $chatroom->name = $input['name'];
+                $chatroom->description = $input['description'];
+                $chatroom->save();
+                break;
+            default:
+                break;
         }
         
         $output['result'] = "true";

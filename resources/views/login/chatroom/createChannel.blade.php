@@ -68,7 +68,7 @@ $selectedUser = json_decode($selectedUser, true);
                                             <div class="form-group bmd-form-group">
                                                 <div class="row" style="padding-top: 5px;">
                                                     <div class="col-2">
-                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" required>
+                                                        <input class="form-control" type="radio" name="{{$item['unique_id']}}" value="0" checked required>
                                                     </div>
                                                     <div class="col-8">
                                                         {{ $item['name'] }} @ {{ $item['display_id'] }}
