@@ -8,7 +8,7 @@
                 <div class="card card-stats">
                     <div class="card-header card-header-warning card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="material-icons">business_center</i>
                         </div>
                         <p class="card-category">
                         </p>
@@ -29,7 +29,7 @@
                                     <td>
                                         <table>
                                             @foreach ($businessPlanUser as $item)
-                                                @if ($item->type == "business admin")
+                                                @if ($item->type == "business admin" || $item->type == "admin")
                                                 <tr>
                                                     <td>{{$item->name}} <small>@ {{$item->display_id}}</small></td>
                                                 </tr>
@@ -57,11 +57,6 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                                Add to contact list
-                                <i class="material-icons info-icon">playlist_add</i>
-    
-                                Start to chat
-                                <i class="material-icons info-icon">chat</i>
                         </div>
                     </div>
                 </div>

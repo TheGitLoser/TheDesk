@@ -43,8 +43,8 @@
 <script>
     var newRequest = {!! $newRequest !!};
     
-    function getGotoChatroomButton(uniqueId){
-        newRequestButton = '{{ route('backend.request.response',['uniqueId'=> '']) }}/' + uniqueId;
+    function getGotoChatroomButton(uniqid){
+        newRequestButton = '{{ route('backend.request.response',['unique_id'=> '']) }}/' + uniqid;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + newRequestButton + '">';

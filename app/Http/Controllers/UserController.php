@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use DB;
 use App\Models\BusinessPlan;
 use App\Models\User;
+use App\Models\NewRequest;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -48,6 +49,20 @@ class UserController extends Controller
         }
         return $user;
     }
+
+    public function index()
+    {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }elseif(userTypeAccess(['indi'])){
+            $newRequest = 0;
+        }else{
+            $newRequest = NewRequest::where('business_plan_id', \getMyBusinessPlanId())->where('status', 2)->count();    // status 2 = Waiting to response
+        }
+        
+        return view('login.home')->with('newRequest', $newRequest);
+    }
+
     public function discoverUser()
     {
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
@@ -65,10 +80,50 @@ class UserController extends Controller
         return view('login.chatroom.discover')->with('output', json_encode($output))
                                               ->with('searchType', $searchType);
     }
+
+    public function profile(){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }
+        $user = User::where('id', \getMyId())->first();
+        $user->DOB = date_format(date_create($user->DOB),"Y-m-d");
+        return view('login.account.profile')->with('profile', $user);
+    }
+
+    public function editPassword(){
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+            return redirect()->route('logout.login');
+        }else{
+            return view('login.account.editPassword');
+        }
+    }
+
     public function ajaxDiscover(Request $request){
         $input = $request->only('name', 'id', 'searchType');
         
         $output = $this->getUserList($input['searchType'], $input['name'], $input['id']);
+        return response()->json(compact('output'));
+    }
+    
+    public function ajaxUpdateProfile(Request $request){
+        $input = $request->only('name', 'displayId', 'phone', 'DOB', 'profile');
+
+        $checkUserDisplayId = User::where('display_id', $input['displayId'])->where('id', '!=', \getMyId())->count();
+        if($checkUserDisplayId) {
+            $output['result'] = 'false';
+            $output['message'] = 'Your Display ID has been used';
+            return response()->json(compact('output'));
+        }
+
+        $user = User::where('id', \getMyId())->first();
+        $user->name = $input['name'];
+        $user->display_id = $input['displayId'];
+        $user->phone = $input['phone'];
+        $user->DOB = $input['DOB'];
+        $user->profile = $input['profile'];
+        $user->save();
+        $output['result'] = "true";
+        $output['redirect'] = route('login.home');
         return response()->json(compact('output'));
     }
 
@@ -89,36 +144,6 @@ class UserController extends Controller
                 $output['message'] = "Your password is incorrect";
             } 
         }
-        return response()->json(compact('output'));
-    }
-    public function profile(){
-        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
-            return redirect()->route('logout.login');
-        }
-        $user = User::where('id', \getMyId())->first();
-        $user->DOB = date_format(date_create($user->DOB),"Y-m-d");
-        return view('login.account.profile')->with('profile', $user);
-    }
-    
-    public function ajaxUpdateProfile(Request $request){
-        $input = $request->only('name', 'displayId', 'phone', 'DOB', 'profile');
-
-        $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
-        if($checkUserDisplayId) {
-            $output['result'] = 'false';
-            $output['message'] = 'Your Display ID has been used';
-            return response()->json(compact('output'));
-        }
-
-        $user = User::where('id', \getMyId())->first();
-        $user->name = $input['name'];
-        $user->display_id = $input['displayId'];
-        $user->phone = $input['phone'];
-        $user->DOB = $input['DOB'];
-        $user->profile = $input['profile'];
-        $user->save();
-        $output['result'] = "true";
-        $output['redirect'] = route('login.home');
         return response()->json(compact('output'));
     }
 }

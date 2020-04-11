@@ -26,13 +26,14 @@ class NewRequestController extends Controller
     }
 
     public function view(){
-        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
 
-        $newRequest = DB::select("SELECT u.name as requesterName, bp.name as companyName,
+        $newRequest = DB::select("SELECT u.name as requesterName, u.id as requesterId, bp.name as companyName,
                                             req.title, req.details, req.unique_id, req.status
-                                        FROM request req JOIN user u ON req.user_id = u.id AND u.status = 1
+                                        FROM request req 
+                                        JOIN user u ON req.user_id = u.id AND u.status = 1
                                         LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1
                                         LEFT JOIN business_plan bp ON bu.business_plan_id = bp.id AND bp.status = 1
                                         WHERE (req.user_id = :myId OR req.business_plan_id = :businessPlanId )
@@ -40,7 +41,13 @@ class NewRequestController extends Controller
                                         ORDER BY req.status desc, req.create_at desc
                                         ", ['myId' => \getMyId(), 'businessPlanId' => \getMyBusinessPlanId()]);
 
-
+        $myId = \getMyId();
+        foreach ($newRequest as $request) {
+            if($request->requesterId == $myId){
+                $request->requesterName .= " (You)";
+            }
+            unset($request->requesterId);
+        }
 
         return view('login.request.view')->with('newRequest', json_encode($newRequest));
     }
@@ -68,7 +75,7 @@ class NewRequestController extends Controller
             // first response
             $newRequest->status = 1;
             $newRequest->save();
-            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id, 'type' => 'new']);
+            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
         }else{
             return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
         }
@@ -80,11 +87,11 @@ class NewRequestController extends Controller
         }
         $input = $request->only('unique_id', 'title', 'details');
         $businessPlan = BusinessPlan::select('id', 'name')->where('unique_id', $input['unique_id'])->first();
-
+        
         
         $chatroom = new Chatroom;
         $chatroom->unique_id = \getUniqid();
-        $chatroom->name = $input['title'] . " @" . $businessPlan->name;
+        $chatroom->name = $input['title'] . " -" . $businessPlan->name;
         $chatroom->description = $input['details'];
         $chatroom->save();
         

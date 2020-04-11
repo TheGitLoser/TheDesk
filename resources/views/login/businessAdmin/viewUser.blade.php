@@ -49,7 +49,7 @@
                 <div class="card card-stats">
                     <div class="card-header card-header-warning card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="material-icons">store</i>
                         </div>
                         <p class="card-category">
                         </p>
@@ -83,8 +83,8 @@
 <script>
     var discoverList = {!! $output !!};
     
-    function getTableButton(uniqueId){
-        removeButton = '{{ route('login.businessAdmin.removeBusinessPlanUser',['uniqueId'=> '']) }}/' + uniqueId;
+    function getTableButton(uniqid){
+        removeButton = '{{ route('login.businessAdmin.removeBusinessPlanUser',['unique_id'=> '']) }}/' + uniqid;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + removeButton + '">';

@@ -10,12 +10,6 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function index(){
-        if (!userTypeAccess(['admin'])) {
-            return redirect()->route('logout.login');
-        }
-        return view('login.admin.home');
-    }
     public function viewBusinessPlan(){
         if (!userTypeAccess(['admin'])) {
             return redirect()->route('logout.login');
@@ -31,6 +25,13 @@ class AdminController extends Controller
             return redirect()->route('logout.login');
         }
         return view('login.admin.createBusinessPlan');
+    }
+    
+    public function addAdminUser(){
+        if (!userTypeAccess(['admin'])) {
+            return redirect()->route('logout.login');
+        }
+        return view('login.admin.addAdminUser');
     }
 
     public function viewBusinessPlanDetails($unique_id){
@@ -49,7 +50,7 @@ class AdminController extends Controller
                             ORDER BY u.type',
                             ['businessPlanId' => $businessPlan['id']]);
 
-        return view('login.admin.viweBusinessPlanDetails')->with('businessPlan', $businessPlan)->with('businessPlanUser', $businessPlanUser);
+        return view('login.admin.viewBusinessPlanDetails')->with('businessPlan', $businessPlan)->with('businessPlanUser', $businessPlanUser);
     }
 
     public function ajaxSearchBusinessPlan(Request $request){
@@ -118,6 +119,54 @@ class AdminController extends Controller
             $output['result'] = 'true';
             $output['redirect'] = route('login.admin.viewBusinessPlanDetails');
             
+            
+        }
+        return response()->json(compact('output'));
+
+    }
+
+    public function ajaxAddAdminUser(Request $request){
+        if (!userTypeAccess(['admin'])) {
+            return redirect()->route('logout.login');
+        }
+        $input = $request->only('name', 'displayId', 'email', 'password');
+
+        $checkUserEmail = User::where('email', $input['email'])->count();
+        $checkUserDisplayId = User::where('display_id', $input['displayId'])->count();
+
+        if($checkUserEmail){
+            // duplicated
+            $output['result'] = 'false';
+            $output['message'] = 'Your email has been used';
+        }elseif ($checkUserDisplayId) {
+            // duplicated
+            $output['result'] = 'false';
+            $output['message'] = 'Your Display ID has been used';
+        }else{
+            $uniqid = \getUniqid();
+            $user = new User;
+            $user->unique_id = $uniqid;
+            $user->name = $input['name'];
+            $user->display_id = $input['displayId'];  
+            $user->email = $input['email'];
+            $user->password = password_hash($input['password'], PASSWORD_DEFAULT, ['cost'=> 11]);
+            $user->type = 'admin';
+            
+            $user->save();
+
+            $businessUser = new BusinessUser;
+            $businessUser->business_plan_id = \getMyBusinessPlanId();
+            $businessUser->user_id = $user->id;
+
+            $businessUser->save();
+
+            $businessPlan = BusinessPlan::select('unique_id')
+                        -> where('id', \getMyBusinessPlanId())
+                        ->where('status', 1)
+                        ->first();
+
+            $output['result'] = 'true';
+            $output['redirect'] = route('login.admin.viewBusinessPlanDetails', ['unique_id' => $businessPlan->unique_id]);
             
         }
         return response()->json(compact('output'));

@@ -15,19 +15,13 @@
             @if (userTypeAccess(['admin']))
                 <li class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
                     <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
-                        <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
+                        <i class="fas fa-users-cog"></i>
                         <p> Admin
                             <b class="caret"></b>
                         </p>
                     </a>
                     <div class="collapse show" id="sidebarDropdownList">
                         <ul class="nav">
-                            {{-- <li class="nav-item{{ $activePage == 'adminDashboard' ? ' active' : '' }}">
-                                <a class="nav-link" href="{{ route('login.admin.dashboard') }}">
-                                    <span class="sidebar-mini"> D </span>
-                                    <span class="sidebar-normal">Dashboard</span>
-                                </a>
-                            </li> --}}
                             <li class="nav-item{{ $activePage == 'adminViewBusinessPlan' ? ' active' : '' }}">
                                 <a class="nav-link" href="{{ route('login.admin.viewBusinessPlan') }}">
                                     <span class="sidebar-mini"> B </span>
@@ -40,6 +34,12 @@
                                     <span class="sidebar-normal">Create business plan</span>
                                 </a>
                             </li>
+                            <li class="nav-item{{ $activePage == 'adminAddAdminUser' ? ' active' : '' }}">
+                                <a class="nav-link" href="{{ route('login.admin.addAdminUser') }}">
+                                    <span class="sidebar-mini"> + </span>
+                                    <span class="sidebar-normal">Add admin user</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -47,19 +47,13 @@
             @if (userTypeAccess(['business admin']))
                 <li class="nav-item {{ ($activePage == 'businessAdminDashboard' || $activePage == 'user-management') ? ' active' : '' }}">
                     <a class="nav-link" data-toggle="collapse" href="#sidebarDropdownList" aria-expanded="true">
-                        <i><img style="width:25px" src="{{ asset('material') }}/img/laravel.svg"></i>
+                        <i class="fas fa-users-cog"></i>
                         <p> Business admin
                             <b class="caret"></b>
                         </p>
                     </a>
                     <div class="collapse show" id="sidebarDropdownList">
                         <ul class="nav">
-                            {{-- <li class="nav-item{{ $activePage == 'businessAdminDashboard' ? ' active' : '' }}">
-                                <a class="nav-link" href="{{ route('login.businessAdmin.dashboard') }}">
-                                    <span class="sidebar-mini"> D </span>
-                                    <span class="sidebar-normal">Dashboard</span>
-                                </a>
-                            </li> --}}
                             <li class="nav-item{{ $activePage == 'businessAdminViewUser' ? ' active' : '' }}">
                                 <a class="nav-link" href="{{ route('login.businessAdmin.viewUser') }}">
                                     <span class="sidebar-mini"> ~ </span>
@@ -72,12 +66,6 @@
                                     <span class="sidebar-normal">Add user</span>
                                 </a>
                             </li>
-                            {{-- <li class="nav-item{{ $activePage == 'businessAdminAssignRequest' ? ' active' : '' }}">
-                                <a class="nav-link" href="{{ route('login.businessAdmin.addUser') }}">
-                                    <span class="sidebar-mini"> R </span>
-                                    <span class="sidebar-normal">Assign request</span>
-                                </a>
-                            </li> --}}
                         </ul>
                     </div>
                 </li>
@@ -85,19 +73,19 @@
 
             <li class="nav-item{{ $activePage == 'request' ? ' active' : '' }}">
                 <a class="nav-link" href="{{ route('login.request.view') }}">
-                    <i class="material-icons">dashboard</i>
+                    <i class="material-icons">question_answer</i>
                     <p>Request</p>
                 </a>
             </li>
             <li class="nav-item{{ $activePage == 'discover' ? ' active' : '' }}">
                 <a class="nav-link" href="{{ route('login.chatroom.discover') }}">
-                    <i class="material-icons">dashboard</i>
+                    <i class="fas fa-user-tie"></i>
                     <p>Discover</p>
                 </a>
             </li>
             <li class="nav-item{{ $activePage == 'contacts' ? ' active' : '' }}">
                 <a class="nav-link" href="{{ route('login.chatroom.contacts') }}">
-                    <i class="material-icons">dashboard</i>
+                    <i class="fas fa-address-book"></i>
                     <p>Contacts</p>
                 </a>
             </li>

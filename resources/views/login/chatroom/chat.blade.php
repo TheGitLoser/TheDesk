@@ -15,7 +15,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                 <div class="card card-stats">
                     <div class="card-header card-header-info card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="material-icons">chat</i>
                         </div>
                         <div class="card-category chatroom-info-left">
                             <h4>{{ $chatroomDetails['name'] }}</h4>

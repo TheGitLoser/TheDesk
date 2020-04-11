@@ -66,7 +66,7 @@
                 <div class="card card-stats">
                     <div class="card-header card-header-warning card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="fas fa-user-tie"></i>
                         </div>
                         <p class="card-category">
                         </p>
@@ -77,7 +77,6 @@
                                 <tr>
                                     <td>Loading...</td>
                                 </tr>
-
                             </tbody>
                         </table>
                     </div>
@@ -107,9 +106,9 @@
     var discoverList = {!! $output !!};
     var searchType = '{{ $searchType }}';
     
-    function getTableButton(uniqueId){
-        addContactButton = '{{ route('backend.chatroom.addContact',['uniqueId'=> '']) }}/' + uniqueId;
-        startChatButton = '{{ route('backend.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
+    function getTableButton(uniqid){
+        addContactButton = '{{ route('backend.chatroom.addContact',['unique_id'=> '']) }}/' + uniqid;
+        startChatButton = '{{ route('backend.chatroom.startChat',['unique_id'=> '']) }}/' + uniqid;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + addContactButton + '">';
@@ -125,8 +124,8 @@
         
         return output;
     }
-    function getNewRequestButton(uniqueId){
-        newRequestButton = '{{ route('login.request.new',['uniqueId'=> '']) }}/' + uniqueId;
+    function getNewRequestButton(uniqid){
+        newRequestButton = '{{ route('login.request.new',['unique_id'=> '']) }}/' + uniqid;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + newRequestButton + '">';

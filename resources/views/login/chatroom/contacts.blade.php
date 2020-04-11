@@ -58,7 +58,7 @@
                     <div class="card card-stats">
                         <div class="card-header card-header-warning card-header-icon">
                             <div class="card-icon">
-                                <i class="material-icons">content_copy</i>
+                                <i class="fas fa-address-book"></i>
                             </div>
                             <div class="card-category" style="height: 100px; overflow: auto">
                                 <button type="submit" class="btn btn-primary" name="createMethod" value="Group">Create Group</button>
@@ -101,9 +101,9 @@
     var contactList = {!! $output !!};
     var searchType = '{{ $searchType }}';
     
-    function getTableButton(uniqueId){
-        hideContactButton = '{{ route('backend.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
-        startChatButton = '{{ route('backend.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
+    function getTableButton(uniqid){
+        hideContactButton = '{{ route('backend.chatroom.hideContact',['unique_id'=> '']) }}/' + uniqid;
+        startChatButton = '{{ route('backend.chatroom.startChat',['unique_id'=> '']) }}/' + uniqid;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + hideContactButton + '">';
@@ -119,10 +119,10 @@
         
         return output;
     }
-    function getCheckBox(uniqueId){
+    function getCheckBox(uniqid){
         output = '<div class="form-check">';
         output += '<label class="form-check-label">';
-        output += '<input class="form-check-input" type="checkbox" name="' + uniqueId + '">';
+        output += '<input class="form-check-input" type="checkbox" name="' + uniqid + '">';
         output += '<span class="form-check-sign">';
         output += '<span class="check"></span>';
         output += '</span>';

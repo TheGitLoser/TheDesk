@@ -20,7 +20,7 @@ class ChatroomController extends Controller
                                                                                 c.id as chatroom_id, cu.user_id
                                         FROM chatroom c
                                             JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
-                                            LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                            LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1 AND msg.user_id != cu.user_id
                                             LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
                                                 AND msg.id = msgSeen.message_id AND msgSeen.seen_status = 1 
                                         WHERE c.status = 1 and cu.status = 1 
@@ -54,11 +54,11 @@ class ChatroomController extends Controller
     
     // call from view
     static function getUnseenMessage(){
-        $myChatroom = DB::select('SELECT c.unique_id as chatroomUniqid, c.name as chatroomName, c.type as chatroomType, u2.name as senderName, 
+        $unseenMessage = DB::select('SELECT c.unique_id as chatroomUniqid, c.name as chatroomName, c.type as chatroomType, u2.name as senderName, 
                                         msg.unique_id, msg.content as message, msg.update_at
                                 FROM chatroom c
                                     JOIN chatroom_user cu ON c.id = cu.chatroom_id AND cu.user_id = :myUserId
-                                    LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1
+                                    LEFT JOIN message msg ON msg.chatroom_id = c.id AND msg.status = 1 AND msg.user_id != cu.user_id
                                     JOIN user u2 ON msg.user_id = u2.id
                                     LEFT JOIN message_seen msgSeen ON msgSeen.chatroom_id = c.id AND msgSeen.user_id = cu.user_id 
                                         AND msg.id = msgSeen.message_id 
@@ -66,8 +66,7 @@ class ChatroomController extends Controller
                                 GROUP BY c.unique_id, c.name, c.update_at, msg.content
                                 ORDER BY msg.update_at DESC',
                                 ['myUserId' => \getMyId()]);
-// dd($myChatroom);
-        return json_encode($myChatroom);
+        return json_encode($unseenMessage);
     }
     
     private function checkChatroomPermission($chatroomUniqid){
