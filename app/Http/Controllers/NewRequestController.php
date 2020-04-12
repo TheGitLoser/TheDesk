@@ -26,7 +26,7 @@ class NewRequestController extends Controller
     }
 
     public function view(){
-        if (!userTypeAccess(['business', 'business admin', 'admin'])) {
+        if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
 
@@ -88,11 +88,17 @@ class NewRequestController extends Controller
         $input = $request->only('unique_id', 'title', 'details');
         $businessPlan = BusinessPlan::select('id', 'name')->where('unique_id', $input['unique_id'])->first();
         
-        
+        if($businessPlan->id == \getMyBusinessPlanId()){
+            $title = $input['title'];
+        }else{
+            $title = $input['title'] . " - " . $businessPlan->name;
+        }
+
         $chatroom = new Chatroom;
         $chatroom->unique_id = \getUniqid();
-        $chatroom->name = $input['title'] . " -" . $businessPlan->name;
+        $chatroom->name = $title;
         $chatroom->description = $input['details'];
+        $chatroom->type = 'Channel';
         $chatroom->save();
         
         $newRequest = new NewRequest;
@@ -100,7 +106,7 @@ class NewRequestController extends Controller
         $newRequest->chatroom_id = $chatroom->id;
         $newRequest->user_id = \getMyId();
         $newRequest->business_plan_id = $businessPlan->id;
-        $newRequest->title = $input['title'];
+        $newRequest->title = $title;
         $newRequest->details = $input['details'];
         $newRequest->save();
 

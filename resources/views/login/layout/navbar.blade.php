@@ -29,7 +29,7 @@
                         <i class="material-icons">notifications</i>
                         <span class="notification" id="notificationCount"></span>
                         <p class="d-lg-none d-md-block">
-                            Notifications
+                            new message
                         </p>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right unseenMsgNotification" aria-labelledby="navbarDropdownMenuLink" id="notification">
