@@ -25,7 +25,7 @@ Route::post('/ajax/Login', 'AuthController@ajaxLogin') -> name('ajax.login');
 Route::post('/ajax/Register', 'AuthController@ajaxRegister') -> name('ajax.register');
 
 // login pages
-Route::get('/login/account/logout', 'AuthController@logout') -> name('login.account.logout');
+Route::get('/backend/logout', 'AuthController@logout') -> name('backend.logout');
 
 // chatroom
 Route::get('/chatroom/chat/{unique_id}', 'ChatroomController@chat') -> name('login.chatroom.chat');
@@ -70,7 +70,7 @@ Route::post('/ajax/editPassword', 'UserController@ajaxEditPassword') -> name('aj
 Route::get('/businessAdmin/user', 'BusinessAdminController@viewUser') -> name('login.businessAdmin.viewUser');
 Route::get('/businessAdmin/removeBusinessPlanUser/{unique_id}', 'BusinessAdminController@removeBusinessPlanUser') -> name('login.businessAdmin.removeBusinessPlanUser');
 Route::get('/businessAdmin/addUser', 'BusinessAdminController@addUser') -> name('login.businessAdmin.addUser');
-Route::post('/ajax/createBusinessUser', 'BusinessAdminController@ajaxCreateBusinessUser') -> name('ajax.createBusinessUser');
+Route::post('/ajax/addBusinessUser', 'BusinessAdminController@ajaxAddBusinessUser') -> name('ajax.addBusinessUser');
 
 // admin
 Route::get('/admin/businessPlan', 'AdminController@viewBusinessPlan') -> name('login.admin.viewBusinessPlan');

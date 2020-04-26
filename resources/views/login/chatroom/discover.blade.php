@@ -30,8 +30,8 @@
                                             </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="discover-extact" data-toggle="tab">
-                                                <i class="material-icons">perm_identity</i> by extact name/id
+                                            <a class="nav-link" id="discover-exact" data-toggle="tab">
+                                                <i class="material-icons">perm_identity</i> by exact name/id
                                             </a>
                                         </li>
                                     </ul>
@@ -186,7 +186,7 @@
         }else if($("#discover-colleague").hasClass("show")){
             searchType = 'colleague';
         }else{
-            searchType = 'extact';
+            searchType = 'exact';
         }
         e.preventDefault();
         $.ajaxSetup({

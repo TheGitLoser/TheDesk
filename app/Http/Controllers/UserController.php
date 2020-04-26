@@ -37,7 +37,7 @@ class UserController extends Controller
                                                 ',
                 ["businessPlanId" => \getMyBusinessPlanId(), "name" => "%".$name."%", "displayId" => "%".$displayId."%", "myId" => \getMyId()]
             );
-        }else{  // extact
+        }else{  // exact
             $user = User::select('unique_id', 'name', 'display_id')
                 ->where(function($q)use($name, $displayId) {
                     $q->where('name', $name)

@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => '', 'title' => ''])
+@extends('login.layout.app', ['activePage' => '', 'title' => 'My Profile'])
 
 @section('content')
 <div class="content">

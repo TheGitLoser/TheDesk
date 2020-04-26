@@ -83,7 +83,7 @@
             }
         });
         $.ajax({
-            url: "{{ route('ajax.createBusinessUser') }}",
+            url: "{{ route('ajax.addBusinessUser') }}",
             method: 'post',
             data: {
                 type: $('#type').val(),

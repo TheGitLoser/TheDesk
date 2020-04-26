@@ -38,7 +38,7 @@ class BusinessAdminController extends Controller
 
         return back();
     }
-    public function ajaxCreateBusinessUser(Request $request){
+    public function ajaxAddBusinessUser(Request $request){
         if (!userTypeAccess(['business admin'])) {
             return redirect()->route('logout.login');
         }

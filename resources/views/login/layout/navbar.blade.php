@@ -49,7 +49,7 @@
                         <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
                         <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ route('login.account.logout') }}"> Logout</a>
+                        <a class="dropdown-item" href="{{ route('backend.logout') }}"> Logout</a>
                     </div>
                 </li>
             </ul>
