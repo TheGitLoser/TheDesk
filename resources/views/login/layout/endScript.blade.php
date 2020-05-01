@@ -49,7 +49,7 @@
 </script>
 
 {{-- Custom js --}}
-<script src="{{ asset('js/socket.js') }}?v=1" type="text/javascript"></script>
+<script src="{{ asset('js/socket.js') }}?v=1.1" type="text/javascript"></script>
 
 <!-- Material Dashboard DEMO methods, don't include it in your project! -->
 {{-- <script src="{{ asset('material') }}/demo/demo.js"></script> --}}

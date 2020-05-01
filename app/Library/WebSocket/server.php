@@ -88,7 +88,6 @@ var_dump($message);
     switch ($message->socketType) {
         case 'sendMessage':
             // $id = client's id assigned by socket
-            $output['socketType'] = 'newChatroomMessage';
             $output['chatroomUniqid'] = $message->chatroomUniqid;
             $output['chatroomType'] = $message->chatroomType;
             $output['senderUniqid'] = $message->myUniqid;
@@ -187,6 +186,7 @@ var_dump($message);
             }
         
             $chatroomParticipantUpdateUI = array_diff($chatroomParticipantInSocket, $chatroomParticipantInSocketInCurrentChatroom);    // to update ui
+
             $output['socketType'] = 'updateUINewInvitation';
             foreach ($chatroomParticipantUpdateUI as $id) {
         print_r($output);

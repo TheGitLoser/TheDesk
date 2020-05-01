@@ -55,7 +55,16 @@ $(function () {
                     }) => unique_id === response['chatroomUniqid']);
                     if (indexToBeUpdate == -1) {
                         // is new invitation
-                        getChatroomList();
+                        getChatroomList(true);  // with noti
+                    }
+                    break;
+                case "updateUINewInvitation":
+                    indexToBeUpdate = chatroomList.findIndex(({
+                        unique_id
+                    }) => unique_id === response['chatroomUniqid']);
+                    if (indexToBeUpdate == -1) {
+                        // is new invitation
+                        getChatroomList(false);     // without noti
                     }
                     break;
                 case "updateUINewMessage":

@@ -177,7 +177,6 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         $( "footer" ).remove("footer");
         $('a.navbar-brand').remove();
 
-        // check if is new chatroom
         Socket.onopen = function(event){
             console.log(Socket.readyState);
             Socket.send(JSON.stringify(messageSend));

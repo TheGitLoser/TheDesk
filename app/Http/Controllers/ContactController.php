@@ -17,7 +17,7 @@ class ContactController extends Controller
                                 FROM contact_list c JOIN user u ON c.contact_user_id = u.id AND u.status = 1
                                 LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1 
                                 WHERE c.user_id = :myUserId AND (bu.business_plan_id is null OR bu.business_plan_id != :businessPlanId)
-                                    and (u.type = 'indi' OR u.type LIKE 'business%') and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and u.name LIKE :name and u.display_id LIKE :display_id
                                     and c.status = 1",
                 ["businessPlanId" => \getMyBusinessPlanId(), 
                 'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]

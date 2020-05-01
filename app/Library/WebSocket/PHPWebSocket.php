@@ -17,7 +17,7 @@
 class PHPWebSocket
 {
 	// maximum amount of clients that can be connected at one time
-	const WS_MAX_CLIENTS = 1000;
+	const WS_MAX_CLIENTS = 10000;
 
 	// maximum amount of clients that can be connected at one time on the same IP v4 address
 	const WS_MAX_CLIENTS_PER_IP = 300;

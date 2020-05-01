@@ -21,8 +21,8 @@ Route::get('/register', 'AuthController@register') -> name('logout.register');
 Route::get('/forgotPassword', 'AuthController@forgotPassword') -> name('logout.forgotPassword');
 Route::get('/resetPassword', 'AuthController@resetPassword') -> name('logout.resetPassword');
 
-Route::post('/ajax/Login', 'AuthController@ajaxLogin') -> name('ajax.login');
-Route::post('/ajax/Register', 'AuthController@ajaxRegister') -> name('ajax.register');
+Route::post('/ajax/login', 'AuthController@ajaxLogin') -> name('ajax.login');
+Route::post('/ajax/register', 'AuthController@ajaxRegister') -> name('ajax.register');
 
 // login pages
 Route::get('/backend/logout', 'AuthController@logout') -> name('backend.logout');

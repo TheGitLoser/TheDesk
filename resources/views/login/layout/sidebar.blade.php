@@ -146,7 +146,7 @@
         $('#chatroom').html(tempHtml);
     }
 
-    function getChatroomList(){
+    function getChatroomList(noti){
         $.ajaxSetup({
             headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -158,7 +158,9 @@
             success: function(response){
                 chatroomList = response;
                 outputChatroomList(chatroomList);
-                pushNoti(chatroomList[0].name, "Start chatting with "+ chatroomList[0].name, getChatroomURL(response['chatroomUniqid']), false);
+                if(noti){
+                    pushNoti(chatroomList[0].name, "Start chatting with "+ chatroomList[0].name, getChatroomURL(response['chatroomUniqid']), false);
+                }
             }
         });
     }

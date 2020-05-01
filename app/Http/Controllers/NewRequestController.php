@@ -63,7 +63,7 @@ class NewRequestController extends Controller
                                     ->where('user_id', $myId)
                                     ->first();
 
-        // check if requester is myself and not in chat room
+        // check if requester is not myself and not in chat room
         if($newRequest->user_id != $myId && !$participant){
             $addMe = new ChatroomUser;
             $addMe->chatroom_id = $newRequest->chatroom_id;
@@ -75,10 +75,8 @@ class NewRequestController extends Controller
             // first response
             $newRequest->status = 1;
             $newRequest->save();
-            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
-        }else{
-            return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
         }
+        return redirect()->route('login.chatroom.chat', ['uniqueId'=> $newRequest->unique_id]);
     }
 
     public function ajaxNewRequest(Request $request){
