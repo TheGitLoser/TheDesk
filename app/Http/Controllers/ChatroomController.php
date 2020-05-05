@@ -381,7 +381,8 @@ class ChatroomController extends Controller
             $chatroom->type = "Channel";
         }
         $chatroom->save();
-        return redirect()->back();
+        // return redirect()->back();
+        return redirect()-> route('login.chatroom.chat', ["unique_id" => $chatroom->unique_id]);
     }
 
     public function backendMessageSeen($unique_id){

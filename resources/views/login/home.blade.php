@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row">
             @if (userTypeAccess(['admin']))
-                <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="col-lg col-md-6 col-sm-6">
                     <a href="{{ route('login.admin.viewBusinessPlan') }}">
                         <div class="card card-stats">
                             <div class="card-header card-header-warning card-header-icon">
@@ -25,7 +25,7 @@
                 </div>
             @endif
             @if (userTypeAccess(['business admin']))
-                <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="col-lg col-md-6 col-sm-6">
                     <a href="{{ route('login.businessAdmin.viewUser') }}">
                         <div class="card card-stats">
                             <div class="card-header card-header-warning card-header-icon">
@@ -44,7 +44,7 @@
                     </a>
                 </div>
             @endif
-            <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="col-lg col-md-6 col-sm-6">
                 <a href="{{ route('login.request.view') }}">
                     <div class="card card-stats">
                         <div class="card-header card-header-success card-header-icon">
@@ -66,7 +66,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="col-lg col-md-6 col-sm-6">
                 <a href="{{ route('login.chatroom.discover') }}">
                     <div class="card card-stats">
                         <div class="card-header card-header-danger card-header-icon">
@@ -84,7 +84,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="col-lg col-md-6 col-sm-6">
                 <a href="{{ route('login.chatroom.contacts') }}">
                     <div class="card card-stats">
                         <div class="card-header card-header-primary card-header-icon">

@@ -236,7 +236,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     messageSend['socketType'] = "startTypingMessage";
                     Socket.send(JSON.stringify(messageSend));
                     typingMessage = true;
-                }else if($(this).val().length == 0){
+                }else if($('#inputMessage').val().length == 0){
                     // stop typing
                     messageSend['socketType'] = "stopTypingMessage";
                     Socket.send(JSON.stringify(messageSend));
