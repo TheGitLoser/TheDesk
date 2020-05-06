@@ -33,7 +33,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
                     @csrf
                     <div class="card-body message-body" id="message-body">
                         <table class="table w-100 d-md-table">
-                            <tr><td>name</td>
+                            <tr><td>Name</td>
                                 <td>
                                     <div class="form-group">
                                         <input type="text" class="form-control" id="name" value="{{$chatroomDetails['name']}}" required>
