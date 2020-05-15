@@ -30,6 +30,8 @@ $(function () {
                             pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
                         }
                     }
+                    messageSend['socketType'] = "initChatroom";
+                    Socket.send(JSON.stringify(messageSend));
                     break;
                 case "notiNewChatroomMessage":
                     updateChatroomList(response, 1);
