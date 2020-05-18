@@ -19,4 +19,4 @@
 <link href="{{ asset('css/styles.css') }}" rel="stylesheet" type="text/css" >
 
 <!-- CSS Just for demo purpose, don't include it in your project -->
-<link href="{{ asset('material') }}/demo/demo.css" rel="stylesheet" />
+{{-- <link href="{{ asset('material') }}/demo/demo.css" rel="stylesheet" /> --}}

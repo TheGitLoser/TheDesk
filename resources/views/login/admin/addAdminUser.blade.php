@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => '', 'title' => 'Edit Password'])
+@extends('login.layout.app', ['activePage' => 'adminAddAdminUser', 'title' => 'Add admin account'])
 
 @section('content')
 <div class="content">
@@ -9,40 +9,46 @@
                     @csrf
                     <div class="card">
                         <div class="card-header card-header-primary">
-                            <h4 class="card-title">Change password</h4>
-                            <p class="card-category">Password</p>
+                            <h4 class="card-title">New admin account</h4>
+                            <p class="card-category"></p>
                         </div>
                         <div class="card-body ">
                             <div class="row">
-                                <label class="col-sm-2 col-form-label" for="input-current-password">Current
-                                    Password</label>
+                                <label class="col-sm-2 col-form-label">Name</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="password" id="currentPassword" placeholder="Current Password" required>
+                                        <input class="form-control" type="text" id="name" placeholder="Name" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-sm-2 col-form-label" for="input-password">New Password</label>
+                                <label class="col-sm-2 col-form-label">Display ID</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="password" id="newPassword" placeholder="New Password" required>
+                                        <input class="form-control" type="text" id="displayId" placeholder="Display ID" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-sm-2 col-form-label" for="input-password-confirmation">Confirm New
-                                    Password</label>
+                                <label class="col-sm-2 col-form-label">Email</label>
                                 <div class="col-sm-7">
                                     <div class="form-group bmd-form-group">
-                                        <input class="form-control" type="password" id="passwordConfirmation" placeholder="Confirm New Password" required>
+                                        <input class="form-control" type="email" id="email" placeholder="Email" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-sm-2 col-form-label">Password</label>
+                                <div class="col-sm-7">
+                                    <div class="form-group bmd-form-group">
+                                        <input class="form-control" type="password" id="password" placeholder="Password" required>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="text-center mx-auto text-danger font-weight-bold" id="errorMsg"></div>
                         <div class="card-footer ml-auto mr-auto">
-                            <button type="submit" class="btn btn-primary">Change password</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
                         </div>
                     </div>
                 </form>
@@ -66,12 +72,13 @@
             }
         });
         $.ajax({
-            url: "{{ route('ajax.editPassword') }}",
+            url: "{{ route('ajax.addAdminUser') }}",
             method: 'post',
             data: {
-                currentPassword: $('#currentPassword').val(),
-                newPassword: $('#newPassword').val(),
-                passwordConfirmation: $('#passwordConfirmation').val()
+                name: $('#name').val(),
+                displayId: $('#displayId').val(),
+                email: $('#email').val(),
+                password: $('#password').val()
             },
             success: function(response){
                 if (response['output']['result'] == 'true') {

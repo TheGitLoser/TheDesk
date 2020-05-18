@@ -1,4 +1,4 @@
-@extends('login.layout.app', ['activePage' => 'contacts', 'title' => 'My contacts'])
+@extends('login.layout.app', ['activePage' => '', 'title' => 'Add user', 'currentChatroom' => $chatroomUniqid])
 
 @section('content')
 <div class="content">
@@ -53,16 +53,15 @@
 
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-                <form action="{{ route('login.chatroom.createChannel') }}" method="POST">
+                <form action="{{ route('backend.chatroom.channelAddUser', ['unique_id' => $chatroomUniqid]) }}" method="POST">
                     @csrf
                     <div class="card card-stats">
                         <div class="card-header card-header-warning card-header-icon">
                             <div class="card-icon">
-                                <i class="fas fa-address-book"></i>
+                                <i class="material-icons">content_copy</i>
                             </div>
-                            <div class="card-category" style="height: 100px; overflow: auto">
-                                <button type="submit" class="btn btn-primary" name="createMethod" value="Group">Create Group</button>
-                                <button type="submit" class="btn btn-primary" name="createMethod" value="Channel">Create Channel</button>
+                            <div class="card-category" style="height: 0;">
+                                <button type="submit" class="btn btn-primary">Add User</button>
                             </div>
                         </div>
                         <div class="card-body">
@@ -101,9 +100,9 @@
     var contactList = {!! $output !!};
     var searchType = '{{ $searchType }}';
     
-    function getTableButton(uniqid){
-        hideContactButton = '{{ route('backend.chatroom.hideContact',['unique_id'=> '']) }}/' + uniqid;
-        startChatButton = '{{ route('backend.chatroom.startChat',['unique_id'=> '']) }}/' + uniqid;
+    function getTableButton(uniqueId){
+        hideContactButton = '{{ route('backend.chatroom.hideContact',['uniqueId'=> '']) }}/' + uniqueId;
+        startChatButton = '{{ route('backend.chatroom.startChat',['uniqueId'=> '']) }}/' + uniqueId;
 
         output = '<td class="td-actions text-right td-button">';
         output += '<a href="' + hideContactButton + '">';
@@ -119,10 +118,10 @@
         
         return output;
     }
-    function getCheckBox(uniqid){
+    function getCheckBox(uniqueId){
         output = '<div class="form-check">';
         output += '<label class="form-check-label">';
-        output += '<input class="form-check-input" type="checkbox" name="' + uniqid + '">';
+        output += '<input class="form-check-input" type="checkbox" name="' + uniqueId + '">';
         output += '<span class="form-check-sign">';
         output += '<span class="check"></span>';
         output += '</span>';
@@ -134,7 +133,7 @@
         tempHtml = '';
         tempHtml = '<tbody>';
         $.each(contactList, function(i, item) {
-        tempHtml += '<tr><td style="width: 10%;">' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small></td>'
+        tempHtml += '<tr><td style="width: 10%;">' + getCheckBox(item.unique_id) + '</td><td>' + item.name + ' <small>@' + item.display_id + '</small><td>'
                     + getTableButton(item.unique_id)
                     + '</tr>';
         });

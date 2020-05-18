@@ -9,19 +9,39 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    private function getContact(){
+    public function getContact($searchType, $name, $displayId){
         $myUserId = getMyId();
-        $result = DB::select('SELECT u.unique_id, u.name, u.display_id 
-                            FROM contact_list c JOIN user u ON c.contact_user_id = u.id
-                            WHERE c.user_id = :myUserId 
-                                and c.status = 1 and u.status = 1',
-                        ['myUserId' => $myUserId]);
+        if ($searchType == 'user'){
+            $result = DB::select(
+                "SELECT u.unique_id, u.name, u.display_id ,bu.user_id, u.id
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id AND u.status = 1
+                                LEFT JOIN business_user bu ON u.id = bu.user_id AND bu.status = 1 
+                                WHERE c.user_id = :myUserId AND (bu.business_plan_id is null OR bu.business_plan_id != :businessPlanId)
+                                    and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and c.status = 1",
+                ["businessPlanId" => \getMyBusinessPlanId(), 
+                'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
+            );
+        }else{  // colleague
+            $result = DB::select(
+                "SELECT u.unique_id, u.name, u.display_id 
+                                FROM contact_list c JOIN user u ON c.contact_user_id = u.id
+                                JOIN business_user bu ON u.id = bu.user_id
+                                WHERE c.user_id = :myUserId 
+                                    AND bu.business_plan_id = :businessPlanId
+                                    and u.name LIKE :name and u.display_id LIKE :display_id
+                                    and c.status = 1 and u.status = 1",
+                ["businessPlanId" => \getMyBusinessPlanId(), 
+                'myUserId' => $myUserId, 'name' => "%{$name}%", 'display_id' => "%{$displayId}%"]
+            );
+
+        }
         return $result;
     }
     // shared form this@addContact & Chatroom@addToChat
     function checkContactExists($unique_id){
         $myId = getMyId();
-        $contactUserId = uniqueIdToId($unique_id);
+        $contactUserId = \userUniqidToId($unique_id);
         $contact = Contact::where('user_id', $myId) 
                             ->where('contact_user_id', $contactUserId)
                             ->get();
@@ -45,27 +65,33 @@ class ContactController extends Controller
             return redirect()->route('logout.login');
         }
         
-        $output = $this->getContact();
+        if (session('user.auth') == 'indi') {
+            $searchType = 'user';
+        }else{
+            $searchType = 'colleague';
+        }
 
-        return view('login.chatroom.contacts')->with('output', json_encode($output));
+        $output = $this->getContact($searchType, '', '');
+        return view('login.chatroom.contacts')->with('output', json_encode($output))
+                                                ->with('searchType', $searchType);
     }
     
-    public function addContact($unique_id){
+    public function backendAddContact($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
-        ContactController::checkContactExists($unique_id);
+        $this->checkContactExists($unique_id);
         
         return redirect()->route('login.chatroom.contacts');
     }
 
-    public function hideContact($unique_id){
+    public function backendHideContact($unique_id){
         if (!userTypeAccess(['indi', 'business', 'business admin', 'admin'])) {
             return redirect()->route('logout.login');
         }
 
         $myId = getMyId();
-        $contactUserId = uniqueIdToId($unique_id);
+        $contactUserId = \userUniqidToId($unique_id);
         $contact = Contact::where('user_id', $myId) 
                             ->where('contact_user_id', $contactUserId)
                             ->first();
@@ -74,5 +100,10 @@ class ContactController extends Controller
         
         return back();
     }
-    
+    public function ajaxSearchContact(Request $request){
+        $input = $request->only('name', 'id', 'searchType');
+        
+        $output = $this->getContact($input['searchType'], $input['name'], $input['id']);
+        return response()->json(compact('output'));
+    }
 }

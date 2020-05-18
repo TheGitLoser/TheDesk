@@ -42,6 +42,16 @@
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">
+                                            <i class="material-icons">face</i>
+                                        </span>
+                                    </div>
+                                    <input type="text" name="name" id="displayId" class="form-control" placeholder="Display ID..." required>
+                                </div>
+                            </div>
+                            <div class="bmd-form-group mt-3">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
                                             <i class="material-icons">email</i>
                                         </span>
                                     </div>
@@ -135,6 +145,7 @@
             method: 'post',
             data: {
                 name: $('#name').val(),
+                displayId: $('#displayId').val(),
                 email: $('#email').val(),
                 password: $('#password').val(),
                 passwordConfirmation: $('#passwordConfirmation').val(),

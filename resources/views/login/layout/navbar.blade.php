@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
     <div class="container-fluid">
         <div class="navbar-wrapper">
-            <a class="navbar-brand" href="#">{{ $title }}</a>
+            <a class="navbar-brand" href="/" id="pageTitle">{{ $title }}</a>
         </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -27,18 +27,14 @@
                     <a class="nav-link" href="" id="navbarDropdownMenuLink" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <i class="material-icons">notifications</i>
-                        <span class="notification"></span>
+                        <span class="notification" id="notificationCount"></span>
                         <p class="d-lg-none d-md-block">
-                            Notifications
+                            new message
                         </p>
                     </a>
-                    {{-- <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">{{ __('Mike John responded to your email') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('You have 5 new tasks') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('You\'re now friend with Andrew') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('Another Notification') }}</a>
-                        <a class="dropdown-item" href="#">{{ __('Another One') }}</a>
-                    </div> --}}
+                    <div class="dropdown-menu dropdown-menu-right unseenMsgNotification" aria-labelledby="navbarDropdownMenuLink" id="notification">
+                        {{-- <a class="dropdown-item" href="#">{{ __('Another One') }}</a> --}}
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown"
@@ -49,13 +45,45 @@
                         </p>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                        {{-- <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
-                        <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a> --}}
+                        <div class="dropdown-item">Hi, @php echo session("user.info.name"); @endphp</div>
+                        <a class="dropdown-item" href="{{ route('login.account.profile') }}"> Profile</a>
+                        <a class="dropdown-item" href="{{ route('login.account.editPassword') }}"> Change Password</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{ route('login.account.logout') }}"> Logout</a>
+                        <a class="dropdown-item" href="{{ route('backend.logout') }}"> Logout</a>
                     </div>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+
+@push('js')
+<script>
+    var unseenMessage = {!! App\Http\Controllers\ChatroomController::getUnseenMessage() !!};
+    function outputNotification(unseenMessage){
+        tempHtml = "";
+        $.each(unseenMessage, function(i, item) {
+            var link = '{{ route('login.chatroom.chat',['unique_id'=> '']) }}/' + item.chatroomUniqid;
+            if(item.chatroomType == "DM" ){
+                tempMessage = item.senderName + ':  ' + item.message;
+            }else{
+                tempMessage = item.senderName + ' (' + item.chatroomName + '):<br>' + item.message;
+            }
+            tempHtml += '<a class="dropdown-item" href="' + link +'">' + tempMessage + "</a>";
+        });
+        $('#notification').html(tempHtml);
+
+        if(unseenMessage.length){
+            $('#notificationCount').show();
+            $('#notificationCount').html(unseenMessage.length);
+        }else{
+            $('#notificationCount').hide();
+        }
+
+    }
+
+    $(function(){
+        outputNotification(unseenMessage);
+    });
+</script>
+@endpush

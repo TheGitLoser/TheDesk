@@ -1,5 +1,52 @@
+table{
+    overflow: auto;
+}
+
+/*-------------------------
+:: Scrollbar
+-------------------------- */
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.unseenMsgNotification{
+    overflow: auto;
+    max-height: 500px;
+    max-width: 300px;
+}
+
 .sidebar-search-input {
-    width: 150px !important;
+    width: 200px !important;
+}
+
+.sidebar-noti {
+    top: 2px;
+    border: 1px solid #FFF;
+    font-size: 10px;
+    background: #f44336;
+    color: #FFFFFF;
+    padding: 0px 5px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 19px; 
+    display: block;
 }
 
 .td-icon {

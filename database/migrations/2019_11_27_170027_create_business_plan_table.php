@@ -16,7 +16,7 @@ class CreateBusinessPlanTable extends Migration
         Schema::create('business_plan', function (Blueprint $table) {
             $table->increments('id');
             $table->string('unique_id', 50);
-            $table->string('company_name', 50);
+            $table->string('name', 50);
             $table->mediumText('profile')->nullable();
             $table->string('profile_picture', 500)->nullable();  //URL
 

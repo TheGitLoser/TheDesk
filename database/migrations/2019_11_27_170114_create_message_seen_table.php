@@ -18,7 +18,7 @@ class CreateMessageSeenTable extends Migration
             $table->integer('chatroom_id');
             $table->integer('message_id');
             $table->integer('user_id');
-            $table->string('seen_status', 2)->default('6');
+            $table->string('seen_status', 2)->default('1');
 
             $table->timestamp('create_at')->default(\DB::raw('CURRENT_TIMESTAMP'));
         });
