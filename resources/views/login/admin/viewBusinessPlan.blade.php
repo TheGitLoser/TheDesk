@@ -62,8 +62,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                            Remove user account
-                            <i class="far fa-trash-alt"></i>
+                            
                         </div>
                     </div>
                 </div>
