@@ -30,7 +30,7 @@ $(function () {
                             pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
                         }
                     }
-                    messageSend['socketType'] = "initChatroom";
+                    messageSend['socketType'] = "initChatroom";     // update other tab's UI
                     Socket.send(JSON.stringify(messageSend));
                     break;
                 case "notiNewChatroomMessage":
@@ -100,7 +100,6 @@ $(function () {
                         unseenMessage.splice(element,1);
                     });
                     outputNotification(unseenMessage);
-                    homePageOutputList(unseenMessage);
                     break;
                 case "startTypingMessageInThisChatroom":
                     chatroomTypingParticipate.push(response['senderUniqid']);
