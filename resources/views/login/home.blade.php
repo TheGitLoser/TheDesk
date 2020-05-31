@@ -147,7 +147,7 @@
         
         return output;
     }
-    function outputList(unseenMessage){
+    function homePageOutputList(unseenMessage){
         tempHtml = '';
         
         $.each(unseenMessage, function(i, item){
@@ -166,7 +166,7 @@
         $('#ajaxTable').html(tempHtml);
     }
     $(function(){
-        outputList(unseenMessage);
+        homePageOutputList(unseenMessage);
     });
 </script>
 @endpush
