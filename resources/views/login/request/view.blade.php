@@ -26,7 +26,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="stats">
-                            Goto response
+                            Goto chat room
                             <i class="material-icons info-icon">reply</i>
                         </div>
                     </div>

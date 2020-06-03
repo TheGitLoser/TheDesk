@@ -80,6 +80,7 @@
             $('#notificationCount').hide();
         }
 
+        homePageOutputList(unseenMessage);
     }
 
     $(function(){

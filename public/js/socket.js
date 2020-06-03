@@ -30,7 +30,7 @@ $(function () {
                             pushNoti(chatroomName, response['message'], getChatroomURL(response['chatroomUniqid']), true);
                         }
                     }
-                    messageSend['socketType'] = "initChatroom";
+                    messageSend['socketType'] = "initChatroom";     // update other tab's UI
                     Socket.send(JSON.stringify(messageSend));
                     break;
                 case "notiNewChatroomMessage":
@@ -197,6 +197,7 @@ function updateChatroomList(response, unseenNumber) {
 
 function pushServiceWorkerNoti(title, body, url, current, type) {
     console.log('showNoti');
+    Notification.requestPermission();
     if ('serviceWorker' in navigator) {
         serviceWorkerRegistration.then(function (registration) {
                 console.log("Service Worker Registered");

@@ -202,7 +202,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
             }
         });
         $.ajax({
-            @if ($chatroomDetails['type'] == 'channel')
+            @if ($chatroomDetails['type'] == 'Channel')
                 url: "{{ route('ajax.chatroom.setting', ['mode'=>'channel']) }}",
             @else
                 url: "{{ route('ajax.chatroom.setting', ['mode'=>'group']) }}",

@@ -173,7 +173,7 @@ $chatroomUserDetails = json_decode($chatroomUser, true);
         // style adjust
         $("#pageTitle").hide();    
 
-        $('.message-body').height($(window).height() * 0.65);
+        $('.message-body').height($(window).height() * 0.6);
         $( "footer" ).remove("footer");
         $('a.navbar-brand').remove();
 
