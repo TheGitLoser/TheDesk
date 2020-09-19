@@ -10,4 +10,4 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-app/Library/WebSocket/server.php
+app/Library/WebSocket/config.php
